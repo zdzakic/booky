@@ -1,9 +1,12 @@
 from rest_framework import generics
 from .models import ServiceType, TimeSlot, Reservation
-from .serializers import ServiceTypeSerializer, TimeSlotSerializer, ReservationSerializer
+from .serializers import ServiceTypeSerializer, TimeSlotSerializer, ReservationSerializer, ReservationListSerializer
 from datetime import datetime
 from django.db.models import Exists, OuterRef
 from rest_framework.exceptions import ValidationError
+from django.utils.dateparse import parse_date
+from rest_framework.response import Response
+from datetime import timedelta
 
 # Pregled svih usluga
 class ServiceTypeListAPIView(generics.ListAPIView):
@@ -15,18 +18,80 @@ class TimeSlotListAPIView(generics.ListAPIView):
     serializer_class = TimeSlotSerializer
 
     def get_queryset(self):
+        queryset = TimeSlot.objects.filter(is_available=True)
+
         date_str = self.request.query_params.get('date')
-        if not date_str:
-            raise ValidationError({"date": "Date query parameter is required. Use format YYYY-MM-DD."})
+        if date_str:
+            parsed_date = parse_date(date_str)
+            if parsed_date:
+                queryset = queryset.filter(date=parsed_date)
 
-        try:
-            date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        except ValueError:
-            raise ValidationError({"date": "Invalid date format. Use YYYY-MM-DD."})
-
-        return TimeSlot.objects.filter(date=date, is_available=True)
+        return queryset
 
 # Slanje rezervacije
 class ReservationCreateAPIView(generics.CreateAPIView):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+
+
+class ReservationListAPIView(generics.ListAPIView):
+    """
+    Lists all reservations (for admin use).
+    """
+    queryset = Reservation.objects.select_related('timeslot', 'service').order_by('-timeslot__date', '-timeslot__start_time')
+    serializer_class = ReservationListSerializer
+
+
+class AvailableSlotsAPIView(generics.ListAPIView):
+    """
+    Returns available slots for a given service and date, considering service duration.
+    """
+
+    def get(self, request):
+        service_id = request.GET.get('service')
+        date_str = request.GET.get('date')
+
+        if not service_id or not date_str:
+            return Response({"error": "Missing 'service' or 'date' parameter."}, status=400)
+
+        try:
+            service = ServiceType.objects.get(pk=service_id)
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except (ServiceType.DoesNotExist, ValueError):
+            return Response({"error": "Invalid service or date."}, status=400)
+
+        required_slots = service.duration_minutes // 30
+
+        # 🔍 Filtriramo samo slobodne i nerezervisane slotove
+        slots = TimeSlot.objects.annotate(
+            is_reserved=Exists(
+                Reservation.objects.filter(timeslot=OuterRef('pk'))
+            )
+        ).filter(
+            date=date_obj,
+            is_available=True,
+            is_reserved=False
+        ).order_by('start_time')
+
+        result = []
+        slot_list = list(slots)
+
+        for i in range(len(slot_list) - required_slots + 1):
+            sequence = slot_list[i:i + required_slots]
+
+            # Provjera uzastopnosti
+            valid_sequence = True
+            for j in range(1, len(sequence)):
+                prev = datetime.combine(date_obj, sequence[j - 1].start_time)
+                curr = datetime.combine(date_obj, sequence[j].start_time)
+                if (curr - prev).seconds != 30 * 60:
+                    valid_sequence = False
+                    break
+
+            if valid_sequence:
+                result.append({
+                    "start_time": sequence[0].start_time.strftime("%H:%M"),
+                    "end_time": (datetime.combine(date_obj, sequence[-1].start_time) + timedelta(minutes=30)).time().strftime("%H:%M"),
+                })
+
+        return Response(result)

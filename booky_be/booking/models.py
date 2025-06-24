@@ -10,7 +10,7 @@ class ServiceType(models.Model):
 class TimeSlot(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
-    service = models.ForeignKey(ServiceType, on_delete=models.CASCADE)
+    # service = models.ForeignKey(ServiceType, on_delete=models.CASCADE)
     is_available = models.BooleanField(default=True)
 
     def __str__(self):
