@@ -1,20 +1,21 @@
 from rest_framework import generics
 from .models import ServiceType, TimeSlot, Reservation
-from .serializers import ServiceTypeSerializer, TimeSlotSerializer, ReservationSerializer, ReservationListSerializer
+from .serializers import ServiceTypeSerializer, TimeSlotSerializer, ReservationListSerializer,ReservationSerializer
 from datetime import datetime
 from django.db.models import Exists, OuterRef
-from rest_framework.exceptions import ValidationError
 from django.utils.dateparse import parse_date
 from rest_framework.response import Response
+from rest_framework import status
 from datetime import timedelta
+from rest_framework.generics import ListAPIView,CreateAPIView
 
 # Pregled svih usluga
-class ServiceTypeListAPIView(generics.ListAPIView):
+class ServiceTypeListAPIView(ListAPIView):
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
 
 # Pregled dostupnih termina po datumu (kasnije možemo filtrirati po datumu)
-class TimeSlotListAPIView(generics.ListAPIView):
+class TimeSlotListAPIView(ListAPIView):
     serializer_class = TimeSlotSerializer
 
     def get_queryset(self):
@@ -28,13 +29,8 @@ class TimeSlotListAPIView(generics.ListAPIView):
 
         return queryset
 
-# Slanje rezervacije
-class ReservationCreateAPIView(generics.CreateAPIView):
-    queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
 
-
-class ReservationListAPIView(generics.ListAPIView):
+class ReservationListAPIView(ListAPIView):
     """
     Lists all reservations (for admin use).
     """
@@ -42,7 +38,7 @@ class ReservationListAPIView(generics.ListAPIView):
     serializer_class = ReservationListSerializer
 
 
-class AvailableSlotsAPIView(generics.ListAPIView):
+class AvailableSlotsAPIView(ListAPIView):
     """
     Returns available slots for a given service and date, considering service duration.
     """
@@ -95,3 +91,16 @@ class AvailableSlotsAPIView(generics.ListAPIView):
                 })
 
         return Response(result)
+
+
+class ReservationCreateAPIView(CreateAPIView):
+    """
+    Handles creation of reservations via POST request.
+    Expects service name, customer info, and selected date/time.
+    """
+    def post(self, request):
+        serializer = ReservationSerializer(data=request.data)
+        if serializer.is_valid():
+            reservation = serializer.save()
+            return Response({"message": "Reservation erfolgreich erstellt."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -20,17 +20,6 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         model = TimeSlot
         fields = '__all__'
 
-class ReservationCreateAPIView(APIView):
-    """
-    Handles creation of reservations via POST request.
-    Expects service name, customer info, and selected date/time.
-    """
-    def post(self, request):
-        serializer = ReservationSerializer(data=request.data)
-        if serializer.is_valid():
-            reservation = serializer.save()
-            return Response({"message": "Reservation erfolgreich erstellt."}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -77,11 +66,6 @@ class ReservationSerializer(serializers.ModelSerializer):
             is_available=True
         ).order_by('start_time'))
 
-        print("=== DEBUG INFO ===")
-        print("Requested date:", date)
-        print("Requested start time:", start_time)
-        print("Required slots:", required_slots)
-        print("Slot times needed:", slot_times)
 
         all_slots = TimeSlot.objects.filter(date=date).order_by('start_time')
         print("All slots on that date:")
@@ -104,9 +88,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         )
 
         return reservation
-
-
-# booking/serializers.py
 
 class ReservationListSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name', read_only=True)
