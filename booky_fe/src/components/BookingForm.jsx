@@ -10,6 +10,13 @@ import CheckboxField from './CheckboxField';
 import DatePickerComponent from './DatePickerComponent';
 import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
+import {
+  validateFullName,
+  validatePhone,
+  validateEmail,
+  validateLicensePlate,
+  validateAllInputs
+} from '../util/validators';
 
 const serviceOptions = [
   { value: '1', label: 'Reifenwechsel' },
@@ -29,6 +36,7 @@ export default function BookingForm() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -65,6 +73,14 @@ export default function BookingForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 1) Validate full name
+    const nameError = validateFullName(formData.fullName);
+    if (nameError) {
+      setErrors({ fullName: nameError });
+      return;
+    }
+
     if (!selectedDate || !selectedTime) {
       alert('Bitte wählen Sie ein Datum und eine Uhrzeit.');
       return;
@@ -103,6 +119,7 @@ export default function BookingForm() {
             placeholder="Vollständiger Name"
             required
           />
+        
           <InputField
             type="tel"
             name="phone"
