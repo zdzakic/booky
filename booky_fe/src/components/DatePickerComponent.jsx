@@ -7,11 +7,8 @@ import { DayPicker } from 'react-day-picker';
 import { CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { HOLIDAYS } from '../util/constants';
 
-const HOLIDAYS = [
-  new Date(2025, 6, 4),   // July 4, 2025
-  new Date(2025, 11, 25), // Dec 25, 2025
-];
 
 export default function DatePickerComponent({ selectedDate, setSelectedDate }) {
   const disabledDays = [

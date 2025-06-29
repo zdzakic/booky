@@ -1,5 +1,6 @@
 // BookingForm.jsx
 import React, { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import axios from '../util/axios';
@@ -8,6 +9,7 @@ import ServiceSelect from './ServiceSelect';
 import CheckboxField from './CheckboxField';
 import DatePickerComponent from './DatePickerComponent';
 import TimeSlots from './TimeSlots';
+import SubmitButton from './SubmitButton';
 
 const serviceOptions = [
   { value: '1', label: 'Reifenwechsel' },
@@ -141,20 +143,23 @@ export default function BookingForm() {
             setSelectedDate={setSelectedDate}
           />
           {selectedDate && (
-            <TimeSlots
-              slots={availableSlots}
-              loading={isLoadingSlots}
-              selectedTime={selectedTime}
-              setSelectedTime={setSelectedTime}
-            />
-          )}
-          <button
-            type="submit"
-            disabled={!formData.service || !selectedDate || !selectedTime}
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Termin anfragen
-          </button>
+           isLoadingSlots
+             ? (
+               <div className="flex justify-center py-4">
+                 <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+               </div>
+             ) : (
+               <TimeSlots
+                 slots={availableSlots}
+                 loading={isLoadingSlots}
+                 selectedTime={selectedTime}
+                 setSelectedTime={setSelectedTime}
+               />
+             )
+         )}
+          <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime}>
+          Termin anfragen
+          </SubmitButton>
         </form>
       </div>
     </div>
