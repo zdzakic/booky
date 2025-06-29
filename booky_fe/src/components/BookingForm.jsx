@@ -1,6 +1,7 @@
 // BookingForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import axios from '../util/axios';
 import InputField from './InputField';
 import ServiceSelect from './ServiceSelect';
@@ -43,7 +44,7 @@ export default function BookingForm() {
       setAvailableSlots([]);
       setSelectedTime(null);
       try {
-        const dateStr = selectedDate.toISOString().slice(0, 10); // YYYY-MM-DD
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
         const resp = await axios.get(
           `available-slots/?date=${dateStr}&service=${formData.service}`
         );
@@ -74,8 +75,8 @@ export default function BookingForm() {
         license_plate: formData.licensePlate,
         service: parseInt(formData.service, 10),
         is_stored: formData.isStored,
-        date: selectedDate.toISOString().slice(0,10),
-        start_time: selectedTime,
+        date: format(selectedDate, 'yyyy-MM-dd'), 
+        start_time: `${selectedTime}:00`,
       };
       const resp = await axios.post('reservations/', payload);
       if (resp.status === 201) navigate('/success');
