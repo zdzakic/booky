@@ -137,3 +137,41 @@ class AvailableSlotsTest(APITestCase):
         response = self.client.get(url)
         # Provjeravamo da sada "08:00" više NIJE među dostupnim slotovima (ako capacity=1)
         self.assertFalse(any(slot["start_time"] == "08:00" for slot in response.data))
+
+
+
+class ReservationCapacityTest(APITestCase):
+    def setUp(self):
+        self.service = ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
+        self.slot = TimeSlot.objects.create(
+            date=date(2025, 6, 30),
+            start_time=time(9, 30),
+            is_available=True,
+            capacity=2  # Odmah postavi capacity na 2!
+        )
+        self.url = reverse('reservation-create')
+
+    def test_multiple_bookings_with_capacity(self):
+        data = {
+            "full_name": "User One",
+            "phone": "111",
+            "email": "u1@test.com",
+            "license_plate": "AAA111",
+            "service": self.service.id,
+            "is_stored": True,
+            "date": "2025-06-30",
+            "start_time": "09:30"
+        }
+        # Prva rezervacija
+        response1 = self.client.post(self.url, data, format='json')
+        self.assertEqual(response1.status_code, 201)
+
+        # Druga rezervacija
+        data["full_name"] = "User Two"
+        response2 = self.client.post(self.url, data, format='json')
+        self.assertEqual(response2.status_code, 201)
+
+        # Treća rezervacija – treba pasti
+        data["full_name"] = "User Three"
+        response3 = self.client.post(self.url, data, format='json')
+        self.assertEqual(response3.status_code, 400)

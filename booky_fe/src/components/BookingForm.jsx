@@ -56,10 +56,10 @@ export default function BookingForm() {
       try {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         const resp = await axios.get(
-          `available-slots/?date=${dateStr}&service=${formData.service}`
+          `all-slots-status/?date=${dateStr}&service=${formData.service}`
         );
         setAvailableSlots(
-          resp.data.map(s => ({ time: s.start_time, available: true }))
+          resp.data.map(s => ({ time: s.start_time, enabled: s.enabled }))
         );
       } catch (err) {
         console.error('Error fetching timeslots:', err);

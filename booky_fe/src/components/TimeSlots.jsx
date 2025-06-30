@@ -13,10 +13,10 @@ export default function TimeSlots({ slots, loading, selectedTime, setSelectedTim
           <button
             key={s.time}
             type="button"
-            disabled={!s.available}
+            disabled={!s.enabled}
             onClick={() => setSelectedTime(s.time)}
             className={
-              s.available
+              s.enabled
                 ? s.time === selectedTime
                   ? 'py-2 px-2 rounded-xl border bg-orange-600 text-white border-orange-600'
                   : 'py-2 px-2 rounded-xl border bg-white text-gray-800 hover:border-orange-400'
