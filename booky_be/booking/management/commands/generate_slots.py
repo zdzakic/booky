@@ -31,7 +31,8 @@ class Command(BaseCommand):
                     TimeSlot.objects.create(
                         date=single_date,
                         start_time=current_time,
-                        is_available=True
+                        is_available=True,
+                        capacity=2
                     )
                     created += 1
 

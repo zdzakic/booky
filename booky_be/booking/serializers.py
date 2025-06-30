@@ -13,6 +13,7 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
         model = ServiceType
         fields = '__all__'
 
+
 class TimeSlotSerializer(serializers.ModelSerializer):
     service = ServiceTypeSerializer(read_only=True)
 
@@ -21,78 +22,9 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-class ReservationSerializer(serializers.ModelSerializer):
-    date = serializers.DateField(write_only=True)
-    start_time = serializers.TimeField(write_only=True)
-    reserved_date = serializers.DateField(source='timeslot.date', read_only=True)
-    reserved_start_time = serializers.TimeField(source='timeslot.start_time', read_only=True)
-
-    class Meta:
-        model = Reservation
-        fields = [
-            'full_name',
-            'phone',
-            'email',
-            'license_plate',
-            'service',
-            'is_stored',
-            'date',
-            'start_time',
-            'reserved_date',
-            'reserved_start_time'
-        ]
-
-    def create(self, validated_data):
-        date = validated_data.pop('date')
-        start_time = validated_data.pop('start_time')
-        service = validated_data['service']
-
-        # Koliko slotova treba za ovu uslugu?
-        required_slots = service.duration_minutes // 30
-
-        base_time = datetime.combine(date, start_time)
-
-        # Lista svih potrebnih termina
-        slot_times = [
-            (base_time + timedelta(minutes=30 * i)).time()
-            for i in range(required_slots)
-        ]
-
-        # Pronađi sve slotove koji su slobodni — bez filtera po service!
-        slots = list(TimeSlot.objects.filter(
-            date=date,
-            start_time__in=slot_times,
-            is_available=True
-        ).order_by('start_time'))
-
-
-        all_slots = TimeSlot.objects.filter(date=date).order_by('start_time')
-        print("All slots on that date:")
-        for s in all_slots:
-            print(f"- {s.start_time} | available: {s.is_available}")
-
-
-        if len(slots) != required_slots:
-            raise ValidationError("One or more time slots are no longer available.")
-
-        # Označi slotove kao zauzete
-        for slot in slots:
-            slot.is_available = False
-            slot.save()
-
-        # Kreiraj rezervaciju
-        reservation = Reservation.objects.create(
-                timeslot=slots[0],
-            **validated_data
-        )
-
-        return reservation
-
 class ReservationListSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name', read_only=True)
-    date = serializers.DateField(source='timeslot.date', read_only=True)
-    start_time = serializers.TimeField(source='timeslot.start_time', read_only=True)
+    slots = serializers.SerializerMethodField()
 
     class Meta:
         model = Reservation
@@ -104,7 +36,45 @@ class ReservationListSerializer(serializers.ModelSerializer):
             'license_plate',
             'is_stored',
             'service_name',
-            'date',
-            'start_time'
+            'slots'
         ]
 
+    def get_slots(self, obj):
+        # Vrati listu slotova kao dict-ove (datum, vrijeme)
+        return [
+            {
+                "date": ts.date,
+                "start_time": ts.start_time.strftime("%H:%M"),
+            }
+            for ts in obj.timeslot.all()
+        ]
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+    # Ako koristiš "timeslots" ili "timeslot", koristi isti naziv kao u modelu
+    timeslot = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=TimeSlot.objects.all()
+    )
+    slots = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Reservation
+        fields = ['id', 'full_name', 'phone', 'email', 'license_plate', 'service', 'is_stored', 'timeslot', 'slots']
+
+    def get_slots(self, obj):
+        return [
+            {
+                "date": ts.date,
+                "start_time": ts.start_time,
+            }
+            for ts in obj.timeslot.all()
+        ]
+
+    def validate_timeslot(self, value):
+        """
+        Provjeri da li je svaki slot iz liste slobodan (capacity).
+        """
+        for slot in value:
+            if slot.reservation_set.count() >= slot.capacity:
+                raise ValidationError(f"Terminski slot {slot.date} {slot.start_time} je već popunjen.")
+        return value
