@@ -145,7 +145,7 @@ export default function BookingForm() {
           <LanguageSwitcher lang={lang} setLang={setLang} />
       </div>
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
-          Termin buchen
+          {t.bookingTitle}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6 w-full">
           <InputField
