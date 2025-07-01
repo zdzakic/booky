@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import axios from '../util/axios';
+import axios from '../utils/axios';
 import InputField from './InputField';
 import ServiceSelect from './ServiceSelect';
 import CheckboxField from './CheckboxField';
@@ -11,7 +11,7 @@ import DatePickerComponent from './DatePickerComponent';
 import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
 import LanguageSwitcher from './LanguageSwitcher';
-import { translations } from '../util/translations';
+import { translations } from '../utils/translations';
 
 import {
   validateFullName,
@@ -19,7 +19,7 @@ import {
   validateEmail,
   validateLicensePlate,
   validateAllInputs
-} from '../util/validators';
+} from '../utils/validators';
 
 
 export default function BookingForm() {
@@ -47,9 +47,6 @@ export default function BookingForm() {
   const [serviceOptions, setServiceOptions] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
 
-  // debug
-  console.log("loadingServices:", loadingServices);
-  console.log("serviceOptions:", serviceOptions);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -97,21 +94,19 @@ export default function BookingForm() {
       } catch (err) {
         setServiceOptions([]);
       }
-      setLoadingServices(false); // <-- OVDJE VAN TRY BLOKA!
+      setLoadingServices(false); 
     };
-    setLoadingServices(true); // ← Dodaj ovo prije poziva
+    setLoadingServices(true); 
     fetchServices();
   }, [lang]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1) Validate full name
-    const nameError = validateFullName(formData.fullName);
-    if (nameError) {
-      setErrors({ fullName: nameError });
-      return;
-    }
+    const validationErrors = validateAllInputs(formData, t.errors);
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) return;
 
     if (!selectedDate || !selectedTime) {
       alert('Bitte wählen Sie ein Datum und eine Uhrzeit.');
@@ -147,38 +142,58 @@ export default function BookingForm() {
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
           {t.bookingTitle}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-6 w-full">
+        <form onSubmit={handleSubmit} className="space-y-4 w-full">
+
+         {/* Full Name */}
           <InputField
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
             placeholder={t.fullName}
-            required
           />
-        
-          <InputField
+          {errors.fullName && (
+            <p className="text-red-500 text-xs mt-1 mb-0">{errors.fullName}</p>
+          )}
+
+          {/* Phone */}
+        <InputField
             type="tel"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             placeholder={t.phone}
-            required
+            error={errors.phone}
           />
-          <InputField
+          {errors.phone && (
+            <p className="text-red-500 text-xs mt-1 mb-0">{errors.phone}</p>
+          )}
+
+          {/* Email */}
+         <InputField
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="E-Mail"
-            required
           />
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1 mb-0">{errors.email}</p>
+          )}
+
+
+          {/* License Plate */}
           <InputField
             name="licensePlate"
             value={formData.licensePlate}
             onChange={handleChange}
             placeholder={t.licensePlate}
-            required
+            error={errors.licensePlate}
           />
+          {errors.licensePlate && (
+            <p className="text-red-500 text-xs mt-1 mb-0">{errors.licensePlate}</p>
+          )}
+
+          
           <ServiceSelect
           service={formData.service}
           onChange={handleChange}

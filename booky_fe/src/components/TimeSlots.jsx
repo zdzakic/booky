@@ -1,6 +1,6 @@
 // TimeSlots.jsx
 import React from 'react';
-import { translations } from '../util/translations';
+import { translations } from '../utils/translations';
 
 export default function TimeSlots({ slots, loading, selectedTime, setSelectedTime, lang = 'de' }) {
   const t = translations[lang];

@@ -1,7 +1,7 @@
 // src/pages/SuccessPage.jsx
 import { CheckCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { translations } from '../util/translations';
+import { translations } from '../utils/translations';
 
 const SuccessPage = () => {
   const location = useLocation();

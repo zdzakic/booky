@@ -28,4 +28,11 @@ class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.full_name} – {self.service.name} on {self.timeslots.date} at {self.timeslots.start_time}"
+        slot_list = list(self.timeslot.all())
+        if slot_list:
+            slots_str = ", ".join(
+                f"{ts.date} {ts.start_time.strftime('%H:%M')}" for ts in slot_list
+            )
+        else:
+            slots_str = "no slots"
+        return f"{self.full_name} – {self.service.name} on [{slots_str}]"

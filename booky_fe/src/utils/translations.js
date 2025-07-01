@@ -19,6 +19,13 @@ export const translations = {
       successTitle: "Reservierung erfolgreich!",
       successMsg: "Vielen Dank für Ihre Buchung. Wir haben Ihre Anfrage erhalten und werden sie schnellstmöglich bestätigen.",
       backToHome: "Zurück zur Startseite",
+      // Validation errors:
+    errors: {
+      fullName: "Bitte geben Sie Ihren Namen ein.",
+      phone: "Ungültige Schweizer Telefonnummer.",
+      email: "Ungültige E-Mail-Adresse.",
+      licensePlate: "Bitte geben Sie das Kennzeichen ein."
+    }
     },
     en: {
       bookingTitle: "Book an appointment",
@@ -39,6 +46,13 @@ export const translations = {
       successTitle: "Reservation successful!",
       successMsg: "Thank you for your booking. We have received your request and will confirm it as soon as possible.",
       backToHome: "Back to homepage",
+      // Validation errors:
+    errors: {
+      fullName: "Please enter your name.",
+      phone: "Invalid  phone number.",
+      email: "Invalid email address.",
+      licensePlate: "Please enter your license plate."
+    }
     }
   }
   
