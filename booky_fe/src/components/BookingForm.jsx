@@ -134,7 +134,8 @@ export default function BookingForm() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-lg bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-4 flex flex-col gap-6">
+      <div className="w-full max-w-md min-w-[480px] bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-4 flex flex-col gap-4">
+
         {/* Language Switcher */}
         <div className="flex justify-end mb-2">
           <LanguageSwitcher lang={lang} setLang={setLang} />
@@ -142,7 +143,7 @@ export default function BookingForm() {
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
           {t.bookingTitle}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4 w-full">
+        <form onSubmit={handleSubmit} className="space-y-2 w-full">
 
          {/* Full Name */}
           <InputField
@@ -150,11 +151,9 @@ export default function BookingForm() {
             value={formData.fullName}
             onChange={handleChange}
             placeholder={t.fullName}
+            error={errors.fullName}
           />
-          {errors.fullName && (
-            <p className="text-red-500 text-xs mt-1 mb-0">{errors.fullName}</p>
-          )}
-
+         
           {/* Phone */}
         <InputField
             type="tel"
@@ -164,9 +163,6 @@ export default function BookingForm() {
             placeholder={t.phone}
             error={errors.phone}
           />
-          {errors.phone && (
-            <p className="text-red-500 text-xs mt-1 mb-0">{errors.phone}</p>
-          )}
 
           {/* Email */}
          <InputField
@@ -175,11 +171,8 @@ export default function BookingForm() {
             value={formData.email}
             onChange={handleChange}
             placeholder="E-Mail"
+            error={errors.email}
           />
-          {errors.email && (
-            <p className="text-red-500 text-xs mt-1 mb-0">{errors.email}</p>
-          )}
-
 
           {/* License Plate */}
           <InputField
@@ -189,11 +182,7 @@ export default function BookingForm() {
             placeholder={t.licensePlate}
             error={errors.licensePlate}
           />
-          {errors.licensePlate && (
-            <p className="text-red-500 text-xs mt-1 mb-0">{errors.licensePlate}</p>
-          )}
-
-          
+      
           <ServiceSelect
           service={formData.service}
           onChange={handleChange}

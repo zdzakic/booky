@@ -13,7 +13,7 @@ const CheckboxField = ({ id, name, checked, onChange, label }) => (
     />
     <label
       htmlFor={id}
-      className="ml-2 text-sm text-gray-700 dark:text-gray-300"
+      className="mt-4 mb-4 ml-2 text-sm text-gray-700 dark:text-gray-300"
     >
       {label}
     </label>
