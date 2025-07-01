@@ -10,6 +10,9 @@ import CheckboxField from './CheckboxField';
 import DatePickerComponent from './DatePickerComponent';
 import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
+import LanguageSwitcher from './LanguageSwitcher';
+import { translations } from '../util/translations';
+
 import {
   validateFullName,
   validatePhone,
@@ -18,12 +21,12 @@ import {
   validateAllInputs
 } from '../util/validators';
 
-// const serviceOptions = [
-//   { value: '1', label: 'Reifenwechsel' },
-//   { value: '2', label: 'Gummiwechsel auf Felgen' },
-// ];
 
 export default function BookingForm() {
+
+  const [lang, setLang] = useState('de');
+  const t = translations[lang];
+
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -32,6 +35,7 @@ export default function BookingForm() {
     service: '',
     isStored: false,
   });
+
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -43,6 +47,9 @@ export default function BookingForm() {
   const [serviceOptions, setServiceOptions] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
 
+  // debug
+  console.log("loadingServices:", loadingServices);
+  console.log("serviceOptions:", serviceOptions);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -84,18 +91,17 @@ export default function BookingForm() {
         setServiceOptions(
           resp.data.map(s => ({
             value: s.id.toString(),
-            label: s.name,
+            label: lang === 'de' ? s.name_de : s.name_en,
           }))
         );
       } catch (err) {
-        console.error('Greška pri učitavanju servisa', err);
         setServiceOptions([]);
-      } finally {
-        setLoadingServices(false);
       }
+      setLoadingServices(false); // <-- OVDJE VAN TRY BLOKA!
     };
+    setLoadingServices(true); // ← Dodaj ovo prije poziva
     fetchServices();
-  }, []); // ← SAMO NA MOUNT
+  }, [lang]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,7 +129,7 @@ export default function BookingForm() {
         start_time: selectedTime,
       };
       const resp = await axios.post('reservations/', payload);
-      if (resp.status === 201) navigate('/success');
+      if (resp.status === 201) navigate('/success', { state: { lang } });
       else alert('Etwas ist schiefgelaufen.');
     } catch (err) {
       console.error('Booking error:', err);
@@ -133,7 +139,11 @@ export default function BookingForm() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-lg bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-10 flex flex-col gap-6">
+      <div className="w-full max-w-lg bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-4 flex flex-col gap-6">
+        {/* Language Switcher */}
+        <div className="flex justify-end mb-2">
+          <LanguageSwitcher lang={lang} setLang={setLang} />
+      </div>
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
           Termin buchen
         </h2>
@@ -142,7 +152,7 @@ export default function BookingForm() {
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
-            placeholder="Vollständiger Name"
+            placeholder={t.fullName}
             required
           />
         
@@ -151,7 +161,7 @@ export default function BookingForm() {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            placeholder="Telefonnummer"
+            placeholder={t.phone}
             required
           />
           <InputField
@@ -166,24 +176,30 @@ export default function BookingForm() {
             name="licensePlate"
             value={formData.licensePlate}
             onChange={handleChange}
-            placeholder="Kennzeichen (z.B. BL-123-AB)"
+            placeholder={t.licensePlate}
             required
           />
           <ServiceSelect
-            service={formData.service}
-            onChange={handleChange}
-            options={serviceOptions}
-          />
+          service={formData.service}
+          onChange={handleChange}
+          options={serviceOptions}
+          loading={loadingServices}
+          labelText={t.service}
+          placeholder={t.chooseService}
+        />
           <CheckboxField
             id="isStored"
             name="isStored"
             checked={formData.isStored}
             onChange={handleChange}
-            label="Räder bei uns eingelagert?"
+            label={t.isStored}
           />
           <DatePickerComponent
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
+            label={t.selectDate}
+            placeholder={t.datePlaceholder}
+            lang={lang}
           />
           {selectedDate && (
            isLoadingSlots
@@ -197,11 +213,12 @@ export default function BookingForm() {
                  loading={isLoadingSlots}
                  selectedTime={selectedTime}
                  setSelectedTime={setSelectedTime}
+                 lang={lang}
                />
              )
          )}
           <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime}>
-          Termin anfragen
+          {t.submit}
           </SubmitButton>
         </form>
       </div>

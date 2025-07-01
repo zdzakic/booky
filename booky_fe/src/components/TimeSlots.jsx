@@ -1,20 +1,24 @@
 // TimeSlots.jsx
 import React from 'react';
+import { translations } from '../util/translations';
 
-export default function TimeSlots({ slots, loading, selectedTime, setSelectedTime }) {
-  if (loading) return <p className="text-sm text-gray-500 dark:text-gray-400">Lade Termine...</p>;
-  if (!slots.length) return <p className="text-sm text-gray-500 dark:text-gray-400">Keine Termine verfügbar.</p>;
+export default function TimeSlots({ slots, loading, selectedTime, setSelectedTime, lang = 'de' }) {
+  const t = translations[lang];
+
+  if (loading)
+    return <p className="text-sm text-gray-500 dark:text-gray-400">{t.loadingSlots}</p>;
+  if (!slots.length)
+    return <p className="text-sm text-gray-500 dark:text-gray-400">{t.noSlots}</p>;
 
   return (
     <div>
-      <label className="block mb-2 text-sm text-gray-700 dark:text-gray-300">Verfügbare Uhrzeiten</label>
+      <label className="block mb-2 text-sm text-gray-700 dark:text-gray-300">{t.availableTimes}</label>
       <div className="grid grid-cols-3 gap-2">
         {slots.map(s => (
           <button
             key={s.time}
             type="button"
             disabled={!s.enabled}
-            // onClick={() => setSelectedTime(s.time)}
             onClick={() =>
               s.enabled &&
               setSelectedTime(prev => (prev === s.time ? null : s.time))
