@@ -18,10 +18,10 @@ import {
   validateAllInputs
 } from '../util/validators';
 
-const serviceOptions = [
-  { value: '1', label: 'Reifenwechsel' },
-  { value: '2', label: 'Gummiwechsel auf Felgen' },
-];
+// const serviceOptions = [
+//   { value: '1', label: 'Reifenwechsel' },
+//   { value: '2', label: 'Gummiwechsel auf Felgen' },
+// ];
 
 export default function BookingForm() {
   const [formData, setFormData] = useState({
@@ -32,12 +32,17 @@ export default function BookingForm() {
     service: '',
     isStored: false,
   });
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const [serviceOptions, setServiceOptions] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -70,6 +75,27 @@ export default function BookingForm() {
     };
     fetchSlots();
   }, [selectedDate, formData.service]);
+
+  // povuci servis dinamicki 
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const resp = await axios.get('services/');
+        setServiceOptions(
+          resp.data.map(s => ({
+            value: s.id.toString(),
+            label: s.name,
+          }))
+        );
+      } catch (err) {
+        console.error('Greška pri učitavanju servisa', err);
+        setServiceOptions([]);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchServices();
+  }, []); // ← SAMO NA MOUNT
 
   const handleSubmit = async (e) => {
     e.preventDefault();
