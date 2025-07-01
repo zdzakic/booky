@@ -94,7 +94,7 @@ export default function BookingForm() {
         service: parseInt(formData.service, 10),
         is_stored: formData.isStored,
         date: format(selectedDate, 'yyyy-MM-dd'), 
-        start_time: `${selectedTime}:00`,
+        start_time: selectedTime,
       };
       const resp = await axios.post('reservations/', payload);
       if (resp.status === 201) navigate('/success');

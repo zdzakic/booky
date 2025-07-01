@@ -14,7 +14,11 @@ export default function TimeSlots({ slots, loading, selectedTime, setSelectedTim
             key={s.time}
             type="button"
             disabled={!s.enabled}
-            onClick={() => setSelectedTime(s.time)}
+            // onClick={() => setSelectedTime(s.time)}
+            onClick={() =>
+              s.enabled &&
+              setSelectedTime(prev => (prev === s.time ? null : s.time))
+            }
             className={
               s.enabled
                 ? s.time === selectedTime
