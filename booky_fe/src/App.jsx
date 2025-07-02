@@ -1,5 +1,6 @@
 import BookingForm from './components/BookingForm';
 import SuccessPage from './pages/SuccessPage';
+import ReservationsDashboard from './components/ReservationsDashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<BookingForm />} />
         <Route path="/success" element={<SuccessPage />} />
+        <Route path="/dashboard" element={<ReservationsDashboard />} />
       </Routes>
     </main>
   );
