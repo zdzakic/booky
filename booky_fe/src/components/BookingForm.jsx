@@ -134,7 +134,7 @@ export default function BookingForm() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md min-w-[480px] bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-4 flex flex-col gap-4">
+      <div className="w-full max-w-md min-w-[480px] bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 flex flex-col gap-4">
 
         {/* Language Switcher */}
         <div className="flex justify-end mb-2">
@@ -143,7 +143,7 @@ export default function BookingForm() {
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
           {t.bookingTitle}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-2 w-full">
+        <form onSubmit={handleSubmit} className="space-y-2 w-full" noValidate>
 
          {/* Full Name */}
           <InputField
@@ -172,6 +172,7 @@ export default function BookingForm() {
             onChange={handleChange}
             placeholder="E-Mail"
             error={errors.email}
+            
           />
 
           {/* License Plate */}
