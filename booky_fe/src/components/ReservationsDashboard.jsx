@@ -45,9 +45,13 @@ const ReservationsDashboard = () => {
   if (loading) return <div className="pt-24 text-center text-lg font-semibold text-gray-500">Laden...</div>;
 
   // Akcije za dugmad (dodaj kasnije prave funkcije)
-  const handleView = (row) => alert('Pregled rezervacije: ' + row.full_name);
-  const handleEdit = (row) => alert('Edit rezervacije: ' + row.full_name);
-  const handleDelete = (row) => window.confirm('Obriši ovu rezervaciju?') && alert('Obrisano! (stub)');
+  const handleView = (row) => alert(`${t.view || 'Pregled'} rezervacije: ${row.full_name}`);
+  const handleEdit = (row) => alert(`${t.edit || 'Izmjena'} rezervacije: ${row.full_name}`);
+  const handleDelete = (row) => {
+    if (window.confirm(t.delete_confirm || 'Obriši ovu rezervaciju?')) {
+      alert('Obrisano! (stub)');
+    }
+  };
 
   // Render redova
   const renderRows = (rows) =>
@@ -120,22 +124,24 @@ const ReservationsDashboard = () => {
         <table className="min-w-full">
           <thead>
             <tr className="text-sm text-gray-800 font-medium border-b">
-              <th className="px-3 py-2 text-left">{t.name || 'Ime i prezime'}</th>
-              <th className="px-3 py-2 text-left">{t.phone || 'Telefon'}</th>
+              <th className="px-3 py-2 text-left">{t.name || 'Name'}</th>
+              <th className="px-3 py-2 text-left">{t.phone || 'Phone'}</th>
               <th className="px-3 py-2 text-left">{t.email || 'Email'}</th>
-              <th className="px-3 py-2 text-left">{t.plates || 'Tablice'}</th>
-              <th className="px-3 py-2 text-left">{t.service || 'Usluga'}</th>
-              <th className="px-3 py-2 text-left">{t.stored || 'Gume skladištene?'}</th>
-              <th className="px-3 py-2 text-left">{t.slot || 'Termin'}</th>
-              <th className="px-3 py-2 text-left">{t.created || 'Kreirano'}</th>
-              <th className="px-3 py-2 text-right">{t.actions || 'Akcije'}</th>
+              <th className="px-3 py-2 text-left">{t.plates || 'License Plates'}</th>
+              <th className="px-3 py-2 text-left">{t.service || 'Service'}</th>
+              <th className="px-3 py-2 text-left">{t.stored || 'Stored?'}</th>
+              <th className="px-3 py-2 text-left">{t.slot || 'Time Slot'}</th>
+              <th className="px-3 py-2 text-left">{t.created || 'Created'}</th>
+              <th className="px-3 py-2 text-right">{t.actions || 'Actions'}</th>
             </tr>
           </thead>
           <tbody>
             {today.length > 0 && (
               <>
                 <tr>
-                  <td colSpan="100%" className="bg-gray-100 text-sm font-semibold text-gray-700 py-2 pl-3">Danas</td>
+                  <td colSpan="100%" className="bg-gray-100 text-sm font-semibold text-gray-700 py-2 pl-3">
+                    {t.today || 'Today'}
+                  </td>
                 </tr>
                 {renderRows(today)}
               </>
@@ -143,14 +149,18 @@ const ReservationsDashboard = () => {
             {future.length > 0 && (
               <>
                 <tr>
-                  <td colSpan="100%" className="bg-gray-100 text-sm font-semibold text-gray-700 py-2 pl-3">Sljedeći dani</td>
+                  <td colSpan="100%" className="bg-gray-100 text-sm font-semibold text-gray-700 py-2 pl-3">
+                    {t.upcoming_days || 'Upcoming Days'}
+                  </td>
                 </tr>
                 {renderRows(future)}
               </>
             )}
             {today.length === 0 && future.length === 0 && (
               <tr>
-                <td colSpan="100%" className="py-6 text-center text-gray-400">{t.no_reservations || "Nema rezervacija"}</td>
+                <td colSpan="100%" className="py-6 text-center text-gray-400">
+                  {t.no_reservations || 'No reservations found'}
+                </td>
               </tr>
             )}
           </tbody>
