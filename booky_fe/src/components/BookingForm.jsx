@@ -12,7 +12,6 @@ import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
 import LanguageSwitcher from './LanguageSwitcher';
 import { translations } from '../utils/translations';
-
 import {
   validateFullName,
   validatePhone,

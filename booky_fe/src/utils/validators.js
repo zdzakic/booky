@@ -1,4 +1,5 @@
 // utils/validators.js
+import {CANTON_ABBREVIATIONS} from './constants';
 
 export function validateFullName(name, msg) {
   if (!name.trim()) return msg;
@@ -6,8 +7,9 @@ export function validateFullName(name, msg) {
 }
 
 export function validatePhone(phone, msg) {
-  const re = /^((\+41)|0)\d{8,9}$/;
-  if (!re.test(phone)) return msg;
+  const phoneWithoutSpaces = phone.replace(/\s/g, '');
+  const re = /^((\+41|0041)0?|0)?\d{7,9}$/;
+  if (!re.test(phoneWithoutSpaces)) return msg;
   return '';
 }
 
@@ -18,7 +20,8 @@ export function validateEmail(email, msg) {
 }
 
 export function validateLicensePlate(lp, msg) {
-  if (!lp.trim()) return msg;
+  const regex = new RegExp(`^(${CANTON_ABBREVIATIONS.join('|')})[\\s-]?\\d{1,6}$`, 'i');
+  if (!regex.test(lp.trim())) return msg;
   return '';
 }
 
