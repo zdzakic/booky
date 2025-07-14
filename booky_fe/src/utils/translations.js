@@ -34,12 +34,18 @@ export const translations = {
         yes: "Ja",
         no: "Nein",
         today: "Heute",
-        upcoming_days: "Nächste Tage",
+        upcoming_days: "Kommende Tage",
         no_reservations: "Keine Reservierungen gefunden",
         view: "Ansehen",
         edit: "Bearbeiten",
         delete: "Löschen",
-        delete_confirm: "Diese Reservierung löschen?"
+        delete_confirm: "Sind Sie sicher, dass Sie diese Reservierung löschen möchten?",
+        // Quick-Stats
+        reservations_today: "Reservierungen heute",
+        total_slots_today: "Termine heute",
+        new_clients_today: "Neukunden heute",
+        // Search
+        search_placeholder: "Suche nach Name, Telefon, Kennzeichen...",
       },
       // Validation errors:
       errors: {
@@ -88,7 +94,13 @@ export const translations = {
         view: "View",
         edit: "Edit",
         delete: "Delete",
-        delete_confirm: "Delete this reservation?"
+        delete_confirm: "Are you sure you want to delete this reservation?",
+        // Quick-Stats
+        reservations_today: "Reservations Today",
+        total_slots_today: "Total Slots Today",
+        new_clients_today: "New Clients Today",
+        // Search
+        search_placeholder: "Search by name, phone, license plate...",
       },
       // Validation errors:
       errors: {

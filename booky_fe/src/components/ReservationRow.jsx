@@ -1,4 +1,5 @@
 import React from 'react';
+import { translations } from '../utils/translations';
 
 const ActionButton = ({ title, onClick, children }) => (
   <button className="p-1 hover:bg-gray-100 rounded" title={title} onClick={onClick}>
@@ -7,8 +8,15 @@ const ActionButton = ({ title, onClick, children }) => (
 );
 
 const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete }) => {
+  const t = translations[lang]?.dashboard || {};
+
+  // Dodajemo klasu za isticanje ako je ovo sljedeća rezervacija
+  const rowClass = reservation.isNext
+    ? 'border-b text-sm hover:bg-blue-50 group bg-blue-50'
+    : 'border-b text-sm hover:bg-gray-50 group';
+
   return (
-    <tr className="border-b text-sm hover:bg-gray-50 group">
+    <tr key={reservation.id} className={rowClass}>
       <td className="px-3 py-2 font-medium">{reservation.full_name}</td>
       <td className="px-3 py-2">{reservation.phone}</td>
       <td className="px-3 py-2">{reservation.email}</td>
