@@ -17,6 +17,19 @@ class ServiceTypeListAPIView(ListAPIView):
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
 
+# Pregled svih rezervacija
+class ReservationListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Reservation.objects.all().order_by('slots__date', 'slots__start_time')
+    serializer_class = ReservationSerializer
+
+class ReservationDestroyAPIView(generics.DestroyAPIView):
+    """
+    API view to delete a reservation.
+    Requires the reservation ID in the URL.
+    """
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+
 # Pregled dostupnih termina po datumu (kasnije možemo filtrirati po datumu)
 class TimeSlotListAPIView(ListAPIView):
     serializer_class = TimeSlotSerializer
