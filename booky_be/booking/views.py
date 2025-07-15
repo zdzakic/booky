@@ -19,7 +19,7 @@ class ServiceTypeListAPIView(ListAPIView):
 
 # Pregled svih rezervacija
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Reservation.objects.all().order_by('slots__date', 'slots__start_time')
+    queryset = Reservation.objects.all().order_by('timeslot__date', 'timeslot__start_time').distinct()
     serializer_class = ReservationSerializer
 
 class ReservationDestroyAPIView(generics.DestroyAPIView):
@@ -74,7 +74,7 @@ class AvailableSlotsAPIView(ListAPIView):
 
         required_slots = service.duration_minutes // 30
 
-        # 🔍 Filtriramo samo slobodne i nerezervisane slotove
+        # Filtriramo samo slobodne i nerezervisane slotove
         slots = TimeSlot.objects.annotate(
             is_reserved=Exists(
                 Reservation.objects.filter(timeslot=OuterRef('pk'))
