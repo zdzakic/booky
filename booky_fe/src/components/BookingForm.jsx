@@ -133,64 +133,72 @@ export default function BookingForm() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md min-w-[480px] bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 flex flex-col gap-4">
+      {/* IZMENA 1: Glavni kontejner je sada responzivan */}
+      <div className="w-full max-w-2xl bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 sm:p-8 flex flex-col gap-4">
 
         {/* Language Switcher */}
         <div className="flex justify-end mb-2">
           <LanguageSwitcher lang={lang} setLang={setLang} />
-      </div>
+        </div>
         <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
           {t.bookingTitle}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-2 w-full" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4 w-full" noValidate>
 
-         {/* Full Name */}
-          <InputField
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            placeholder={t.fullName}
-            error={errors.fullName}
-          />
-         
-          {/* Phone */}
-        <InputField
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder={t.phone}
-            error={errors.phone}
-          />
+          {/* IZMENA 2: Grupisanje Ime i Telefon */}
+          <div className="flex flex-col md:flex-row md:gap-4">
+            <div className="w-full md:w-1/2">
+              <InputField
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder={t.fullName}
+                error={errors.fullName}
+              />
+            </div>
+            <div className="w-full md:w-1/2 mt-4 md:mt-0">
+              <InputField
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder={t.phone}
+                error={errors.phone}
+              />
+            </div>
+          </div>
 
-          {/* Email */}
-         <InputField
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="E-Mail"
-            error={errors.email}
-            
-          />
-
-          {/* License Plate */}
-          <InputField
-            name="licensePlate"
-            value={formData.licensePlate}
-            onChange={handleChange}
-            placeholder={t.licensePlate}
-            error={errors.licensePlate}
-          />
+          {/* IZMENA 3: Grupisanje Email i Tablice */}
+          <div className="flex flex-col md:flex-row md:gap-4">
+            <div className="w-full md:w-1/2">
+              <InputField
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="E-Mail"
+                error={errors.email}
+              />
+            </div>
+            <div className="w-full md:w-1/2 mt-4 md:mt-0">
+              <InputField
+                name="licensePlate"
+                value={formData.licensePlate}
+                onChange={handleChange}
+                placeholder={t.licensePlate}
+                error={errors.licensePlate}
+              />
+            </div>
+          </div>
       
           <ServiceSelect
-          service={formData.service}
-          onChange={handleChange}
-          options={serviceOptions}
-          loading={loadingServices}
-          labelText={t.service}
-          placeholder={t.chooseService}
-        />
+            service={formData.service}
+            onChange={handleChange}
+            options={serviceOptions}
+            loading={loadingServices}
+            labelText={t.service}
+            placeholder={t.chooseService}
+          />
           <CheckboxField
             id="isStored"
             name="isStored"
@@ -222,7 +230,7 @@ export default function BookingForm() {
              )
          )}
           <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime}>
-          {t.submit}
+            {t.submit}
           </SubmitButton>
         </form>
       </div>
