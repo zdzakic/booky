@@ -1,9 +1,18 @@
 // TimeSlots.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { translations } from '../utils/translations';
 
 export default function TimeSlots({ slots, loading, selectedTime, setSelectedTime, lang = 'de' }) {
   const t = translations[lang];
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger the animation shortly after the component is ready to be shown.
+    if (!loading && slots.length > 0) {
+      const timer = setTimeout(() => setIsVisible(true), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, slots.length]);
 
   if (loading)
     return <p className="text-sm text-gray-500 dark:text-gray-400">{t.loadingSlots}</p>;
@@ -11,7 +20,7 @@ export default function TimeSlots({ slots, loading, selectedTime, setSelectedTim
     return <p className="text-sm text-gray-500 dark:text-gray-400">{t.noSlots}</p>;
 
   return (
-    <div>
+    <div className={`transition-all duration-300 ease-in-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
       <label className="block mb-2 text-sm text-gray-700 dark:text-gray-300">{t.availableTimes}</label>
       <div className="grid grid-cols-3 gap-2">
         {slots.map(s => (

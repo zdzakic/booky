@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import axios from '../utils/axios';
 import InputField from './InputField';
@@ -108,7 +109,7 @@ export default function BookingForm() {
     if (Object.keys(validationErrors).length > 0) return;
 
     if (!selectedDate || !selectedTime) {
-      alert('Bitte wählen Sie ein Datum und eine Uhrzeit.');
+      toast.error(t.errors.selectDateTime || 'Bitte wählen Sie ein Datum und eine Uhrzeit.');
       return;
     }
     try {
@@ -123,11 +124,15 @@ export default function BookingForm() {
         start_time: selectedTime,
       };
       const resp = await axios.post('reservations/', payload);
-      if (resp.status === 201) navigate('/success', { state: { lang } });
-      else alert('Etwas ist schiefgelaufen.');
+      if (resp.status === 201) {
+        toast.success(t.successBooking || 'Reservierung erfolgreich erstellt!');
+        setTimeout(() => navigate('/success', { state: { lang } }), 1500);
+      } else {
+        toast.error(t.errors.general || 'Etwas ist schiefgelaufen.');
+      }
     } catch (err) {
       console.error('Booking error:', err);
-      alert('Fehler beim Buchen.');
+      toast.error(t.errors.bookingFailed || 'Fehler beim Buchen.');
     }
   };
 

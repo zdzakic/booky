@@ -6,12 +6,19 @@ import { groupByDay } from '../utils/reservationUtils';
 import ReservationsTable from './ReservationsTable';
 import QuickStats from './QuickStats';
 import SearchBar from './SearchBars';
+import DashboardSkeleton from './DashboardSkeleton';
+import EmptyState from './EmptyState';
+import { CalendarPlus } from 'lucide-react';
+import { toast } from 'sonner';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState('de');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reservationToDelete, setReservationToDelete] = useState(null);
 
   useEffect(() => {
     axios.get('/reservations/lists/')
@@ -60,19 +67,34 @@ const ReservationsDashboard = () => {
   const totalSlotsToday = today.reduce((acc, res) => acc + res.slots.length, 0);
   const newClientsToday = today.filter(res => !res.is_stored).length;
 
-  if (loading) return <div className="pt-24 text-center text-lg font-semibold text-gray-500">Laden...</div>;
+  if (loading) return <DashboardSkeleton />;
 
   // Akcije za dugmad (dodaj kasnije prave funkcije)
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
   const handleEdit = (row) => alert(`${t.edit || 'Edit'} reservation: ${row.full_name}`);
+
   const handleDelete = (row) => {
-    if (window.confirm(t.delete_confirm || 'Delete this reservation?')) {
-      alert('Deleted! (stub)');
+    setReservationToDelete(row);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!reservationToDelete) return;
+    try {
+      await axios.delete(`/reservations/${reservationToDelete.id}/`);
+      setReservations(prev => prev.filter(res => res.id !== reservationToDelete.id));
+      toast.success(t.delete_success || 'Reservation deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete reservation:', error);
+      toast.error(t.delete_error || 'Failed to delete reservation.');
+    } finally {
+      setIsModalOpen(false);
+      setReservationToDelete(null);
     }
   };
 
   return (
-    <div className="font-sans bg-gray-50 min-h-screen pt-8 px-2">
+    <div className="font-sans bg-gray-50 dark:bg-gray-950 min-h-screen w-full flex flex-col items-center pt-8 px-4">
       <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
         <h2 className="text-2xl font-bold">{t.all_reservations || 'All reservations'}</h2>
         <LanguageSwitcher lang={lang} setLang={setLang} />
@@ -113,12 +135,26 @@ const ReservationsDashboard = () => {
           onDelete={handleDelete}
         />
 
-        {today.length === 0 && future.length === 0 && (
-          <div className="rounded-lg shadow bg-white border p-6 text-center text-gray-400">
-            {t.no_reservations || 'No reservations found'}
-          </div>
+        {filteredReservations.length === 0 && !loading && (
+          <EmptyState
+            icon={<CalendarPlus className="w-8 h-8 text-gray-400" />}
+            title={t.no_reservations_title || 'No Reservations Found'}
+            message={searchQuery 
+              ? (t.no_reservations_search_message || 'Try adjusting your search query.') 
+              : (t.no_reservations_message || 'There are currently no reservations. Why not create one?')}
+            buttonText={t.create_new_button || 'Create New Reservation'}
+            buttonLink="/"
+          />
         )}
       </div>
+
+      <ConfirmDeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={t.delete_modal_title || 'Delete Reservation'}
+        message={t.delete_modal_message || 'Are you sure you want to delete this reservation? This action cannot be undone.'}
+      />
     </div>
   );
 };
