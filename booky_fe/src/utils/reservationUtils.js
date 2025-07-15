@@ -13,9 +13,10 @@ export function groupByDay(reservations) {
     if (isForToday) {
       today.push(res);
     } else {
-      // Ako nije za danas i ima termine, ide u buduće
-      if (res.slots && res.slots.length > 0) {
-          future.push(res);
+      // Proveravamo da li je termin u budućnosti (ne u prošlosti)
+      const earliestDate = res.slots.reduce((earliest, s) => s.date < earliest ? s.date : earliest, '9999-12-31');
+      if (earliestDate >= todayStr) {
+        future.push(res);
       }
     }
   });

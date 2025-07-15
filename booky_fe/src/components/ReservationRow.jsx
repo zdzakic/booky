@@ -12,6 +12,21 @@ const ActionButton = ({ title, onClick, children }) => (
 const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete }) => {
   const t = translations[lang]?.dashboard || {};
 
+  const now = new Date();
+  const lastSlot = reservation.slots && reservation.slots[reservation.slots.length - 1];
+  let isPast = false;
+
+  if (lastSlot) {
+    // Create a Date object from the last slot's start time.
+    // new Date() will correctly parse this in the user's local timezone.
+    const endTime = new Date(`${lastSlot.date}T${lastSlot.start_time}`);
+    // Add 30 minutes to get the actual end time of the reservation.
+    endTime.setMinutes(endTime.getMinutes() + 30);
+
+    // Compare with the current time.
+    isPast = endTime < new Date();
+  }
+
   // KORAK 2: Definišemo klase koristeći vrednosti iz teme
   const isStoredClasses = `bg-${theme.colors.success}-100 text-${theme.colors.success}-800 dark:bg-${theme.colors.success}-900/30 dark:text-${theme.colors.success}-200`;
   const isNotStoredClasses = `bg-${theme.colors.error}-100 text-${theme.colors.error}-800 dark:bg-${theme.colors.error}-900/30 dark:text-${theme.colors.error}-200`;
@@ -20,7 +35,9 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
   const editIconClasses = `text-${theme.colors.primary}-500`;
   const deleteIconClasses = `text-${theme.colors.error}-500`;
 
-  const rowClass = reservation.isNext
+  const rowClass = isPast
+    ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-20'
+    : reservation.isNext
     ? `border-b text-sm group bg-${theme.colors.secondary}-100 dark:bg-${theme.colors.secondary}-900/30`
     : 'border-b text-sm hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors duration-200';
 
