@@ -85,16 +85,6 @@ const ReservationsDashboard = () => {
         placeholder={t.search_placeholder}
         className="mb-6"
       />
-      {/* <div className="max-w-7xl w-full mx-auto mb-6">
-        <input
-          type="text"
-          placeholder={t.search_placeholder || 'Search...'}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
-        />
-      </div> */}
-
       {/* Quick Stats Section */}
       <QuickStats
         reservationsTodayCount={reservationsTodayCount}

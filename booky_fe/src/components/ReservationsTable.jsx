@@ -5,28 +5,36 @@ const ReservationsTable = ({ title, reservations, labels, lang, onView, onEdit, 
   if (!reservations || reservations.length === 0) {
     return null;
   }
-
-  return (
+   return (
     <div className="mb-8">
       <h3 className="bg-gray-100 text-sm font-semibold text-gray-700 py-2 pl-3 rounded-t-lg">
         {title}
       </h3>
-      <div className="rounded-b-lg shadow bg-white overflow-x-auto border-l border-r border-b">
-        <table className="min-w-full">
-          <thead>
-            <tr className="text-sm text-gray-800 font-medium border-b">
-              <th className="px-3 py-2 text-left">{labels.name || 'Name'}</th>
-              <th className="px-3 py-2 text-left">{labels.phone || 'Phone'}</th>
-              <th className="px-3 py-2 text-left">{labels.email || 'Email'}</th>
-              <th className="px-3 py-2 text-left">{labels.plates || 'License Plates'}</th>
-              <th className="px-3 py-2 text-left">{labels.service || 'Service'}</th>
-              <th className="px-3 py-2 text-left">{labels.stored || 'Stored?'}</th>
-              <th className="px-3 py-2 text-left">{labels.slot || 'Time Slot'}</th>
-              <th className="px-3 py-2 text-left">{labels.created || 'Created'}</th>
-              <th className="px-3 py-2 text-right">{labels.actions || 'Actions'}</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="rounded-b-lg shadow bg-white border-l border-r border-b">
+        
+        {/* KORAK 1: Menjamo <table> u <div> */}
+        {/* Na desktopu koristimo 'md:table' da bi se ponašao kao tabela */}
+        <div className="min-w-full md:table">
+
+          {/* KORAK 2: Menjamo <thead> u <div> */}
+          {/* Sakrivamo zaglavlje na mobilnom ('hidden'), prikazujemo na desktopu ('md:table-header-group') */}
+          <div className="hidden md:table-header-group">
+            <div className="md:table-row text-sm text-gray-800 font-medium border-b">
+              <div className="md:table-cell px-3 py-2 text-left">{labels.name || 'Name'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.phone || 'Phone'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.email || 'Email'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.plates || 'License Plates'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.service || 'Service'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.stored || 'Stored?'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.slot || 'Time Slot'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.created || 'Created'}</div>
+              <div className="md:table-cell px-3 py-2 text-right">{labels.actions || 'Actions'}</div>
+            </div>
+          </div>
+
+          {/* KORAK 3: Menjamo <tbody> u <div> */}
+          {/* Na desktopu se ponaša kao 'table-row-group' */}
+          <div className="md:table-row-group">
             {reservations.map(res => (
               <ReservationRow
                 key={res.id}
@@ -38,8 +46,8 @@ const ReservationsTable = ({ title, reservations, labels, lang, onView, onEdit, 
                 onDelete={onDelete}
               />
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   );
