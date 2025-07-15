@@ -2,8 +2,10 @@ from django.urls import path
 from .views import (
     ServiceTypeListAPIView,
     AvailabilityAPIView,
-    ReservationListCreateAPIView
+    ReservationListCreateAPIView,
 )
+
+app_name = 'booking'
 
 urlpatterns = [
     path('services/', ServiceTypeListAPIView.as_view(), name='service-list'),
