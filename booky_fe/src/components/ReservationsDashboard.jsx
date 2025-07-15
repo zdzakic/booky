@@ -4,6 +4,7 @@ import { translations } from '../utils/translations';
 import LanguageSwitcher from './LanguageSwitcher';
 import { groupByDay } from '../utils/reservationUtils';
 import ReservationsTable from './ReservationsTable';
+import QuickStats from './QuickStats';
 
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
@@ -88,7 +89,13 @@ const ReservationsDashboard = () => {
       </div>
 
       {/* Quick Stats Section */}
-      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <QuickStats
+        reservationsTodayCount={reservationsTodayCount}
+        totalSlotsToday={totalSlotsToday}
+        newClientsToday={newClientsToday}
+        t={t}
+      />
+      {/* <div className="max-w-7xl w-full mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow border">
           <h3 className="text-3xl font-bold text-gray-800">{reservationsTodayCount}</h3>
           <p className="text-sm font-medium text-gray-500">{t.reservations_today}</p>
@@ -101,7 +108,8 @@ const ReservationsDashboard = () => {
           <h3 className="text-3xl font-bold text-gray-800">{newClientsToday}</h3>
           <p className="text-sm font-medium text-gray-500">{t.new_clients_today}</p>
         </div>
-      </div>
+      </div> */}
+
 
       <div className="max-w-7xl w-full mx-auto">
         <ReservationsTable
