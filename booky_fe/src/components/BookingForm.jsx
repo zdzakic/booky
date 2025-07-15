@@ -38,9 +38,7 @@ export default function BookingForm() {
 
 
   const [selectedDate, setSelectedDate] = useState(null);
-  const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -55,30 +53,6 @@ export default function BookingForm() {
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
-
-  useEffect(() => {
-    if (!selectedDate || !formData.service) return;
-    const fetchSlots = async () => {
-      setIsLoadingSlots(true);
-      setAvailableSlots([]);
-      setSelectedTime(null);
-      try {
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        const resp = await axios.get(
-          `all-slots-status/?date=${dateStr}&service=${formData.service}`
-        );
-        setAvailableSlots(
-          resp.data.map(s => ({ time: s.start_time, enabled: s.enabled }))
-        );
-      } catch (err) {
-        console.error('Error fetching timeslots:', err);
-        setAvailableSlots([]);
-      } finally {
-        setIsLoadingSlots(false);
-      }
-    };
-    fetchSlots();
-  }, [selectedDate, formData.service]);
 
   // povuci servis dinamicki 
   useEffect(() => {
@@ -113,15 +87,18 @@ export default function BookingForm() {
       return;
     }
     try {
+      // Combine date and time into a single ISO 8601 string for the backend
+      const [hours, minutes] = selectedTime.split(':');
+      const startTime = new Date(selectedDate);
+      startTime.setHours(hours, minutes, 0, 0);
+
       const payload = {
         full_name: formData.fullName,
         phone: formData.phone,
         email: formData.email,
         license_plate: formData.licensePlate,
         service: parseInt(formData.service, 10),
-        is_stored: formData.isStored,
-        date: format(selectedDate, 'yyyy-MM-dd'), 
-        start_time: selectedTime,
+        start_time: startTime.toISOString(), // Send the combined datetime string
       };
       const resp = await axios.post('reservations/', payload);
       if (resp.status === 201) {
@@ -138,10 +115,8 @@ export default function BookingForm() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center px-4">
-      {/* IZMENA 1: Glavni kontejner je sada responzivan */}
       <div className="w-full max-w-2xl bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 sm:p-8 flex flex-col gap-4">
 
-        {/* Language Switcher */}
         <div className="flex justify-end mb-2">
           <LanguageSwitcher lang={lang} setLang={setLang} />
         </div>
@@ -150,7 +125,6 @@ export default function BookingForm() {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4 w-full" noValidate>
 
-          {/* IZMENA 2: Grupisanje Ime i Telefon */}
           <div className="flex flex-col md:flex-row md:gap-4">
             <div className="w-full md:w-1/2">
               <InputField
@@ -173,7 +147,6 @@ export default function BookingForm() {
             </div>
           </div>
 
-          {/* IZMENA 3: Grupisanje Email i Tablice */}
           <div className="flex flex-col md:flex-row md:gap-4">
             <div className="w-full md:w-1/2">
               <InputField
@@ -218,22 +191,15 @@ export default function BookingForm() {
             placeholder={t.datePlaceholder}
             lang={lang}
           />
-          {selectedDate && (
-           isLoadingSlots
-             ? (
-               <div className="flex justify-center py-4">
-                 <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
-               </div>
-             ) : (
-               <TimeSlots
-                 slots={availableSlots}
-                 loading={isLoadingSlots}
-                 selectedTime={selectedTime}
-                 setSelectedTime={setSelectedTime}
-                 lang={lang}
-               />
-             )
-         )}
+          {selectedDate && formData.service && (
+            <TimeSlots
+              selectedDate={selectedDate}
+              serviceId={formData.service}
+              selectedTime={selectedTime}
+              onTimeSelect={setSelectedTime}
+              lang={lang}
+            />
+          )}
           <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime}>
             {t.submit}
           </SubmitButton>
