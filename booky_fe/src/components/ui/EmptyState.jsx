@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { theme } from '../config/theme';
+import { theme } from '../../config/theme';
 
 const EmptyState = ({ icon, title, message, buttonText, buttonLink }) => {
   const navigate = useNavigate();
 
+  // Note: For this to work with Tailwind's JIT compiler, you might need to safelist these dynamic classes
+  // in your tailwind.config.js if they are not found in your static code.
   const buttonColorClasses = `bg-${theme.colors.primary}-600 hover:bg-${theme.colors.primary}-700`;
 
   return (
@@ -18,7 +20,8 @@ const EmptyState = ({ icon, title, message, buttonText, buttonLink }) => {
         <div className="mt-6">
           <button
             onClick={() => navigate(buttonLink)}
-            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${buttonColorClasses}`}>
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${buttonColorClasses} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${theme.colors.primary}-500`}
+          >
             {buttonText}
           </button>
         </div>

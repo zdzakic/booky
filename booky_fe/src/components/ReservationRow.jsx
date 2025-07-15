@@ -69,7 +69,7 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
       </div>
 
       <div className="text-xs text-gray-400 dark:text-gray-500 md:table-cell md:px-3 md:py-2">
-        <span className="font-semibold md:hidden">Kreirano: </span>
+        <span className="font-semibold md:hidden">{labels.created || 'Created'}: </span>
         {reservation.created ? new Date(reservation.created).toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
       </div>
 

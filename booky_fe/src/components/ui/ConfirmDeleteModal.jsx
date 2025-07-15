@@ -1,13 +1,12 @@
 import React from 'react';
-import Modal from './Modal';
-import { Button } from './ui/button'; // Assuming you have a generic Button component, if not, we can create one or style it directly.
-import { theme } from '../config/theme';
+import Modal from './Modal'; // Ažurirana putanja
+import { theme } from '../../config/theme';
 import { AlertTriangle } from 'lucide-react';
 
-const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, title, message, cancelText, confirmText }) => {
   if (!isOpen) return null;
 
-  const confirmButtonColor = `bg-${theme.colors.error}-600 hover:bg-${theme.colors.error}-700`;
+  
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -22,13 +21,13 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, title, message }) => {
             onClick={onClose}
             className="px-4 py-2 rounded-md text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            Cancel
+            {cancelText || 'Cancel'}
           </button>
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-md text-sm font-medium text-white ${confirmButtonColor}`}
+            className="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700"
           >
-            Confirm Delete
+            {confirmText || 'Confirm Delete'}
           </button>
         </div>
       </div>

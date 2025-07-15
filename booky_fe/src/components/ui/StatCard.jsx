@@ -2,7 +2,7 @@
 import React from 'react';
 
 const StatCard = ({ value, label, color = 'gray' }) => {
-  const cardClasses = `bg-${color}-50 dark:bg-${color}-900/20 border-${color}-200 dark:border-${color}-800`;
+  const cardClasses = `bg-white dark:bg-gray-800/20 border-${color}-200 dark:border-${color}-800`;
   const valueClasses = `text-${color}-600 dark:text-${color}-300`;
   const labelClasses = `text-${color}-500 dark:text-${color}-400`;
 

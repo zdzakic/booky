@@ -5,12 +5,12 @@ import LanguageSwitcher from './LanguageSwitcher';
 import { groupByDay } from '../utils/reservationUtils';
 import ReservationsTable from './ReservationsTable';
 import QuickStats from './QuickStats';
-import SearchBar from './SearchBars';
-import DashboardSkeleton from './DashboardSkeleton';
-import EmptyState from './EmptyState';
+import SearchBar from './ui/SearchBar';
+import DashboardSkeleton from './ui/DashboardSkeleton';
+import EmptyState from './ui/EmptyState';
 import { CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import ConfirmDeleteModal from './ConfirmDeleteModal';
+import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
@@ -73,8 +73,8 @@ const ReservationsDashboard = () => {
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
   const handleEdit = (row) => alert(`${t.edit || 'Edit'} reservation: ${row.full_name}`);
 
-  const handleDelete = (row) => {
-    setReservationToDelete(row);
+  const handleDelete = (reservation) => {
+    setReservationToDelete(reservation);
     setIsModalOpen(true);
   };
 
@@ -148,13 +148,17 @@ const ReservationsDashboard = () => {
         )}
       </div>
 
-      <ConfirmDeleteModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={confirmDelete}
-        title={t.delete_modal_title || 'Delete Reservation'}
-        message={t.delete_modal_message || 'Are you sure you want to delete this reservation? This action cannot be undone.'}
-      />
+      {isModalOpen && reservationToDelete && (
+        <ConfirmDeleteModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={confirmDelete}
+          title={t.delete_confirm_title || 'Delete Reservation?'}
+          message={`${t.delete_confirm_message || 'Are you sure you want to delete the reservation for'} ${reservationToDelete.full_name}?`}
+          cancelText={t.cancel_button || 'Cancel'}
+          confirmText={t.confirm_delete_button || 'Yes, Delete'}
+        />
+      )}
     </div>
   );
 };
