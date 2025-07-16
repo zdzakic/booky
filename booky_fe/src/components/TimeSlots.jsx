@@ -29,8 +29,12 @@ export default function TimeSlots({ selectedDate, serviceId, selectedTime, onTim
           throw new Error('Failed to fetch time slots.');
         }
         const data = await response.json();
-        // The backend returns an array of strings, so we map it to an array of objects.
-        const formattedTimes = data.map(time => ({ time, enabled: true }));
+        // Data is now an array of objects: { time, available_count }
+        const formattedTimes = data.map(slot => ({ 
+          time: slot.time, 
+          available_count: slot.available_count, 
+          enabled: true 
+        }));
         setAvailableTimes(formattedTimes);
         setIsVisible(formattedTimes.length > 0);
       } catch (err) {
@@ -74,7 +78,7 @@ export default function TimeSlots({ selectedDate, serviceId, selectedTime, onTim
             type="button"
             disabled={!s.enabled}
             onClick={() => onTimeSelect(prev => (prev === s.time ? null : s.time))}
-            className={`py-2 px-2 rounded-xl border transition-colors duration-200 ` +
+            className={`py-2 px-2 rounded-xl border transition-colors duration-200 flex flex-col items-center justify-center ` +
               (s.enabled
                 ? s.time === selectedTime
                   ? 'bg-orange-600 text-white border-orange-600'
@@ -82,7 +86,8 @@ export default function TimeSlots({ selectedDate, serviceId, selectedTime, onTim
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500')
             }
           >
-            {s.time}
+            <span className="font-semibold">{s.time}</span>
+            <span className="text-xs">({s.available_count} {t.spotsAvailable || 'frei'})</span>
           </button>
         ))}
       </div>

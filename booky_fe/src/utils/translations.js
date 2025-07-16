@@ -12,12 +12,14 @@ export const translations = {
       selectDate: "Datum auswählen",
       datePlaceholder: "Datum wählen",
       submit: "Termin anfragen",
-      availableTimes: "Verfügbare Uhrzeiten",
+      availableTimes: "Verfügbare Zeiten",
+      noSlots: "Keine freien Termine für diesen Tag verfügbar.",
       loadingSlots: "Lade Termine...",
-      noSlots: "Keine Termine verfügbar.",
+      spotsAvailable: "frei",
       // success page
-      successTitle: "Reservierung erfolgreich!",
-      successMsg: "Vielen Dank für Ihre Buchung. Wir haben Ihre Anfrage erhalten und werden sie schnellstmöglich bestätigen.",
+      successTitle: "Anfrage erhalten",
+      successMsg: "Vielen Dank! Wir haben Ihre Anfrage erhalten und werden sie prüfen. Sie erhalten eine Bestätigung per E-Mail und SMS, sobald der Termin genehmigt wurde.",
+      successBooking: "Anfrage erfolgreich gesendet!",
       backToHome: "Zurück zur Startseite",
       // dashboard
       dashboard: {
@@ -66,9 +68,9 @@ export const translations = {
     },
     en: {
       bookingTitle: "Book an appointment",
-      fullName: "Full name",
-      phone: "Phone number",
-      email: "E-mail",
+      fullName: "Full Name",
+      phone: "Phone Number",
+      email: "Email Address",
       licensePlate: "License plate (e.g. ZH-12345)",
       service: "Select service",
       chooseService: "Choose a service",
@@ -76,12 +78,14 @@ export const translations = {
       selectDate: "Select date",
       datePlaceholder: "Choose a date",
       submit: "Request appointment",
-      availableTimes: "Available times",
+      availableTimes: "Available Times",
+      noSlots: "No available slots for this day.",
       loadingSlots: "Loading times...",
-      noSlots: "No times available.",
+      spotsAvailable: "open",
       // success page
-      successTitle: "Reservation successful!",
-      successMsg: "Thank you for your booking. We have received your request and will confirm it as soon as possible.",
+      successTitle: "Request Received",
+      successMsg: "Thank you! We have received your request and will review it. You will receive a confirmation via email and SMS once the appointment is approved.",
+      successBooking: "Request sent successfully!",
       backToHome: "Back to homepage",
       // dashboard
       dashboard: {
