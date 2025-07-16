@@ -42,64 +42,49 @@ class BookingLogicTests(APITestCase):
         self.assertIn("16:30", response.data)  # Posljednji termin (16:30 + 30min = 17:00) bi trebao biti dostupan
         self.assertNotIn("17:00", response.data) # Ovaj termin je izvan radnog vremena
 
-    def test_single_booking_with_multiple_resources(self):
-        """Testira da termin ostaje dostupan ako se rezervira samo jedan od više resursa."""
-        # === Korak 1: Provjeri da je termin u 09:00 slobodan PRIJE rezervacije ===
-        response_before = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
-        self.assertEqual(response_before.status_code, status.HTTP_200_OK)
-        self.assertIn("09:00", response_before.data)
-
-        # === Korak 2: Kreiraj jednu rezervaciju za 09:00 ===
+    def test_unapproved_reservation_does_not_block_slot(self):
+        """Testira da nova, neodobrena rezervacija NE zauzima termin."""
+        # Kreiramo jednu rezervaciju, koja je po defaultu is_approved=False
         tz = timezone.get_current_timezone()
         start_time_aware = datetime.combine(self.test_date, time(9, 0), tzinfo=tz)
-
         reservation_data = {
-            "full_name": "John Doe",
-            "phone": "555-1234",
-            "email": "john.doe@test.com",
-            "service": self.service.id,
-            "start_time": start_time_aware.isoformat()
+            "full_name": "John Doe", "phone": "555-1234", "email": "john.doe@test.com",
+            "service": self.service.id, "start_time": start_time_aware.isoformat()
         }
-
         response_create = self.client.post(self.reservations_url, reservation_data, format='json')
         self.assertEqual(response_create.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Reservation.objects.count(), 1)
 
-        # === Korak 3: Provjeri da je termin u 09:00 I DALJE DOSTUPAN (jer je drugi resurs slobodan) ===
+        # Provjeravamo da je termin u 09:00 I DALJE DOSTUPAN, jer rezervacija nije odobrena
         response_after = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
         self.assertEqual(response_after.status_code, status.HTTP_200_OK)
-        self.assertIn("09:00", response_after.data) # Ključna provjera!
+        self.assertIn("09:00", response_after.data)
 
-    def test_availability_with_multiple_resources(self):
-        """Testira logiku kada servis ima više resursa i svi se popune."""
+    def test_approved_reservations_block_slot_with_multiple_resources(self):
+        """Testira da se termin popunjava tek NAKON ODOBRENJA rezervacija."""
         tz = timezone.get_current_timezone()
         start_time_aware = datetime.combine(self.test_date, time(10, 0), tzinfo=tz)
 
-        # === Korak 1: Provjeri da je 10:00 slobodno na početku ===
-        response_before = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
-        self.assertIn("10:00", response_before.data)
-
-        # === Korak 2: Kreiraj PRVU rezervaciju za 10:00 ===
-        reservation_data = {
+        # Kreiramo DVIJE rezervacije za isti termin
+        reservation_data_1 = {
             "full_name": "John Doe", "phone": "555-0001", "email": "john@test.com",
             "service": self.service.id, "start_time": start_time_aware.isoformat()
         }
-        response1 = self.client.post(self.reservations_url, reservation_data, format='json')
-        self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
+        self.client.post(self.reservations_url, reservation_data_1, format='json')
 
-        # === Korak 3: Provjeri da je 10:00 I DALJE DOSTUPNO (jer je drugi resurs slobodan) ===
-        response_middle = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
-        self.assertIn("10:00", response_middle.data)
-
-        # === Korak 4: Kreiraj DRUGU rezervaciju za 10:00 ===
         reservation_data_2 = {
             "full_name": "Jane Doe", "phone": "555-0002", "email": "jane@test.com",
             "service": self.service.id, "start_time": start_time_aware.isoformat()
         }
-        response2 = self.client.post(self.reservations_url, reservation_data_2, format='json')
-        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+        self.client.post(self.reservations_url, reservation_data_2, format='json')
         self.assertEqual(Reservation.objects.count(), 2)
 
-        # === Korak 5: Provjeri da 10:00 VIŠE NIJE DOSTUPNO (oba resursa su zauzeta) ===
-        response_after = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
-        self.assertNotIn("10:00", response_after.data)
+        # U ovom trenutku, obje rezervacije su neodobrene, pa termin MORA biti slobodan
+        response_before_approval = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertIn("10:00", response_before_approval.data)
+
+        # Sada odobravamo obje rezervacije
+        Reservation.objects.update(is_approved=True)
+
+        # Tek sada, nakon odobrenja, termin VIŠE NIJE DOSTUPAN
+        response_after_approval = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertNotIn("10:00", response_after_approval.data)

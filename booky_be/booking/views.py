@@ -49,9 +49,10 @@ class AvailabilityAPIView(APIView):
         end_of_day = datetime.combine(date_obj, time.max, tzinfo=tz)
 
         existing_reservations = Reservation.objects.filter(
-            service=service, # Filter by service is crucial
+            service=service, 
             start_time__lt=end_of_day, 
-            end_time__gt=start_of_day
+            end_time__gt=start_of_day,
+            is_approved=True
         ).select_related('resource')
 
         # Group reservations by resource for efficient lookup

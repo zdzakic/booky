@@ -14,11 +14,17 @@ class ReservationAdmin(admin.ModelAdmin):
         'email', 
         'license_plate', 
         'is_stored',
+        'is_approved',
         'created_at'
     ]
-    list_filter = ['service', 'resource', 'is_stored', 'start_time']
+    list_filter = ['service', 'resource', 'is_stored', 'start_time', 'is_approved']
     search_fields = ['full_name', 'email', 'license_plate']
     ordering = ['-start_time']
+    actions = ['approve_reservations']
+
+    def approve_reservations(self, request, queryset):
+        queryset.update(is_approved=True)
+    approve_reservations.short_description = "Approve selected reservations"
 
 @admin.register(ServiceType)
 class ServiceTypeAdmin(admin.ModelAdmin):
