@@ -1,177 +1,105 @@
-# booky/tests/test_reservations.py
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from booking.models import ServiceType, TimeSlot, Reservation
-from datetime import date, time
+from rest_framework import status
+from booking.models import ServiceType, Reservation, Resource, BusinessHours
+from datetime import date, time, datetime
+from django.utils import timezone
 
-class ReservationAPITest(APITestCase):
+
+class BookingLogicTests(APITestCase):
+    """Potpuno novi test suite koji testira postojeću logiku bookinga."""
+    
     def setUp(self):
-        self.service = ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
-        self.slot = TimeSlot.objects.create(
-            date=date(2025, 6, 30),
-            start_time=time(9, 30),
-            is_available=True,
-            capacity=1  # Ažurirano!
-        )
-        self.url = reverse('reservation-create')
+        """Postavlja sve potrebne podatke za testiranje."""
+        # 1. Kreiramo DVA resursa
+        self.resource1 = Resource.objects.create(name="Test Line 1")
+        self.resource2 = Resource.objects.create(name="Test Line 2")
 
-    def test_create_reservation_success(self):
-        data = {
-            "full_name": "Test User",
-            "phone": "123456789",
-            "email": "test@example.com",
-            "license_plate": "XYZ123",
+        # 2. Kreiramo servis i povežemo ga s OBA resursa
+        self.service = ServiceType.objects.create(name="Test Service", duration_minutes=30)
+        self.service.resources.add(self.resource1, self.resource2)
+
+        # 3. Definiramo radno vrijeme za dan koji ćemo testirati
+        #    Koristimo četvrtak, 17. srpnja 2025. Njegov weekday() je 3.
+        self.test_date = date(2025, 7, 17)
+        BusinessHours.objects.create(
+            day_of_week=3,  # Ponedjeljak=0, Utorak=1, Srijeda=2, Četvrtak=3
+            open_time=time(8, 0),
+            close_time=time(17, 0)
+        )
+
+        # 4. Definiramo URL-ove koje ćemo pozivati (s ispravnim namespace-om)
+        self.availability_url = reverse('booking:availability')
+        self.reservations_url = reverse('booking:reservation-list-create')
+
+    def test_get_availability_for_empty_day(self):
+        """Testira osnovnu funkcionalnost: dohvaćanje slobodnih termina za prazan dan."""
+        response = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Provjeravamo ključne vrijednosti
+        self.assertIn("08:00", response.data)  # Prvi termin bi trebao biti dostupan
+        self.assertIn("16:30", response.data)  # Posljednji termin (16:30 + 30min = 17:00) bi trebao biti dostupan
+        self.assertNotIn("17:00", response.data) # Ovaj termin je izvan radnog vremena
+
+    def test_single_booking_with_multiple_resources(self):
+        """Testira da termin ostaje dostupan ako se rezervira samo jedan od više resursa."""
+        # === Korak 1: Provjeri da je termin u 09:00 slobodan PRIJE rezervacije ===
+        response_before = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertEqual(response_before.status_code, status.HTTP_200_OK)
+        self.assertIn("09:00", response_before.data)
+
+        # === Korak 2: Kreiraj jednu rezervaciju za 09:00 ===
+        tz = timezone.get_current_timezone()
+        start_time_aware = datetime.combine(self.test_date, time(9, 0), tzinfo=tz)
+
+        reservation_data = {
+            "full_name": "John Doe",
+            "phone": "555-1234",
+            "email": "john.doe@test.com",
             "service": self.service.id,
-            "is_stored": True,
-            "date": "2025-06-30",
-            "start_time": "09:30"
+            "start_time": start_time_aware.isoformat()
         }
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 201)
+
+        response_create = self.client.post(self.reservations_url, reservation_data, format='json')
+        self.assertEqual(response_create.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Reservation.objects.count(), 1)
-        self.assertEqual(Reservation.objects.first().full_name, "Test User")
 
+        # === Korak 3: Provjeri da je termin u 09:00 I DALJE DOSTUPAN (jer je drugi resurs slobodan) ===
+        response_after = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertEqual(response_after.status_code, status.HTTP_200_OK)
+        self.assertIn("09:00", response_after.data) # Ključna provjera!
 
-class ReservationSlotValidationTest(APITestCase):
-    def setUp(self):
-        self.service_30 = ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
-        self.service_60 = ServiceType.objects.create(name="Reifenwechsel mit Felgen", duration_minutes=60)
+    def test_availability_with_multiple_resources(self):
+        """Testira logiku kada servis ima više resursa i svi se popune."""
+        tz = timezone.get_current_timezone()
+        start_time_aware = datetime.combine(self.test_date, time(10, 0), tzinfo=tz)
 
-        self.date = date(2025, 6, 30)
-        self.slot_1 = TimeSlot.objects.create(date=self.date, start_time=time(8, 0), is_available=True, capacity=1)
-        self.slot_2 = TimeSlot.objects.create(date=self.date, start_time=time(8, 30), is_available=True, capacity=1)
-        self.slot_3 = TimeSlot.objects.create(date=self.date, start_time=time(9, 0), is_available=False, capacity=1)
+        # === Korak 1: Provjeri da je 10:00 slobodno na početku ===
+        response_before = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertIn("10:00", response_before.data)
 
-        self.url = reverse('reservation-create')
-
-    def test_30_min_service_with_one_slot(self):
-        data = {
-            "full_name": "User 30min",
-            "phone": "123",
-            "email": "u30@test.com",
-            "license_plate": "XX1",
-            "service": self.service_30.id,
-            "is_stored": True,
-            "date": str(self.date),
-            "start_time": "08:00"
+        # === Korak 2: Kreiraj PRVU rezervaciju za 10:00 ===
+        reservation_data = {
+            "full_name": "John Doe", "phone": "555-0001", "email": "john@test.com",
+            "service": self.service.id, "start_time": start_time_aware.isoformat()
         }
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 201)
+        response1 = self.client.post(self.reservations_url, reservation_data, format='json')
+        self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
 
-    def test_60_min_service_with_only_one_slot(self):
-        data = {
-            "full_name": "User 60min fail",
-            "phone": "456",
-            "email": "u60fail@test.com",
-            "license_plate": "XX2",
-            "service": self.service_60.id,
-            "is_stored": False,
-            "date": str(self.date),
-            "start_time": "09:00"
+        # === Korak 3: Provjeri da je 10:00 I DALJE DOSTUPNO (jer je drugi resurs slobodan) ===
+        response_middle = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertIn("10:00", response_middle.data)
+
+        # === Korak 4: Kreiraj DRUGU rezervaciju za 10:00 ===
+        reservation_data_2 = {
+            "full_name": "Jane Doe", "phone": "555-0002", "email": "jane@test.com",
+            "service": self.service.id, "start_time": start_time_aware.isoformat()
         }
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)  # ili 422 ako koristiš custom error
+        response2 = self.client.post(self.reservations_url, reservation_data_2, format='json')
+        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Reservation.objects.count(), 2)
 
-
-class ServiceListTest(APITestCase):
-    def test_service_list_returns_all_services(self):
-        ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
-        ServiceType.objects.create(name="Reifenwechsel auf Felgen", duration_minutes=60)
-
-        response = self.client.get(reverse('service-list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['name'], "Reifenwechsel")
-
-
-class ReservationListTest(APITestCase):
-    def setUp(self):
-        self.service = ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
-        self.slot = TimeSlot.objects.create(date=date.today(), start_time=time(8, 0), is_available=True, capacity=1)
-        self.reservation = Reservation.objects.create(
-            full_name="Tester",
-            phone="123456",
-            email="test@test.com",
-            license_plate="XX123",
-            service=self.service,
-            is_stored=False,
-        )
-        # Pravilno dodavanje slotova u rezervaciju (M2M)
-        self.reservation.timeslot.set([self.slot])
-
-    def test_reservation_list_returns_reservations(self):
-        response = self.client.get(reverse('reservation-list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data), 1)
-        self.assertIn('full_name', response.data[0])
-        self.assertIn('slots', response.data[0])  # Provjera da su slotovi prisutni!
-
-
-class AvailableSlotsTest(APITestCase):
-    def setUp(self):
-        self.service = ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
-        self.date = date(2025, 6, 27)
-        TimeSlot.objects.create(date=self.date, start_time=time(8, 0), is_available=True, capacity=1)
-        TimeSlot.objects.create(date=self.date, start_time=time(8, 30), is_available=True, capacity=1)
-
-    def test_available_slots_returns_slots(self):
-        url = reverse('available-slots') + f'?date={self.date}&service={self.service.id}'
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(any(slot["start_time"] == "08:00" for slot in response.data))
-
-    def test_available_slots_excludes_reserved(self):
-        # Prvo napravi rezervaciju za 08:00
-        slot = TimeSlot.objects.get(date=self.date, start_time=time(8, 0))
-        reservation = Reservation.objects.create(
-            full_name="User Reserved",
-            phone="555",
-            email="reserved@test.com",
-            license_plate="XZZZZ",
-            service=self.service,
-            is_stored=True,
-        )
-        reservation.timeslot.set([slot])
-        url = reverse('available-slots') + f'?date={self.date}&service={self.service.id}'
-        response = self.client.get(url)
-        # Provjeravamo da sada "08:00" više NIJE među dostupnim slotovima (ako capacity=1)
-        self.assertFalse(any(slot["start_time"] == "08:00" for slot in response.data))
-
-
-
-class ReservationCapacityTest(APITestCase):
-    def setUp(self):
-        self.service = ServiceType.objects.create(name="Reifenwechsel", duration_minutes=30)
-        self.slot = TimeSlot.objects.create(
-            date=date(2025, 6, 30),
-            start_time=time(9, 30),
-            is_available=True,
-            capacity=2  # Odmah postavi capacity na 2!
-        )
-        self.url = reverse('reservation-create')
-
-    def test_multiple_bookings_with_capacity(self):
-        data = {
-            "full_name": "User One",
-            "phone": "111",
-            "email": "u1@test.com",
-            "license_plate": "AAA111",
-            "service": self.service.id,
-            "is_stored": True,
-            "date": "2025-06-30",
-            "start_time": "09:30"
-        }
-        # Prva rezervacija
-        response1 = self.client.post(self.url, data, format='json')
-        self.assertEqual(response1.status_code, 201)
-
-        # Druga rezervacija
-        data["full_name"] = "User Two"
-        response2 = self.client.post(self.url, data, format='json')
-        self.assertEqual(response2.status_code, 201)
-
-        # Treća rezervacija – treba pasti
-        data["full_name"] = "User Three"
-        response3 = self.client.post(self.url, data, format='json')
-        self.assertEqual(response3.status_code, 400)
+        # === Korak 5: Provjeri da 10:00 VIŠE NIJE DOSTUPNO (oba resursa su zauzeta) ===
+        response_after = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertNotIn("10:00", response_after.data)

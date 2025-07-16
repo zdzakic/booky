@@ -52,6 +52,7 @@ class Reservation(models.Model):
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
 
     is_stored = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False) 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
