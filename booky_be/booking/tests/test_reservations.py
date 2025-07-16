@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from booking.models import ServiceType, Reservation, Resource, BusinessHours
+from booking.models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from datetime import date, time, datetime
 from django.utils import timezone
 
@@ -37,10 +37,10 @@ class BookingLogicTests(APITestCase):
         response = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Provjeravamo ključne vrijednosti
-        self.assertIn("08:00", response.data)  # Prvi termin bi trebao biti dostupan
-        self.assertIn("16:30", response.data)  # Posljednji termin (16:30 + 30min = 17:00) bi trebao biti dostupan
-        self.assertNotIn("17:00", response.data) # Ovaj termin je izvan radnog vremena
+        # Provjeravamo da odgovor sadrži objekte s vremenom i brojem dostupnih mjesta
+        self.assertTrue(any(slot['time'] == '08:00' and slot['available_count'] == 2 for slot in response.data))
+        self.assertTrue(any(slot['time'] == '16:30' for slot in response.data))
+        self.assertFalse(any(slot['time'] == '17:00' for slot in response.data))
 
     def test_unapproved_reservation_does_not_block_slot(self):
         """Testira da nova, neodobrena rezervacija NE zauzima termin."""
@@ -54,10 +54,12 @@ class BookingLogicTests(APITestCase):
         response_create = self.client.post(self.reservations_url, reservation_data, format='json')
         self.assertEqual(response_create.status_code, status.HTTP_201_CREATED)
 
-        # Provjeravamo da je termin u 09:00 I DALJE DOSTUPAN, jer rezervacija nije odobrena
+        # Provjeravamo da je termin u 09:00 i dalje dostupan s punim kapacitetom
         response_after = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
         self.assertEqual(response_after.status_code, status.HTTP_200_OK)
-        self.assertIn("09:00", response_after.data)
+        slot_info = next((slot for slot in response_after.data if slot['time'] == '09:00'), None)
+        self.assertIsNotNone(slot_info)
+        self.assertEqual(slot_info['available_count'], 2) # Oba resursa su i dalje slobodna
 
     def test_approved_reservations_block_slot_with_multiple_resources(self):
         """Testira da se termin popunjava tek NAKON ODOBRENJA rezervacija."""
@@ -78,13 +80,36 @@ class BookingLogicTests(APITestCase):
         self.client.post(self.reservations_url, reservation_data_2, format='json')
         self.assertEqual(Reservation.objects.count(), 2)
 
-        # U ovom trenutku, obje rezervacije su neodobrene, pa termin MORA biti slobodan
-        response_before_approval = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
-        self.assertIn("10:00", response_before_approval.data)
+        # Prije odobrenja, termin je dostupan s punim kapacitetom
+        response_before = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        slot_info_before = next((slot for slot in response_before.data if slot['time'] == '10:00'), None)
+        self.assertIsNotNone(slot_info_before)
+        self.assertEqual(slot_info_before['available_count'], 2)
 
-        # Sada odobravamo obje rezervacije
-        Reservation.objects.update(is_approved=True)
+        # Odobravamo samo JEDNU rezervaciju
+        Reservation.objects.filter(full_name="John Doe").update(is_approved=True)
 
-        # Tek sada, nakon odobrenja, termin VIŠE NIJE DOSTUPAN
-        response_after_approval = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
-        self.assertNotIn("10:00", response_after_approval.data)
+        # Nakon odobrenja jedne, termin je i dalje dostupan, ali s jednim mjestom manje
+        response_middle = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        slot_info_middle = next((slot for slot in response_middle.data if slot['time'] == '10:00'), None)
+        self.assertIsNotNone(slot_info_middle)
+        self.assertEqual(slot_info_middle['available_count'], 1)
+
+        # Odobravamo i DRUGU rezervaciju
+        Reservation.objects.filter(full_name="Jane Doe").update(is_approved=True)
+
+        # Nakon odobrenja obje, termin više nije na listi dostupnih
+        response_after = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+        self.assertFalse(any(slot['time'] == '10:00' for slot in response_after.data))
+
+    def test_availability_on_holiday(self):
+        """Testira da za dan koji je praznik nema slobodnih termina."""
+        # Kreiramo praznik za naš testni datum
+        Holiday.objects.create(name="Test Holiday", date=self.test_date)
+
+        # Pokušavamo dohvatiti dostupnost za taj dan
+        response = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
+
+        # Očekujemo HTTP 200 OK, ali sa praznom listom kao podacima
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, []) # Ključna provjera

@@ -57,3 +57,13 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.service.name} on {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+
+class Holiday(models.Model):
+    name = models.CharField(max_length=100, help_text="e.g., New Year's Day")
+    date = models.DateField(unique=True)
+
+    def __str__(self):
+        return f"{self.name} on {self.date.strftime('%Y-%m-%d')}"
+
+    class Meta:
+        ordering = ['date']

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db import transaction
 from datetime import datetime, time, timedelta
 
-from .models import ServiceType, Reservation, Resource, BusinessHours
+from .models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from .serializers import (
     ServiceTypeSerializer, 
     ReservationSerializer,
@@ -31,8 +31,16 @@ class AvailabilityAPIView(APIView):
             return Response({"error": "'service' and 'date' parameters are required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            service = get_object_or_404(ServiceType, pk=service_id)
             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # === PROVJERA PRAZNIKA ===
+        if Holiday.objects.filter(date=date_obj).exists():
+            return Response([], status=status.HTTP_200_OK) # Vrati praznu listu ako je praznik
+
+        try:
+            service = get_object_or_404(ServiceType, pk=service_id)
             # The BusinessHours model uses 0-indexed weekdays (Monday=0), matching Python's weekday().
             day_of_week = date_obj.weekday()
         except (ValueError, ServiceType.DoesNotExist):
@@ -65,30 +73,33 @@ class AvailabilityAPIView(APIView):
         if not all_resources:
             return Response({"error": "No resources are configured for this specific service."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # --- Loop with timezone awareness --- 
-        current_time = datetime.combine(date_obj, business_hours.open_time, tzinfo=tz)
-        end_of_work_day = datetime.combine(date_obj, business_hours.close_time, tzinfo=tz)
+        total_resources = len(all_resources)
+
+        # Loop through time slots and check for availability
+        available_slots = []
+        start_work_time = datetime.combine(date_obj, business_hours.open_time, tzinfo=tz)
+        end_work_time = datetime.combine(date_obj, business_hours.close_time, tzinfo=tz)
         service_duration = timedelta(minutes=service.duration_minutes)
-        slot_interval = timedelta(minutes=15)
-        available_start_times = set()
+        step = timedelta(minutes=30)  # Define the time step for checking availability. We use 30 minutes for better UI.
 
-        while current_time + service_duration <= end_of_work_day:
-            potential_start = current_time
-            potential_end = potential_start + service_duration
+        current_time = start_work_time
+        while current_time + service_duration <= end_work_time:
+            slot_end_time = current_time + service_duration
 
-            occupied_resources_count = 0
-            for resource in all_resources:
-                for reservation in reservations_by_resource.get(resource.id, []):
-                    if max(potential_start, reservation.start_time) < min(potential_end, reservation.end_time):
-                        occupied_resources_count += 1
-                        break 
-            
-            if occupied_resources_count < len(all_resources):
-                available_start_times.add(potential_start.strftime("%H:%M"))
+            # Count how many resources are booked at this specific time
+            occupied_resources_count = sum(1 for r in existing_reservations if r.start_time < slot_end_time and r.end_time > current_time)
 
-            current_time += slot_interval
+            # If the number of occupied resources is less than the total available, the slot is available
+            if occupied_resources_count < total_resources:
+                available_count = total_resources - occupied_resources_count
+                available_slots.append({
+                    "time": current_time.strftime('%H:%M'),
+                    "available_count": available_count
+                })
 
-        return Response(sorted(list(available_start_times)))
+            current_time += step
+
+        return Response(available_slots, status=status.HTTP_200_OK)
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):

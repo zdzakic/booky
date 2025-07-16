@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Reservation, ServiceType, Resource, BusinessHours
+from .models import Reservation, ServiceType, Resource, BusinessHours, Holiday
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
@@ -26,15 +26,7 @@ class ReservationAdmin(admin.ModelAdmin):
         queryset.update(is_approved=True)
     approve_reservations.short_description = "Approve selected reservations"
 
-@admin.register(ServiceType)
-class ServiceTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'duration_minutes']
-
-@admin.register(Resource)
-class ResourceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
-
-@admin.register(BusinessHours)
-class BusinessHoursAdmin(admin.ModelAdmin):
-    list_display = ['get_day_of_week_display', 'open_time', 'close_time']
-    ordering = ['day_of_week']
+admin.site.register(Resource)
+admin.site.register(ServiceType)
+admin.site.register(BusinessHours)
+admin.site.register(Holiday)
