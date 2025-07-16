@@ -54,6 +54,11 @@ export default function BookingForm() {
     }));
   };
 
+    // Reset selected time if date or service changes
+  useEffect(() => {
+    setSelectedTime(null);
+  }, [selectedDate, formData.service]);
+
   // povuci servis dinamicki 
   useEffect(() => {
     const fetchServices = async () => {
@@ -188,7 +193,7 @@ export default function BookingForm() {
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             label={t.selectDate}
-            placeholder={t.datePlaceholder}
+            placeholder={t.datePlaceholder} 
             lang={lang}
           />
           {selectedDate && formData.service && (

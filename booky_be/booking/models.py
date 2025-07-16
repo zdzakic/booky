@@ -3,6 +3,7 @@ from django.db import models
 class ServiceType(models.Model):
     name = models.CharField(max_length=100)
     duration_minutes = models.PositiveIntegerField()
+    resources = models.ManyToManyField('Resource', related_name='services')
 
     def __str__(self):
         return f"{self.name} ({self.duration_minutes} min)"
