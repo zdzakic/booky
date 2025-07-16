@@ -40,6 +40,9 @@ export const translations = {
         pending: "Ausstehend",
         today: "Heute",
         upcoming_days: "Kommende Tage",
+        reservations_today: "Termine Heute",
+        pending_approval: "Warten auf Freigabe",
+        reservations_this_week: "Termine diese Woche",
         no_reservations: "Keine Reservierungen gefunden",
         no_reservations_title: "Keine Reservierungen gefunden",
         no_reservations_search_message: "Versuchen Sie, Ihre Suchanfrage anzupassen.",
@@ -55,7 +58,7 @@ export const translations = {
         delete_success: "Reservierung erfolgreich gelöscht.",
         delete_error: "Fehler beim Löschen der Reservierung.",
         // Quick-Stats
-        reservations_today: "Reservierungen heute",
+        reservations_today: "Termine Heute",
         total_slots_today: "Termine heute",
         new_clients_today: "Neukunden heute",
         // Search
@@ -109,6 +112,9 @@ export const translations = {
         pending: "Pending",
         today: "Today",
         upcoming_days: "Upcoming Days",
+        reservations_today: "Reservations Today",
+        pending_approval: "Pending Approval",
+        reservations_this_week: "Reservations This Week",
         no_reservations: "No reservations found",
         no_reservations_title: "No Reservations Found",
         no_reservations_search_message: "Try adjusting your search query.",

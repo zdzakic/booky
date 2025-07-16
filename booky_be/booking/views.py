@@ -59,8 +59,7 @@ class AvailabilityAPIView(APIView):
         existing_reservations = Reservation.objects.filter(
             service=service, 
             start_time__lt=end_of_day, 
-            end_time__gt=start_of_day,
-            is_approved=True
+            end_time__gt=start_of_day
         ).select_related('resource')
 
         # Group reservations by resource for efficient lookup
@@ -103,12 +102,14 @@ class AvailabilityAPIView(APIView):
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
-    """Handles listing and creation of reservations."""
-
     def get_queryset(self):
-        return Reservation.objects.select_related('service', 'resource').order_by('-start_time')
+        """
+        Vraća sve rezervacije, sortirane po datumu početka.
+        """
+        return Reservation.objects.all().order_by('start_time')
 
     def get_serializer_class(self):
+        """Odabire serializer ovisno o akciji (GET vs POST)."""
         if self.request.method == 'POST':
             return ReservationSerializer
         return ReservationListSerializer
@@ -144,3 +145,10 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
 
 class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Reservation.objects.all()
+    serializer_class = ReservationListSerializer
+    # permission_classes = [IsAuthenticated] # Privremeno uklonjeno
+
+
+# class HolidayListAPIView(generics.ListAPIView):
+#     queryset = Holiday.objects.all()
+#     serializer_class = HolidaySerializer

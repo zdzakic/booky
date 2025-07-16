@@ -14,6 +14,7 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
 
   // Simplified 'isPast' logic using end_time
   const isPast = new Date(reservation.end_time) < new Date();
+  const isToday = !isPast && reservation.start_time.startsWith(new Date().toISOString().slice(0, 10));
 
   // KORAK 2: Definišemo klase koristeći vrednosti iz teme
   const isStoredClasses = `bg-${theme.colors.success}-100 text-${theme.colors.success}-800 dark:bg-${theme.colors.success}-900/30 dark:text-${theme.colors.success}-200`;
@@ -25,6 +26,8 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
 
   const rowClass = isPast
     ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-60'
+    : isToday
+    ? 'border-b text-sm bg-sky-50 dark:bg-sky-900/30 hover:bg-sky-100 dark:hover:bg-sky-800/50 group transition-colors duration-200' // Highlight for today
     : 'border-b text-sm hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors duration-200';
 
   return (
@@ -54,7 +57,7 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
         {reservation.service?.name || '-'}
       </div>
 
-      <div className="text-sm md:table-cell md:px-3 md:py-2">
+      <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.stored || 'Stored?'}: </span>
         <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${reservation.is_stored ? isStoredClasses : isNotStoredClasses}`}>
           {reservation.is_stored ? (labels.yes || 'Yes') : (labels.no || 'No')}

@@ -40,6 +40,25 @@ const ReservationsDashboard = () => {
     );
   });
 
+  // Calculate statistics from the original reservations list (before filtering)
+  const unapprovedCount = reservations.filter(res => !res.is_approved).length;
+  const reservationsTodayCount = reservations.filter(res => {
+    const today = new Date().toISOString().slice(0, 10);
+    return res.start_time.startsWith(today);
+  }).length;
+
+  const reservationsThisWeekCount = reservations.filter(res => {
+    const reservationDate = new Date(res.start_time);
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); // Monday
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    return reservationDate >= startOfWeek && reservationDate <= endOfWeek;
+  }).length;
+
   if (loading) return <DashboardSkeleton />;
 
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
@@ -80,9 +99,9 @@ const ReservationsDashboard = () => {
       />
 
       <QuickStats
-        reservationsTodayCount={0} // Placeholder, we can recalculate this later if needed
-        totalSlotsToday={0} // Placeholder, we can recalculate this later if needed
-        newClientsToday={0} // Placeholder, we can recalculate this later if needed
+        reservationsTodayCount={reservationsTodayCount}
+        unapprovedCount={unapprovedCount}
+        reservationsThisWeekCount={reservationsThisWeekCount}
         t={t}
       />
 
