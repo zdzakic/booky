@@ -26,6 +26,7 @@ const ReservationsTable = ({ title, reservations, labels, lang, onView, onEdit, 
               <div className="md:table-cell px-3 py-2 text-left">{labels.plates || 'License Plates'}</div>
               <div className="md:table-cell px-3 py-2 text-left">{labels.service || 'Service'}</div>
               <div className="md:table-cell px-3 py-2 text-left">{labels.stored || 'Stored?'}</div>
+              <div className="md:table-cell px-3 py-2 text-left">{labels.status || 'Status'}</div>
               <div className="md:table-cell px-3 py-2 text-left">{labels.slot || 'Time Slot'}</div>
               <div className="md:table-cell px-3 py-2 text-left">{labels.created || 'Created'}</div>
               <div className="md:table-cell px-3 py-2 text-right">{labels.actions || 'Actions'}</div>

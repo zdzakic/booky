@@ -58,5 +58,6 @@ class ReservationListSerializer(serializers.ModelSerializer):
             'start_time', 
             'end_time',
             'is_stored',
+            'is_approved',
             'created_at'
         ]

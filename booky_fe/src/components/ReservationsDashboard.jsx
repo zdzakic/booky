@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from '../utils/axios';
 import { translations } from '../utils/translations';
 import LanguageSwitcher from './LanguageSwitcher';
-import { groupByDay } from '../utils/reservationUtils';
 import ReservationsTable from './ReservationsTable';
 import QuickStats from './QuickStats';
 import SearchBar from './ui/SearchBar';
@@ -21,7 +20,7 @@ const ReservationsDashboard = () => {
   const [reservationToDelete, setReservationToDelete] = useState(null);
 
   useEffect(() => {
-    axios.get('/reservations/lists/')
+    axios.get('/reservations/')
       .then(res => {
         setReservations(res.data);
         setLoading(false);
@@ -31,7 +30,6 @@ const ReservationsDashboard = () => {
 
   const t = translations[lang]?.dashboard || {};
 
-  // Filtriranje rezervacija na osnovu pretrage
   const filteredReservations = reservations.filter(res => {
     const query = searchQuery.toLowerCase();
     return (
@@ -42,34 +40,8 @@ const ReservationsDashboard = () => {
     );
   });
 
-  // Grupisanje termina po danima
-  const { today, future } = groupByDay(filteredReservations);
-
-  // Pronalazak i označavanje sljedeće rezervacije za danas
-  const now = new Date();
-  const currentTime = now.toTimeString().slice(0, 5); // npr. "18:45"
-  let nextReservationFound = false;
-
-  const todayWithNext = today.map(res => {
-    if (nextReservationFound) return { ...res, isNext: false };
-
-    const earliestSlotTime = res.slots.reduce((earliest, s) => s.start_time < earliest ? s.start_time : earliest, '23:59');
-
-    if (earliestSlotTime > currentTime) {
-      nextReservationFound = true;
-      return { ...res, isNext: true };
-    }
-    return { ...res, isNext: false };
-  });
-
-  // Izračunavanje statistike za brzi pregled
-  const reservationsTodayCount = today.length;
-  const totalSlotsToday = today.reduce((acc, res) => acc + res.slots.length, 0);
-  const newClientsToday = today.filter(res => !res.is_stored).length;
-
   if (loading) return <DashboardSkeleton />;
 
-  // Akcije za dugmad (dodaj kasnije prave funkcije)
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
   const handleEdit = (row) => alert(`${t.edit || 'Edit'} reservation: ${row.full_name}`);
 
@@ -100,34 +72,24 @@ const ReservationsDashboard = () => {
         <LanguageSwitcher lang={lang} setLang={setLang} />
       </div>
 
-      {/* Search Input */}
       <SearchBar
         searchQuery={searchQuery}
         onSearchChange={(e) => setSearchQuery(e.target.value)}
         placeholder={t.search_placeholder}
         className="mb-6"
       />
-      {/* Quick Stats Section */}
+
       <QuickStats
-        reservationsTodayCount={reservationsTodayCount}
-        totalSlotsToday={totalSlotsToday}
-        newClientsToday={newClientsToday}
+        reservationsTodayCount={0} // Placeholder, we can recalculate this later if needed
+        totalSlotsToday={0} // Placeholder, we can recalculate this later if needed
+        newClientsToday={0} // Placeholder, we can recalculate this later if needed
         t={t}
       />
 
       <div className="max-w-7xl w-full mx-auto">
         <ReservationsTable
-          title={t.today || 'Today'}
-          reservations={todayWithNext}
-          labels={t}
-          lang={lang}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-        <ReservationsTable
-          title={t.upcoming_days || 'Upcoming Days'}
-          reservations={future}
+          title={t.all_reservations || 'All reservations'}
+          reservations={filteredReservations}
           labels={t}
           lang={lang}
           onView={handleView}

@@ -12,20 +12,8 @@ const ActionButton = ({ title, onClick, children }) => (
 const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete }) => {
   const t = translations[lang]?.dashboard || {};
 
-  const now = new Date();
-  const lastSlot = reservation.slots && reservation.slots[reservation.slots.length - 1];
-  let isPast = false;
-
-  if (lastSlot) {
-    // Create a Date object from the last slot's start time.
-    // new Date() will correctly parse this in the user's local timezone.
-    const endTime = new Date(`${lastSlot.date}T${lastSlot.start_time}`);
-    // Add 30 minutes to get the actual end time of the reservation.
-    endTime.setMinutes(endTime.getMinutes() + 30);
-
-    // Compare with the current time.
-    isPast = endTime < new Date();
-  }
+  // Simplified 'isPast' logic using end_time
+  const isPast = new Date(reservation.end_time) < new Date();
 
   // KORAK 2: Definišemo klase koristeći vrednosti iz teme
   const isStoredClasses = `bg-${theme.colors.success}-100 text-${theme.colors.success}-800 dark:bg-${theme.colors.success}-900/30 dark:text-${theme.colors.success}-200`;
@@ -36,9 +24,7 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
   const deleteIconClasses = `text-${theme.colors.error}-500`;
 
   const rowClass = isPast
-    ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-20'
-    : reservation.isNext
-    ? `border-b text-sm group bg-${theme.colors.secondary}-100 dark:bg-${theme.colors.secondary}-900/30`
+    ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-60'
     : 'border-b text-sm hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors duration-200';
 
   return (
@@ -65,7 +51,7 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
 
       <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.service || 'Service'}: </span>
-        {reservation.service_name}
+        {reservation.service?.name || '-'}
       </div>
 
       <div className="text-sm md:table-cell md:px-3 md:py-2">
@@ -74,20 +60,29 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
           {reservation.is_stored ? (labels.yes || 'Yes') : (labels.no || 'No')}
         </span>
       </div>
+
+      {/* Status Cell */}
+      <div className="text-sm md:table-cell md:px-3 md:py-2">
+        <span className="font-semibold md:hidden">{labels.status || 'Status'}: </span>
+        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${reservation.is_approved 
+          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+          : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'}`}>
+          {reservation.is_approved ? (labels.approved || 'Approved') : (labels.pending || 'Pending')}
+        </span>
+      </div>
       
+      {/* Simplified Time Slot display */}
       <div className="col-span-2 mt-2 md:table-cell md:px-3 md:py-2 md:mt-0">
-        <div className="flex flex-wrap gap-1 items-center">
-          {reservation.slots.map(slot => (
-            <div key={slot.id} className={`font-mono text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${timeSlotClasses}`}>
-              {slot.date} {slot.start_time}
-            </div>
-          ))}
+        <div className={`font-mono text-xs px-2 py-0.5 rounded-full whitespace-nowrap inline-block ${timeSlotClasses}`}>
+          {new Date(reservation.start_time).toLocaleString(lang === 'de' ? 'de-CH' : 'en-GB', { 
+            year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' 
+          })}
         </div>
       </div>
 
       <div className="text-xs text-gray-400 dark:text-gray-500 md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.created || 'Created'}: </span>
-        {reservation.created ? new Date(reservation.created).toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
+        {reservation.created_at ? new Date(reservation.created_at).toLocaleString(lang === 'de' ? 'de-CH' : 'en-GB', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
       </div>
 
       <div className="col-span-2 mt-2 md:table-cell md:px-3 md:py-2 md:mt-0">
