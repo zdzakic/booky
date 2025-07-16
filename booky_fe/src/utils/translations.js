@@ -63,6 +63,16 @@ export const translations = {
         new_clients_today: "Neukunden heute",
         // Search
         search_placeholder: "Suche nach Name, Telefon, Kennzeichen...",
+        // --- NOVI KLJUČEVI ---
+        title: 'Reservierungs-Dashboard',
+        unapproved_reservations: 'Nicht genehmigte Reservierungen',
+        total_reservations: 'Gesamte Reservierungen',
+        approve: 'Genehmigen',
+        approving: 'Genehmigung wird bearbeitet...',
+        approve_success: 'Reservierung erfolgreich genehmigt!',
+        approve_error: 'Genehmigung der Reservierung fehlgeschlagen.',
+        delete_success: 'Reservierung erfolgreich gelöscht.',
+        delete_error: 'Löschen der Reservierung fehlgeschlagen.'
       },
       // Validation errors:
       errors: {
@@ -135,6 +145,16 @@ export const translations = {
         new_clients_today: "New Clients Today",
         // Search
         search_placeholder: "Search by name, phone, license plate...",
+        // --- NOVI KLJUČEVI ---
+        title: 'Reservations Dashboard',
+        unapproved_reservations: 'Unapproved Reservations',
+        total_reservations: 'Total Reservations',
+        approve: 'Approve',
+        approving: 'Approving...',
+        approve_success: 'Reservation approved successfully!',
+        approve_error: 'Failed to approve reservation.',
+        delete_success: 'Reservation deleted successfully.',
+        delete_error: 'Failed to delete reservation.'
       },
       // Validation errors:
       errors: {

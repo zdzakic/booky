@@ -25,7 +25,7 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
   const deleteIconClasses = `text-${theme.colors.error}-500`;
 
   const rowClass = isPast
-    ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-60'
+    ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-20'
     : isToday
     ? 'border-b text-sm bg-sky-50 dark:bg-sky-900/30 hover:bg-sky-100 dark:hover:bg-sky-800/50 group transition-colors duration-200' // Highlight for today
     : 'border-b text-sm hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors duration-200';

@@ -71,28 +71,33 @@ const ReservationsDashboard = () => {
     setIsModalOpen(true);
   };
 
-  const handleApprove = async (reservationId) => {
-    try {
-      const token = localStorage.getItem('token'); // Pretpostavka da token treba
-      await axios.patch(`${API_BASE_URL}/reservations/${reservationId}/`, 
-        { is_approved: true },
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-      // Azuriraj stanje lokalno za instant feedback
-      setReservations(prev => 
-        prev.map(res => res.id === reservationId ? { ...res, is_approved: true } : res)
-      );
-      toast.success(t.approve_success || 'Reservation approved!');
-    } catch (error) {
-      console.error('Failed to approve reservation:', error);
-      toast.error(t.approve_error || 'Failed to approve reservation.');
-    }
+  const handleApprove = (id) => {
+    // Optimistic UI update
+    const originalReservations = [...reservations];
+    setReservations(prev => prev.map(r => r.id === id ? { ...r, is_approved: true } : r));
+
+    toast.promise(
+      axios.patch(`reservations/${id}/`, { is_approved: true }),
+      {
+        loading: t.approving || 'Approving...',
+        success: () => {
+          // Opcionalno: Možete potpuno ukloniti rezervaciju iz liste nakon odobrenja
+          // setReservations(prev => prev.filter(r => r.id !== id));
+          return t.approve_success || 'Reservation approved successfully!';
+        },
+        error: () => {
+          // Vrati na staro ako je došlo do greške
+          setReservations(originalReservations);
+          return t.approve_error || 'Failed to approve reservation.';
+        },
+      }
+    );
   };
 
   const confirmDelete = async () => {
     if (!reservationToDelete) return;
     try {
-      await axios.delete(`/reservations/${reservationToDelete}/`);
+      await axios.delete(`reservations/${reservationToDelete}/`);
       setReservations(prev => prev.filter(res => res.id !== reservationToDelete));
       toast.success(t.delete_success || 'Reservation deleted successfully.');
     } catch (error) {

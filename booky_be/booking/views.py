@@ -159,7 +159,7 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
             Name: {instance.full_name}
             Phone: {instance.phone}
             Email: {instance.email}
-            Plates: {instance.plates}
+            Plates: {instance.license_plate}
             Service: {instance.service.name}
             Time Slot: {instance.start_time.strftime('%d.%m.%Y at %H:%M')}
 
@@ -169,6 +169,22 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
             recipient_list = ['owner@domain.com'] # Change to your email
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+            # --- START: Send confirmation to user ---
+            subject_user = "Your reservation is pending approval"
+            message_user = f"""
+            Hello {instance.full_name},
+
+            We have received your reservation request for {instance.service.name} on {instance.start_time.strftime('%d.%m.%Y at %H:%M')}.
+
+            You will receive another email once your reservation is confirmed.
+
+            Thank you!
+            """
+            recipient_list_user = [instance.email]
+            send_mail(subject_user, message_user, from_email, recipient_list_user, fail_silently=False)
+            # --- END: Send confirmation to user ---
+
         except Exception as e:
             # If email sending fails, we don't want to crash the whole process.
             # We'll just print the error to the console.
@@ -179,6 +195,39 @@ class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Reservation.objects.all()
     serializer_class = ReservationListSerializer
     # permission_classes = [IsAuthenticated] # Privremeno uklonjeno
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        # Ako se mijenja status na odobren
+        if 'is_approved' in request.data and request.data['is_approved'] == True and not instance.is_approved:
+            try:
+                subject = "Your reservation has been approved"
+                message = f"""
+                Hello {instance.full_name},
+
+                Your reservation for {instance.service.name} has been approved.
+
+                Details:
+                Service: {instance.service.name}
+                Date: {instance.start_time.strftime('%d.%m.%Y')}
+                Time: {instance.start_time.strftime('%H:%M')}
+                Resource: {instance.resource.name}
+                Plates: {instance.license_plate}
+
+                We look forward to seeing you!
+
+                Best regards,
+                Your service team
+                """
+                from_email = 'noreply@booky.app'
+                recipient_list = [instance.email]
+                
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except Exception as e:
+                print(f"Error sending approval email: {e}")
+
+        return super().partial_update(request, *args, **kwargs)
 
 
 # class HolidayListAPIView(generics.ListAPIView):

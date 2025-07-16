@@ -4,6 +4,7 @@ from rest_framework import status
 from booking.models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from datetime import date, time, datetime, timedelta
 from django.utils import timezone
+from django.core import mail
 
 
 class BookingLogicTests(APITestCase):
@@ -74,3 +75,47 @@ class BookingLogicTests(APITestCase):
         response = self.client.get(self.availability_url, {'service': self.service.id, 'date': self.test_date.isoformat()})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0) # Ne bi trebalo biti slotova
+
+    def test_approve_reservation_and_sends_email(self):
+        """
+        Testira da PATCH zahtjev na /reservations/<id>/ ispravno odobrava
+        rezervaciju i šalje email korisniku.
+        """
+        # 1. Kreiraj rezervaciju koju ćemo odobriti
+        tz = timezone.get_current_timezone()
+        start_time_aware = datetime.combine(self.test_date, time(11, 0), tzinfo=tz)
+        reservation_data = {
+            "full_name": "Approve Test User",
+            "phone": "555-approve",
+            "email": "approve.user@test.com",
+            "service": self.service.id,
+            "plates": "ZG-APPROVE",
+            "start_time": start_time_aware.isoformat()
+        }
+        create_response = self.client.post(self.reservations_url, reservation_data, format='json')
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        
+        # Očisti mail.outbox od emailova poslanih prilikom kreiranja rezervacije
+        mail.outbox = []
+
+        # 2. Dohvati rezervaciju direktno iz baze (jer response ne vraća ID)
+        try:
+            reservation = Reservation.objects.get(email="approve.user@test.com")
+        except Reservation.DoesNotExist:
+            self.fail("Reservation was not created in the database.")
+        self.assertFalse(reservation.is_approved)
+
+        # 3. Pošalji PATCH zahtjev za odobravanje
+        detail_url = reverse('booking:reservation-detail', kwargs={'pk': reservation.pk})
+        approve_response = self.client.patch(detail_url, {'is_approved': True}, format='json')
+
+        # 4. Provjeri odgovore i stanje u bazi
+        self.assertEqual(approve_response.status_code, status.HTTP_200_OK)
+        reservation.refresh_from_db()
+        self.assertTrue(reservation.is_approved)
+
+        # 5. Provjeri da je poslan samo jedan email (onaj za odobrenje)
+        self.assertEqual(len(mail.outbox), 1)
+        approval_email = mail.outbox[0]
+        self.assertEqual(approval_email.to, ["approve.user@test.com"])
+        self.assertIn("Your reservation has been approved", approval_email.subject)
