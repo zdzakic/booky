@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from booking.models import ServiceType, Reservation, Resource, BusinessHours, Holiday
-from datetime import date, time, datetime
+from datetime import date, time, datetime, timedelta
 from django.utils import timezone
 
 
@@ -11,12 +11,12 @@ class BookingLogicTests(APITestCase):
     
     def setUp(self):
         """Set up a clean environment for each test."""
-        self.service = ServiceType.objects.create(name='Tire Change', duration_minutes=30)
+        self.service = ServiceType.objects.create(name='Test Service', duration_minutes=30)
         self.resource1 = Resource.objects.create(name='Lift 1')
         self.resource2 = Resource.objects.create(name='Lift 2')
         self.service.resources.add(self.resource1, self.resource2)
-        self.test_date = date(2025, 7, 16) # Srijeda
-        BusinessHours.objects.create(day_of_week=2, open_time='09:00', close_time='17:00') # 2 = Srijeda
+        self.test_date = timezone.localdate() + timedelta(days=1) # UVIJEK KORISTI SUTRA
+        BusinessHours.objects.create(day_of_week=self.test_date.weekday(), open_time='09:00', close_time='17:00') 
         self.availability_url = reverse('booking:availability')
         self.reservations_url = reverse('booking:reservation-list-create')
 
@@ -35,7 +35,7 @@ class BookingLogicTests(APITestCase):
         start_time_aware = datetime.combine(self.test_date, time(10, 0), tzinfo=tz)
         reservation_data = {
             "full_name": "Test User", "phone": "555-1234", "email": "test.user@test.com",
-            "service": self.service.id, "start_time": start_time_aware.isoformat()
+            "service": self.service.id, "plates": "ZG-TEST-123", "start_time": start_time_aware.isoformat()
         }
         response_create = self.client.post(self.reservations_url, reservation_data, format='json')
         self.assertEqual(response_create.status_code, status.HTTP_201_CREATED)
@@ -56,7 +56,7 @@ class BookingLogicTests(APITestCase):
         start_time_aware = datetime.combine(self.test_date, time(11, 0), tzinfo=tz)
         reservation_data = {
             "full_name": "Test User Approved", "phone": "555-1234", "email": "test.user.approved@test.com",
-            "service": self.service.id, "start_time": start_time_aware.isoformat()
+            "service": self.service.id, "plates": "ZG-TEST-456", "start_time": start_time_aware.isoformat()
         }
         response_create = self.client.post(self.reservations_url, reservation_data, format='json')
         self.assertEqual(response_create.status_code, status.HTTP_201_CREATED)

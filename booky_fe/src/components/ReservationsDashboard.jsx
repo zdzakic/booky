@@ -11,6 +11,8 @@ import { CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 
+const API_BASE_URL = '/api'; // Pretpostavka da API ima ovakav base URL
+
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,16 +66,34 @@ const ReservationsDashboard = () => {
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
   const handleEdit = (row) => alert(`${t.edit || 'Edit'} reservation: ${row.full_name}`);
 
-  const handleDelete = (reservation) => {
-    setReservationToDelete(reservation);
+  const handleDelete = (reservationId) => {
+    setReservationToDelete(reservationId);
     setIsModalOpen(true);
+  };
+
+  const handleApprove = async (reservationId) => {
+    try {
+      const token = localStorage.getItem('token'); // Pretpostavka da token treba
+      await axios.patch(`${API_BASE_URL}/reservations/${reservationId}/`, 
+        { is_approved: true },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      // Azuriraj stanje lokalno za instant feedback
+      setReservations(prev => 
+        prev.map(res => res.id === reservationId ? { ...res, is_approved: true } : res)
+      );
+      toast.success(t.approve_success || 'Reservation approved!');
+    } catch (error) {
+      console.error('Failed to approve reservation:', error);
+      toast.error(t.approve_error || 'Failed to approve reservation.');
+    }
   };
 
   const confirmDelete = async () => {
     if (!reservationToDelete) return;
     try {
-      await axios.delete(`/reservations/${reservationToDelete.id}/`);
-      setReservations(prev => prev.filter(res => res.id !== reservationToDelete.id));
+      await axios.delete(`/reservations/${reservationToDelete}/`);
+      setReservations(prev => prev.filter(res => res.id !== reservationToDelete));
       toast.success(t.delete_success || 'Reservation deleted successfully.');
     } catch (error) {
       console.error('Failed to delete reservation:', error);
@@ -113,6 +133,7 @@ const ReservationsDashboard = () => {
           lang={lang}
           onView={handleView}
           onEdit={handleEdit}
+          onApprove={handleApprove}
           onDelete={handleDelete}
         />
 

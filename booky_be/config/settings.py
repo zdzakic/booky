@@ -135,3 +135,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # React Vite frontend
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# Email settings for development (prints to console)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

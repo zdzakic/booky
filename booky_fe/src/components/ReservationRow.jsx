@@ -9,7 +9,7 @@ const ActionButton = ({ title, onClick, children }) => (
   </button>
 );
 
-const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete }) => {
+const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
   const t = translations[lang]?.dashboard || {};
 
   // Simplified 'isPast' logic using end_time
@@ -89,18 +89,18 @@ const ReservationRow = ({ reservation, labels, lang, onView, onEdit, onDelete })
       </div>
 
       <div className="col-span-2 mt-2 md:table-cell md:px-3 md:py-2 md:mt-0">
-        <div className="flex gap-2 items-center justify-start md:justify-end">
-          <ActionButton title={labels.view || "View"} onClick={() => onView(reservation)}>
-            <svg className={`w-5 h-5 ${viewIconClasses}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M1.5 12s3.5-7 10.5-7 10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
-          </ActionButton>
-          <ActionButton title={labels.edit || "Edit"} onClick={() => onEdit(reservation)}>
-            <svg className={`w-5 h-5 ${editIconClasses}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487a2.036 2.036 0 112.881 2.881l-9.071 9.072a4 4 0 01-1.414.942l-4 1.334 1.334-4a4 4 0 01.942-1.414l9.072-9.071z"/></svg>
-          </ActionButton>
-          <ActionButton title={labels.delete || "Delete"} onClick={() => onDelete(reservation)}>
+        <div className="flex items-center space-x-1">
+          {!reservation.is_approved && (
+            <ActionButton title={labels.approve || "Approve"} onClick={() => onApprove(reservation.id)}>
+              <svg className={`w-5 h-5 text-green-500`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </ActionButton>
+          )}
+          <ActionButton title={labels.delete || "Delete"} onClick={() => onDelete(reservation.id)}>
             <svg className={`w-5 h-5 ${deleteIconClasses}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </ActionButton>
         </div>
       </div>
+
     </div>
   );
 };

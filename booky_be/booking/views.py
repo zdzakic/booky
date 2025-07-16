@@ -12,6 +12,7 @@ from .serializers import (
     ReservationSerializer,
     ReservationListSerializer
 )
+from django.core.mail import send_mail
 
 
 class ServiceTypeListAPIView(generics.ListAPIView):
@@ -83,6 +84,12 @@ class AvailabilityAPIView(APIView):
 
         current_time = start_work_time
         while current_time + service_duration <= end_work_time:
+
+            # If the date is today, skip slots that are in the past.
+            if date_obj == timezone.localdate() and current_time < timezone.localtime():
+                current_time += step
+                continue
+
             slot_end_time = current_time + service_duration
 
             # Count how many resources are booked at this specific time
@@ -140,7 +147,32 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
 
         # 3. Assign the first available resource and save
         assigned_resource = available_resources.first()
-        serializer.save(end_time=end_time, resource=assigned_resource)
+        instance = serializer.save(end_time=end_time, resource=assigned_resource)
+
+        # 4. Send email notification AFTER saving the instance
+        try:
+            subject = f"New reservation for {instance.service.name}"
+            message = f"""
+            A new reservation has been created.
+
+            Details:
+            Name: {instance.full_name}
+            Phone: {instance.phone}
+            Email: {instance.email}
+            Plates: {instance.plates}
+            Service: {instance.service.name}
+            Time Slot: {instance.start_time.strftime('%d.%m.%Y at %H:%M')}
+
+            Please approve it in the administration panel.
+            """
+            from_email = 'noreply@booky.app' # This can be anything
+            recipient_list = ['owner@domain.com'] # Change to your email
+
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        except Exception as e:
+            # If email sending fails, we don't want to crash the whole process.
+            # We'll just print the error to the console.
+            print(f"Error sending email: {e}")
 
 
 class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
