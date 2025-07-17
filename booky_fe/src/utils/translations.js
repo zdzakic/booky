@@ -75,6 +75,9 @@ export const translations = {
         approving: 'Genehmigung wird bearbeitet...',
         approve_success: 'Reservierung erfolgreich genehmigt!',
         approve_error: 'Genehmigung der Reservierung fehlgeschlagen.',
+        manage_holidays: 'Feiertage verwalten',
+        reservations_tab: 'Reservierungen',
+        holidays_tab: 'Feiertage verwalten',
       },
       // Validation errors:
       errors: {
@@ -159,6 +162,9 @@ export const translations = {
         approving: 'Approving...',
         approve_success: 'Reservation approved successfully!',
         approve_error: 'Failed to approve reservation.',
+        manage_holidays: 'Manage Holidays',
+        reservations_tab: 'Reservations',
+        holidays_tab: 'Manage Holidays',
       },
       // Validation errors:
       errors: {
@@ -166,6 +172,93 @@ export const translations = {
         phone: "Invalid phone number.",
         email: "Invalid email address.",
         licensePlate: "Please enter your license plate."
+      }
+    },
+    hr: {
+      bookingTitle: "Rezerviraj termin",
+      fullName: "Puno ime",
+      phone: "Broj telefona",
+      email: "E-mail adresa",
+      licensePlate: "Registarska oznaka (npr. ZH-12345)",
+      service: "Odaberite uslugu",
+      chooseService: "Odaberite uslugu",
+      isStored: "Su kola spremljena kod nas?",
+      selectDate: "Odaberite datum",
+      datePlaceholder: "Odaberite datum",
+      submit: "Zatražite termin",
+      availableTimes: "Raspoloživi termini",
+      noSlots: "Nema raspoloživih termina za ovaj dan.",
+      loadingSlots: "Učitavanje termina...",
+      spotsAvailable: "slobodno",
+      // success page
+      successTitle: "Zahtjev primljen",
+      successMsg: "Hvala! Primili smo vaš zahtjev i pregledat ćemo ga. Dobit ćete potvrdu putem e-pošte i SMS-a čim bude termin odobren.",
+      successBooking: "Zahtjev uspješno poslan!",
+      backToHome: "Natrag na početnu stranicu",
+      // dashboard
+      dashboard: {
+        all_reservations: "Sve rezervacije",
+        name: "Ime",
+        phone: "Telefon",
+        email: "E-mail",
+        plates: "Registarske oznake",
+        service: "Usluga",
+        stored: "Spremljeno?",
+        status: "Status",
+        slot: "Termin",
+        created: "Kreirano",
+        actions: "Akcije",
+        yes: "Da",
+        no: "Ne",
+        approved: "Odobreno",
+        pending: "Na čekanju",
+        today: "Danas",
+        upcoming_days: "Nadolazeći dani",
+        reservations_today: "Rezervacije danas",
+        pending_approval: "Na čekanju odobrenja",
+        reservations_this_week: "Rezervacije ove sedmice",
+        no_reservations: "Nema pronađenih rezervacija",
+        no_reservations_title: "Nema pronađenih rezervacija",
+        no_reservations_search_message: "Pokušajte prilagoditi upit pretrage.",
+        no_reservations_message: "Trenutno nema rezervacija. Zašto ne bi kreirali novu?",
+        create_new_button: "Kreiraj novu rezervaciju",
+        view: "Pregled",
+        edit: "Uredi",
+        delete: "Izbriši",
+        delete_confirm_title: "Potvrdite brisanje",
+        delete_confirm_message: "Jeste li sigurni da želite trajno izbrisati ovu rezervaciju? Ova akcija se ne može poništiti.",
+        cancel_button: "Otkaži",
+        confirm_delete_button: "Da, izbriši",
+        delete_success: "Rezervacija uspješno izbrisana.",
+        delete_error: "Greška prilikom brisanja rezervacije.",
+        // Quick-Stats
+        reservations_today: "Rezervacije danas",
+        total_slots_today: "Ukupni termini danas",
+        new_clients_today: "Novi klijenti danas",
+        // Search
+        search_placeholder: "Pretraži po imenu, telefonu, registarskoj oznaci...",
+        // --- NOVI KLJUČEVI ---
+        title: 'Rezervacijski dashboard',
+        filter_upcoming: 'Nadolazeće (3 tjedna)',
+        filter_pending: 'Na čekanju',
+        filter_all: 'Sve nadolazeće',
+        filter_past: 'Prošle',
+        unapproved_reservations: 'Nepotvrđene rezervacije',
+        total_reservations: 'Ukupne rezervacije',
+        approve: 'Potvrdi',
+        approving: 'Potvrđivanje u tijeku...',
+        approve_success: 'Rezervacija uspješno potvrdjena!',
+        approve_error: 'Greška prilikom potvrđivanja rezervacije.',
+        manage_holidays: 'Upravljanje praznicima',
+        reservations_tab: 'Rezervacije',
+        holidays_tab: 'Upravljanje praznicima',
+      },
+      // Validation errors:
+      errors: {
+        fullName: "Molimo unesite vaše ime.",
+        phone: "Neispravan broj telefona.",
+        email: "Neispravna e-mail adresa.",
+        licensePlate: "Molimo unesite registarsku oznaku."
       }
     }
   }

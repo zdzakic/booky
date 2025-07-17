@@ -10,6 +10,7 @@ import EmptyState from './ui/EmptyState';
 import { CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
+import HolidayManager from './HolidayManager';
 
 // API BASE URL
 const API_BASE_URL = '/api'; 
@@ -23,6 +24,7 @@ const ReservationsDashboard = () => {
   const [reservationToDelete, setReservationToDelete] = useState(null);
   const [activeFilter, setActiveFilter] = useState('3w'); // Default filter
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+  const [activeView, setActiveView] = useState('reservations'); // 'reservations' or 'holidays'
 
   // Debounce efekt za pretragu
   useEffect(() => {
@@ -140,71 +142,99 @@ const ReservationsDashboard = () => {
   }
 
   return (
-    <div className="font-sans bg-gray-50 dark:bg-gray-950 min-h-screen w-full flex flex-col items-center pt-8 px-4">
-      <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
-        <h2 className="text-2xl font-bold">{t.all_reservations || 'All reservations'}</h2>
-        <LanguageSwitcher lang={lang} setLang={setLang} />
-      </div>
+  <div className="font-sans bg-gray-50 dark:bg-gray-950 min-h-screen w-full flex flex-col items-center pt-8 px-4">
+    <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
+      <h2 className="text-2xl font-bold">{activeView === 'reservations' ? (t.all_reservations || 'All reservations') : (t.manage_holidays || 'Manage Holidays')}</h2>
+      <LanguageSwitcher lang={lang} setLang={setLang} />
+    </div>
 
-      <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-gray-900 rounded-lg mb-4">
-          <FilterButton filterValue="3w" label={t.filter_upcoming || 'Upcoming (3 weeks)'} />
-          <FilterButton filterValue="pending" label={t.filter_pending || 'Pending'} />
-          <FilterButton filterValue="all" label={t.filter_all || 'All Upcoming'} />
-          <FilterButton filterValue="past" label={t.filter_past || 'Past'} />
-      </div>
-
-      <SearchBar
-        searchQuery={searchQuery}
-        onSearchChange={(e) => setSearchQuery(e.target.value)}
-        placeholder={t.search_placeholder}
-        className="mb-6"
-      />
-
-      <QuickStats
-        reservationsTodayCount={reservationsTodayCount}
-        unapprovedCount={unapprovedCount}
-        reservationsThisWeekCount={reservationsThisWeekCount}
-        t={t}
-      />
-
-      <div className="max-w-7xl w-full mx-auto">
-        <ReservationsTable
-          title={t.all_reservations || 'All reservations'}
-          reservations={filteredReservations}
-          labels={t}
-          lang={lang}
-          onView={handleView}
-          onEdit={handleEdit}
-          onApprove={handleApprove}
-          onDelete={handleDelete}
-        />
-
-        {filteredReservations.length === 0 && !loading && (
-          <EmptyState
-            icon={<CalendarPlus className="w-8 h-8 text-gray-400" />}
-            title={t.no_reservations_title || 'No Reservations Found'}
-            message={searchQuery 
-              ? (t.no_reservations_search_message || 'Try adjusting your search query.') 
-              : (t.no_reservations_message || 'There are currently no reservations. Why not create one?')}
-            buttonText={t.create_new_button || 'Create New Reservation'}
-            buttonLink="/"
-          />
+    {/* Combined Controls Row */}
+    <div className="flex justify-between items-center w-full max-w-7xl mx-auto mb-6">
+      {/* Filter Buttons (Left) - Only for reservations view */}
+      <div>
+        {activeView === 'reservations' && (
+          <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-gray-900 rounded-lg">
+            <FilterButton filterValue="3w" label={t.filter_upcoming || 'Upcoming (3 weeks)'} />
+            <FilterButton filterValue="pending" label={t.filter_pending || 'Pending'} />
+            <FilterButton filterValue="all" label={t.filter_all || 'All Upcoming'} />
+            <FilterButton filterValue="past" label={t.filter_past || 'Past'} />
+          </div>
         )}
       </div>
 
-      {isModalOpen && reservationToDelete && (
-        <ConfirmDeleteModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onConfirm={confirmDelete}
-          title={t.delete_confirm_title || 'Delete Reservation?'}
-          message={`${t.delete_confirm_message || 'Are you sure you want to delete the reservation for'} ${reservationToDelete.full_name}?`}
-          cancelText={t.cancel_button || 'Cancel'}
-          confirmText={t.confirm_delete_button || 'Yes, Delete'}
-        />
-      )}
+      {/* View Switcher (Right) */}
+      <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-gray-900 rounded-lg">
+        <button 
+          onClick={() => setActiveView('reservations')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'reservations' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+          {t.reservations_tab || 'Reservations'}
+        </button>
+        <button 
+          onClick={() => setActiveView('holidays')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'holidays' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+          {t.holidays_tab || 'Manage Holidays'}
+        </button>
+      </div>
     </div>
-  );
+
+    {activeView === 'reservations' ? (
+      <>
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={t.search_placeholder}
+          className="mb-6"
+        />
+
+        <QuickStats
+          reservationsTodayCount={reservationsTodayCount}
+          unapprovedCount={unapprovedCount}
+          reservationsThisWeekCount={reservationsThisWeekCount}
+          t={t}
+        />
+
+        <div className="max-w-7xl w-full mx-auto">
+          <ReservationsTable
+            title={t.all_reservations || 'All reservations'}
+            reservations={filteredReservations}
+            labels={t}
+            lang={lang}
+            onView={handleView}
+            onEdit={handleEdit}
+            onApprove={handleApprove}
+            onDelete={handleDelete}
+          />
+
+          {filteredReservations.length === 0 && !loading && (
+            <EmptyState
+              icon={<CalendarPlus className="w-8 h-8 text-gray-400" />}
+              title={t.no_reservations_title || 'No Reservations Found'}
+              message={searchQuery 
+                ? (t.no_reservations_search_message || 'Try adjusting your search query.') 
+                : (t.no_reservations_message || 'There are currently no reservations. Why not create one?')}
+              buttonText={t.create_new_button || 'Create New Reservation'}
+              buttonLink="/"
+            />
+          )}
+        </div>
+      </>
+    ) : (
+      <HolidayManager lang={lang} />
+    )}
+
+    {isModalOpen && reservationToDelete && (
+      <ConfirmDeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={t.delete_confirm_title || 'Delete Reservation?'}
+        message={`${t.delete_confirm_message || 'Are you sure you want to delete the reservation for'} ${reservationToDelete.full_name}?`}
+        cancelText={t.cancel_button || 'Cancel'}
+        confirmText={t.confirm_delete_button || 'Yes, Delete'}
+      />
+    )}
+  </div>
+ );
 };
 
 export default ReservationsDashboard;
