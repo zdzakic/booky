@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db import transaction
 from datetime import datetime, time, timedelta
+from django.db.models import Q
 
 from .models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from .serializers import (
@@ -109,11 +110,47 @@ class AvailabilityAPIView(APIView):
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
+
     def get_queryset(self):
         """
-        Vraća sve rezervacije, sortirane po datumu početka.
+        Dinamički filtrira rezervacije na temelju 'period' query parametra.
+        Moguće vrijednosti za 'period':
+        - '3w' (default): Prikazuje rezervacije od danas do 3 tjedna unaprijed.
+        - 'all': Prikazuje sve rezervacije.
+        - 'pending': Prikazuje sve neodobrene rezervacije.
+        - 'today': Prikazuje sve rezervacije za današnji dan.
         """
-        return Reservation.objects.all().order_by('start_time')
+        period = self.request.query_params.get('period', '3w')
+        search_query = self.request.query_params.get('search', None)
+        
+        queryset = Reservation.objects.all()
+        today = timezone.now().date()
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(full_name__icontains=search_query) |
+                Q(email__icontains=search_query) |
+                Q(phone__icontains=search_query) |
+                Q(license_plate__icontains=search_query)
+            )
+
+        # Logika filtriranja po periodu
+        if period == 'pending':
+            queryset = queryset.filter(is_approved=False)
+        elif period == 'past':
+            queryset = queryset.filter(start_time__date__lt=today)
+        else: # '3w', 'all', 'today' i default
+            queryset = queryset.filter(start_time__date__gte=today)
+            if period == '3w':
+                three_weeks_from_now = today + timedelta(weeks=3)
+                queryset = queryset.filter(start_time__date__lte=three_weeks_from_now)
+            elif period == 'today':
+                queryset = queryset.filter(start_time__date=today)
+        
+        # Sortiranje primjenjujemo na kraju
+        if period == 'past':
+            return queryset.order_by('-start_time') # Prošle sortiramo od najnovijih
+        return queryset.order_by('start_time') # Buduće sortiramo od najranijih
 
     def get_serializer_class(self):
         """Odabire serializer ovisno o akciji (GET vs POST)."""

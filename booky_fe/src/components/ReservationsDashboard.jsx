@@ -20,33 +20,48 @@ const ReservationsDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reservationToDelete, setReservationToDelete] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('3w'); // Default filter
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+
+  // Debounce efekt za pretragu
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500); // Čekaj 500ms nakon prestanka tipkanja
+
+    // Očisti timer ako korisnik nastavi tipkati
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
 
   useEffect(() => {
-    axios.get('/reservations/')
+    setLoading(true);
+    axios.get('/reservations/', {
+      params: { 
+        period: activeFilter,
+        search: debouncedSearchQuery // Koristi debounced vrijednost
+      }
+    })
       .then(res => {
+        // Sada direktno postavljamo podatke s backenda, bez FE filtriranja
         setReservations(res.data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [activeFilter, debouncedSearchQuery]); // Re-fetch when filter or debounced search term changes
 
   const t = translations[lang]?.dashboard || {};
 
-  const filteredReservations = reservations.filter(res => {
-    const query = searchQuery.toLowerCase();
-    return (
-      res.full_name.toLowerCase().includes(query) ||
-      (res.phone && res.phone.toLowerCase().includes(query)) ||
-      (res.email && res.email.toLowerCase().includes(query)) ||
-      (res.license_plate && res.license_plate.toLowerCase().includes(query))
-    );
-  });
+  // VAŽNO: Uklanjamo staro filtriranje na frontendu.
+  // Vaš postojeći `filteredReservations` bi trebao biti uklonjen ili promijenjen
+  // da jednostavno koristi `reservations` koje dolaze s backenda.
+  const filteredReservations = reservations;
 
-  // Calculate statistics from the original reservations list (before filtering)
   const unapprovedCount = reservations.filter(res => !res.is_approved).length;
-  const reservationsTodayCount = reservations.filter(res => {
+  const reservationsTodayCount = reservations.filter(r => {
     const today = new Date().toISOString().slice(0, 10);
-    return res.start_time.startsWith(today);
+    return r.start_time.startsWith(today);
   }).length;
 
   const reservationsThisWeekCount = reservations.filter(res => {
@@ -60,8 +75,6 @@ const ReservationsDashboard = () => {
 
     return reservationDate >= startOfWeek && reservationDate <= endOfWeek;
   }).length;
-
-  if (loading) return <DashboardSkeleton />;
 
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
   const handleEdit = (row) => alert(`${t.edit || 'Edit'} reservation: ${row.full_name}`);
@@ -109,11 +122,34 @@ const ReservationsDashboard = () => {
     }
   };
 
+  const FilterButton = ({ filterValue, label }) => (
+    <button 
+      onClick={() => setActiveFilter(filterValue)}
+      className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${
+        activeFilter === filterValue 
+        ? 'bg-orange-500 text-white shadow-sm'
+        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700'
+      }`}>
+      {label}
+    </button>
+  );
+
+  if (loading && reservations.length === 0) {
+    return <DashboardSkeleton />;
+  }
+
   return (
     <div className="font-sans bg-gray-50 dark:bg-gray-950 min-h-screen w-full flex flex-col items-center pt-8 px-4">
       <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
         <h2 className="text-2xl font-bold">{t.all_reservations || 'All reservations'}</h2>
         <LanguageSwitcher lang={lang} setLang={setLang} />
+      </div>
+
+      <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-gray-900 rounded-lg mb-4">
+          <FilterButton filterValue="3w" label={t.filter_upcoming || 'Upcoming (3 weeks)'} />
+          <FilterButton filterValue="pending" label={t.filter_pending || 'Pending'} />
+          <FilterButton filterValue="all" label={t.filter_all || 'All Upcoming'} />
+          <FilterButton filterValue="past" label={t.filter_past || 'Past'} />
       </div>
 
       <SearchBar

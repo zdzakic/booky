@@ -119,3 +119,59 @@ class BookingLogicTests(APITestCase):
         approval_email = mail.outbox[0]
         self.assertEqual(approval_email.to, ["approve.user@test.com"])
         self.assertIn("Your reservation has been approved", approval_email.subject)
+
+
+
+class ReservationFilteringTests(APITestCase):
+    def setUp(self):
+        self.service = ServiceType.objects.create(name='Test Service', duration_minutes=60)
+        self.resource = Resource.objects.create(name='Test Resource')
+        self.resource.services.add(self.service)
+        
+        # Kreiranje rezervacija u različitim periodima
+        start_time_past = timezone.now() - timedelta(days=5)
+        Reservation.objects.create(service=self.service, resource=self.resource, full_name='Past User', start_time=start_time_past, end_time=start_time_past + timedelta(minutes=self.service.duration_minutes), is_approved=True)
+        
+        start_time_today = timezone.now()
+        Reservation.objects.create(service=self.service, resource=self.resource, full_name='Today User', start_time=start_time_today, end_time=start_time_today + timedelta(minutes=self.service.duration_minutes), is_approved=True)
+        
+        start_time_future = timezone.now() + timedelta(days=5)
+        Reservation.objects.create(service=self.service, resource=self.resource, full_name='Future User', start_time=start_time_future, end_time=start_time_future + timedelta(minutes=self.service.duration_minutes), is_approved=True)
+        
+        start_time_pending = timezone.now() + timedelta(days=1)
+        Reservation.objects.create(service=self.service, resource=self.resource, full_name='Pending User', start_time=start_time_pending, end_time=start_time_pending + timedelta(minutes=self.service.duration_minutes), is_approved=False)
+
+    def test_filter_period_3w(self):
+        """Testira da `period=3w` vraća rezervacije od danas do 3 tjedna u budućnost."""
+        response = self.client.get(reverse('booking:reservation-list-create'), {'period': '3w'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3) # Today, Future, Pending
+        self.assertNotIn('Past User', [r['full_name'] for r in response.data])
+
+    def test_filter_period_pending(self):
+        """Testira da `period=pending` vraća samo neodobrene rezervacije."""
+        response = self.client.get(reverse('booking:reservation-list-create'), {'period': 'pending'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['full_name'], 'Pending User')
+
+    def test_filter_period_all_shows_upcoming(self):
+        """Testira da `period=all` vraća sve buduće i današnje rezervacije."""
+        response = self.client.get(reverse('booking:reservation-list-create'), {'period': 'all'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3) # Today, Future, Pending
+        self.assertNotIn('Past User', [r['full_name'] for r in response.data])
+
+    def test_filter_period_past_shows_past(self):
+        """Testira da `period=past` vraća samo prošle rezervacije."""
+        response = self.client.get(reverse('booking:reservation-list-create'), {'period': 'past'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['full_name'], 'Past User')
+
+    def test_search_query(self):
+        """Testira da `search` parametar ispravno filtrira rezultate."""
+        response = self.client.get(reverse('booking:reservation-list-create'), {'search': 'Future'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['full_name'], 'Future User')

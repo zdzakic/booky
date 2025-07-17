@@ -51,7 +51,7 @@ export const translations = {
         view: "Ansehen",
         edit: "Bearbeiten",
         delete: "Löschen",
-        delete_confirm_title: "Reservierung löschen?",
+        delete_confirm_title: "Löschung bestätigen",
         delete_confirm_message: "Sind Sie sicher, dass Sie diese Reservierung endgültig löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
         cancel_button: "Abbrechen",
         confirm_delete_button: "Ja, löschen",
@@ -65,14 +65,16 @@ export const translations = {
         search_placeholder: "Suche nach Name, Telefon, Kennzeichen...",
         // --- NOVI KLJUČEVI ---
         title: 'Reservierungs-Dashboard',
+        filter_upcoming: 'Anstehende (3 Wochen)',
+        filter_pending: 'Ausstehend',
+        filter_all: 'Alle Zukünftigen',
+        filter_past: 'Vergangene',
         unapproved_reservations: 'Nicht genehmigte Reservierungen',
         total_reservations: 'Gesamte Reservierungen',
         approve: 'Genehmigen',
         approving: 'Genehmigung wird bearbeitet...',
         approve_success: 'Reservierung erfolgreich genehmigt!',
         approve_error: 'Genehmigung der Reservierung fehlgeschlagen.',
-        delete_success: 'Reservierung erfolgreich gelöscht.',
-        delete_error: 'Löschen der Reservierung fehlgeschlagen.'
       },
       // Validation errors:
       errors: {
@@ -133,7 +135,7 @@ export const translations = {
         view: "View",
         edit: "Edit",
         delete: "Delete",
-        delete_confirm_title: "Delete Reservation?",
+        delete_confirm_title: "Confirm Deletion",
         delete_confirm_message: "Are you sure you want to permanently delete this reservation? This action cannot be undone.",
         cancel_button: "Cancel",
         confirm_delete_button: "Yes, Delete",
@@ -147,14 +149,16 @@ export const translations = {
         search_placeholder: "Search by name, phone, license plate...",
         // --- NOVI KLJUČEVI ---
         title: 'Reservations Dashboard',
+        filter_upcoming: 'Upcoming (3 weeks)',
+        filter_pending: 'Pending',
+        filter_all: 'All Upcoming',
+        filter_past: 'Past',
         unapproved_reservations: 'Unapproved Reservations',
         total_reservations: 'Total Reservations',
         approve: 'Approve',
         approving: 'Approving...',
         approve_success: 'Reservation approved successfully!',
         approve_error: 'Failed to approve reservation.',
-        delete_success: 'Reservation deleted successfully.',
-        delete_error: 'Failed to delete reservation.'
       },
       // Validation errors:
       errors: {
