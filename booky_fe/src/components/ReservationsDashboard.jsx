@@ -11,7 +11,8 @@ import { CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 
-const API_BASE_URL = '/api'; // Pretpostavka da API ima ovakav base URL
+// API BASE URL
+const API_BASE_URL = '/api'; 
 
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);

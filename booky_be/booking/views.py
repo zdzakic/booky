@@ -11,9 +11,12 @@ from .models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from .serializers import (
     ServiceTypeSerializer, 
     ReservationSerializer,
-    ReservationListSerializer
+    ReservationListSerializer,
+    HolidaySerializer
 )
 from django.core.mail import send_mail
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 
 
 class ServiceTypeListAPIView(generics.ListAPIView):
@@ -267,6 +270,10 @@ class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
         return super().partial_update(request, *args, **kwargs)
 
 
-# class HolidayListAPIView(generics.ListAPIView):
-#     queryset = Holiday.objects.all()
-#     serializer_class = HolidaySerializer
+class HolidayViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows holidays to be viewed, created, or deleted.
+    """
+    queryset = Holiday.objects.all()
+    serializer_class = HolidaySerializer
+    permission_classes = [AllowAny] # TODO: Replace with IsAdminUser or custom owner permission

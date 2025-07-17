@@ -120,6 +120,47 @@ class BookingLogicTests(APITestCase):
         self.assertEqual(approval_email.to, ["approve.user@test.com"])
         self.assertIn("Your reservation has been approved", approval_email.subject)
 
+    def test_end_time_calculation(self):
+        """Provjerava da li se end_time ispravno izračunava prilikom kreiranja rezervacije."""
+        start_time = timezone.now() + timedelta(days=10)
+        reservation_data = {
+            'full_name': 'End Time Test User',
+            'email': 'endtime@test.com',
+            'phone': '123456789',
+            'license_plate': 'TEST-ET',
+            'service': self.service.pk,
+            'start_time': start_time.isoformat(),
+            'is_approved': False
+        }
+        response = self.client.post(reverse('booking:reservation-list-create'), reservation_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Provjeri izračunato end_time
+        created_reservation = Reservation.objects.get(pk=response.data['id'])
+        expected_end_time = start_time + timedelta(minutes=self.service.duration_minutes)
+        self.assertEqual(created_reservation.end_time, expected_end_time)
+
+
+class AvailabilityTests(APITestCase):
+    def setUp(self):
+        """Set up a service and a holiday for testing availability."""
+        self.service = ServiceType.objects.create(name='Test Service', duration_minutes=60)
+        self.holiday_date = timezone.now().date() + timedelta(days=10)
+        Holiday.objects.create(name='Test Holiday', date=self.holiday_date)
+        # Ensure business hours exist for the day of the holiday to make the test valid
+        BusinessHours.objects.create(
+            day_of_week=self.holiday_date.weekday(),
+            open_time=time(9, 0),
+            close_time=time(17, 0)
+        )
+
+    def test_no_slots_on_holiday(self):
+        """Verify that no available slots are returned for a date marked as a holiday."""
+        url = reverse('booking:availability')
+        response = self.client.get(url, {'service': self.service.id, 'date': self.holiday_date.strftime('%Y-%m-%d')})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, []) # Expect an empty list of slots
 
 
 class ReservationFilteringTests(APITestCase):
