@@ -97,7 +97,7 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
               className="text-green-600 hover:text-green-900 dark:text-green-500 dark:hover:text-green-400"
               aria-label={`Approve ${reservation.full_name}`}
             >
-              <Check className="h-5 w-5" />
+              <Check className="h-4 w-4" />
             </button>
           )}
           <button
@@ -105,7 +105,7 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
             className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400"
             aria-label={`Delete ${reservation.full_name}`}
           >
-            <Trash2 className="h-5 w-5" />
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
       </div>

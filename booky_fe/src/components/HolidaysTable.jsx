@@ -42,8 +42,9 @@ const HolidaysTable = ({ holidays, labels, lang, onDelete }) => {
                   <button 
                     onClick={() => onDelete(holiday)}
                     className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400"
-                    aria-label={`Delete ${holiday.name}`}>
-                    <Trash2 className="h-5 w-5" />
+                    aria-label={`Delete ${holiday.name}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </td>
               </tr>
