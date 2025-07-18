@@ -78,6 +78,30 @@ export const translations = {
         manage_holidays: 'Feiertage verwalten',
         reservations_tab: 'Reservierungen',
         holidays_tab: 'Feiertage verwalten',
+        // holiday layout 
+        holiday_list_title: 'Feiertagsliste',
+        add_holiday_button: 'Feiertag hinzufügen',
+        no_holidays_message: 'Sie haben noch keine Feiertage festgelegt. Fügen Sie einen hinzu, um Termine für Buchungen zu sperren.',
+        fetch_holidays_error: 'Feiertage konnten nicht geladen werden.',
+        delete_holiday_success: 'Feiertag erfolgreich gelöscht.',
+        delete_holiday_error: 'Fehler beim Löschen des Feiertags.',
+        no_holidays_title: 'Keine Feiertage festgelegt',
+        delete_holiday_confirm_title: 'Feiertag löschen?',
+        delete_holiday_confirm_message: 'Sind Sie sicher, dass Sie löschen möchten',
+        // Table Headers
+        holiday_name_header: 'Name',
+        holiday_date_header: 'Datum',
+        holiday_actions_header: 'Aktionen',
+        // holiday modal 
+        add_holiday_success: 'Feiertag erfolgreich hinzugefügt.',
+        add_holiday_error: 'Fehler beim Hinzufügen des Feiertags.',
+        add_holiday_modal_title: 'Neuen Feiertag hinzufügen',
+        holiday_name_label: 'Name des Feiertags',
+        holiday_name_placeholder: 'z.B. Neujahr',
+        holiday_date_label: 'Datum',
+        holiday_date_placeholder: 'Datum wählen',
+        add_holiday_form_error: 'Bitte füllen Sie Name und Datum aus.',
+        add_button: 'Hinzufügen',
       },
       // Validation errors:
       errors: {
@@ -165,6 +189,30 @@ export const translations = {
         manage_holidays: 'Manage Holidays',
         reservations_tab: 'Reservations',
         holidays_tab: 'Manage Holidays',
+        // holiday layout
+        holiday_list_title: 'Holiday List',
+        add_holiday_button: 'Add Holiday',
+        no_holidays_message: 'You have not set any holidays yet. Add one to block out dates for bookings.',
+        fetch_holidays_error: 'Failed to fetch holidays.',
+        delete_holiday_success: 'Holiday deleted successfully.',
+        delete_holiday_error: 'Failed to delete holiday.',
+        no_holidays_title: 'No Holidays Set',
+        delete_holiday_confirm_title: 'Delete Holiday?',
+        delete_holiday_confirm_message: 'Are you sure you want to delete',
+        // Table Headers
+        holiday_name_header: 'Name',
+        holiday_date_header: 'Date',
+        holiday_actions_header: 'Actions',
+        // holiday modal 
+        add_holiday_success: 'Holiday added successfully.',
+        add_holiday_error: 'Failed to add holiday.',
+        add_holiday_modal_title: 'Add New Holiday',
+        holiday_name_label: 'Holiday Name',
+        holiday_name_placeholder: 'e.g., New Year\'s Day',
+        holiday_date_label: 'Date',
+        holiday_date_placeholder: 'Select a date',
+        add_holiday_form_error: 'Please fill out both name and date.',
+        add_button: 'Add',
       },
       // Validation errors:
       errors: {
@@ -252,6 +300,16 @@ export const translations = {
         manage_holidays: 'Upravljanje praznicima',
         reservations_tab: 'Rezervacije',
         holidays_tab: 'Upravljanje praznicima',
+        // holiday modal 
+        add_holiday_success: 'Praznik uspješno dodan.',
+        add_holiday_error: 'Greška pri dodavanju praznika.',
+        add_holiday_modal_title: 'Dodaj novi praznik',
+        holiday_name_label: 'Naziv praznika',
+        holiday_name_placeholder: 'npr. Nova Godina',
+        holiday_date_label: 'Datum',
+        holiday_date_placeholder: 'Odaberite datum',
+        add_holiday_form_error: 'Molimo popunite naziv i datum.',
+        add_button: 'Dodaj',
       },
       // Validation errors:
       errors: {

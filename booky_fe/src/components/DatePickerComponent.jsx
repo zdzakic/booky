@@ -9,18 +9,19 @@ import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { HOLIDAYS } from '../utils/constants';
 
-// Očekuje: selectedDate, setSelectedDate, label, placeholder, lang ('de'/'en')
+// Očekuje: selectedDate, setSelectedDate, label, placeholder, lang ('de'/'en'), holidays (optional array)
 export default function DatePickerComponent({
   selectedDate,
   setSelectedDate,
-  label = 'Datum auswählen',
-  placeholder = 'Datum wählen',
-  lang = 'de'
+  label = 'Select Date',
+  placeholder = 'Select a date',
+  lang = 'de',
+  holidays = HOLIDAYS // Fallback to static holidays if not provided
 }) {
   const disabledDays = [
     { before: new Date() },
     { dayOfWeek: [0, 6] },
-    ...HOLIDAYS.map(d => ({ date: d })),
+    ...holidays.map(d => (typeof d === 'string' ? new Date(d) : new Date(d.date))),
   ];
 
   const modifiersClassNames = {
