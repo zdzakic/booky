@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class ServiceType(models.Model):
     name = models.CharField(max_length=100)
@@ -61,6 +62,13 @@ class Reservation(models.Model):
 class Holiday(models.Model):
     name = models.CharField(max_length=100, help_text="e.g., New Year's Day")
     date = models.DateField(unique=True)
+    created_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='holidays'
+    )
 
     def __str__(self):
         return f"{self.name} on {self.date.strftime('%Y-%m-%d')}"

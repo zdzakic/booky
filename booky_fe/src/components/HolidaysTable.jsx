@@ -15,6 +15,9 @@ const HolidaysTable = ({ holidays, labels, lang, onDelete }) => {
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                 {labels.holiday_date_header || 'Date'}
               </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                {labels.holiday_created_by_header || 'Created By'}
+              </th>
               <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                 {labels.holiday_actions_header || 'Actions'}
               </th>
@@ -30,6 +33,10 @@ const HolidaysTable = ({ holidays, labels, lang, onDelete }) => {
                 <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 block md:table-cell">
                   <span className="font-bold md:hidden">{labels.holiday_date_header || 'Date'}: </span>
                   {format(new Date(holiday.date), 'dd.MM.yyyy')}
+                </td>
+                <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 block md:table-cell">
+                  <span className="font-bold md:hidden">{labels.holiday_created_by_header || 'Created By'}: </span>
+                  {holiday.created_by_username || 'N/A'}
                 </td>
                 <td className="px-6 py-2 whitespace-nowrap text-right text-sm font-medium block md:table-cell">
                   <button 

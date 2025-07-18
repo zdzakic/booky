@@ -274,6 +274,14 @@ class HolidayViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows holidays to be viewed, created, or deleted.
     """
-    queryset = Holiday.objects.all()
+    queryset = Holiday.objects.all().order_by('date')
     serializer_class = HolidaySerializer
     permission_classes = [AllowAny] # TODO: Replace with IsAdminUser or custom owner permission
+
+    def perform_create(self, serializer):
+        # Automatically set the creator to the current user.
+        if self.request.user.is_authenticated:
+            serializer.save(created_by=self.request.user)
+        else:
+            # Optional: handle case for unauthenticated users if needed
+            serializer.save()

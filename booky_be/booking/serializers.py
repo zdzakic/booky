@@ -46,15 +46,23 @@ class ReservationSerializer(serializers.ModelSerializer):
 
 
 class HolidaySerializer(serializers.ModelSerializer):
+    created_by_username = serializers.SerializerMethodField()
+
     class Meta:
         model = Holiday
-        fields = ['id', 'name', 'date']
+        fields = ['id', 'name', 'date', 'created_by_username']
+
+    def get_created_by_username(self, obj):
+        if obj.created_by:
+            return obj.created_by.username
+        return '-'
 
 
 class ReservationListSerializer(serializers.ModelSerializer):
     """Serializer for listing reservations, includes nested details for context."""
     service = ServiceTypeSerializer(read_only=True)
     resource = ResourceSerializer(read_only=True)
+    service_name = serializers.CharField(source='service.name', read_only=True)
 
     class Meta:
         model = Reservation
@@ -70,5 +78,6 @@ class ReservationListSerializer(serializers.ModelSerializer):
             'end_time',
             'is_stored',
             'is_approved',
-            'created_at'
+            'created_at',
+            'service_name'
         ]

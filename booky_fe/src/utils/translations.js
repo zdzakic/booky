@@ -94,6 +94,7 @@ export const translations = {
         holiday_name_header: 'Name',
         holiday_date_header: 'Datum',
         holiday_actions_header: 'Aktionen',
+        holiday_created_by_header: 'Erstellt von',
         // holiday modal 
         add_holiday_success: 'Feiertag erfolgreich hinzugefügt.',
         add_holiday_error: 'Fehler beim Hinzufügen des Feiertags.',
@@ -208,6 +209,7 @@ export const translations = {
         holiday_name_header: 'Name',
         holiday_date_header: 'Date',
         holiday_actions_header: 'Actions',
+        holiday_created_by_header: 'Created by',
         // holiday modal 
         add_holiday_success: 'Holiday added successfully.',
         add_holiday_error: 'Failed to add holiday.',
