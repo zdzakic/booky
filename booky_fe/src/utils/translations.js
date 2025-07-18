@@ -46,7 +46,7 @@ export const translations = {
         no_reservations: "Keine Reservierungen gefunden",
         no_reservations_title: "Keine Reservierungen gefunden",
         no_reservations_search_message: "Versuchen Sie, Ihre Suchanfrage anzupassen.",
-        no_reservations_message: "Es sind derzeit keine Reservierungen vorhanden. Erstellen Sie eine neue.",
+        no_reservations_message: "Es sind derzeit keine Reservierungen. Erstellen Sie eine neue.",
         create_new_button: "Neue Reservierung erstellen",
         view: "Ansehen",
         edit: "Bearbeiten",
@@ -63,7 +63,6 @@ export const translations = {
         new_clients_today: "Neukunden heute",
         // Search
         search_placeholder: "Suche nach Name, Telefon, Kennzeichen...",
-        // --- NOVI KLJUČEVI ---
         title: 'Reservierungs-Dashboard',
         filter_upcoming: 'Anstehende (3 Wochen)',
         filter_pending: 'Ausstehend',
@@ -81,11 +80,12 @@ export const translations = {
         // holiday layout 
         holiday_list_title: 'Feiertagsliste',
         add_holiday_button: 'Feiertag hinzufügen',
-        no_holidays_message: 'Sie haben noch keine Feiertage festgelegt. Fügen Sie einen hinzu, um Termine für Buchungen zu sperren.',
+        no_holidays_message: 'Es sind noch keine Feiertage geplant. Sie können einen über die Schaltfläche oben hinzufügen.',
         fetch_holidays_error: 'Feiertage konnten nicht geladen werden.',
         delete_holiday_success: 'Feiertag erfolgreich gelöscht.',
         delete_holiday_error: 'Fehler beim Löschen des Feiertags.',
-        no_holidays_title: 'Keine Feiertage festgelegt',
+        no_holidays_title: 'Keine Feiertage gefunden',
+        add_new_holiday_button: 'Neuen Feiertag hinzufügen',
         delete_holiday_confirm_title: 'Feiertag löschen?',
         delete_holiday_confirm_message: 'Sind Sie sicher, dass Sie löschen möchten',
         delete_holiday_modal_title: 'Feiertag löschen',
@@ -178,7 +178,6 @@ export const translations = {
         new_clients_today: "New Clients Today",
         // Search
         search_placeholder: "Search by name, phone, license plate...",
-        // --- NOVI KLJUČEVI ---
         title: 'Reservations Dashboard',
         filter_upcoming: 'Upcoming (3 weeks)',
         filter_pending: 'Pending',
@@ -293,7 +292,6 @@ export const translations = {
         new_clients_today: "Novi klijenti danas",
         // Search
         search_placeholder: "Pretraži po imenu, telefonu, registarskoj oznaci...",
-        // --- NOVI KLJUČEVI ---
         title: 'Rezervacijski dashboard',
         filter_upcoming: 'Nadolazeće (3 tjedna)',
         filter_pending: 'Na čekanju',

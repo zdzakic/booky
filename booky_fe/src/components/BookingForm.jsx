@@ -12,6 +12,7 @@ import DatePickerComponent from './DatePickerComponent';
 import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
 import LanguageSwitcher from './LanguageSwitcher';
+import AnimatedText from './ui/AnimatedText';
 import { translations } from '../utils/translations';
 import {
   validateFullName,
@@ -150,9 +151,7 @@ export default function BookingForm() {
           <div className="flex justify-end mb-2">
             <LanguageSwitcher lang={lang} setLang={setLang} />
           </div>
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
-            {t.bookingTitle}
-          </h2>
+          <AnimatedText tag="h2" text={t.bookingTitle} className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4" />
           <form onSubmit={handleSubmit} className="space-y-4 w-full" noValidate>
             <div className="flex flex-col md:flex-row md:gap-4">
               <div className="w-full md:w-1/2">
@@ -200,7 +199,7 @@ export default function BookingForm() {
               service={formData.service}
               onChange={handleChange}
               options={serviceOptions}
-              labelText={t.service}
+              labelText={<AnimatedText text={t.service} />}
               placeholder={t.chooseService}
             />
             <CheckboxField
@@ -208,12 +207,12 @@ export default function BookingForm() {
               name="isStored"
               checked={formData.isStored}
               onChange={handleChange}
-              label={t.isStored}
+              label={<AnimatedText text={t.isStored} />}
             />
             <DatePickerComponent
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
-              label={t.selectDate}
+              label={<AnimatedText text={t.selectDate} />}
               placeholder={t.datePlaceholder}
               lang={lang}
               holidays={holidays}

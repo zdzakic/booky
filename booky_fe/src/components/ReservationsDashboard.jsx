@@ -214,7 +214,7 @@ const ReservationsDashboard = () => {
         </div>
       </>
     ) : (
-      <HolidayManager holidays={holidays} setHolidays={setHolidays} t={t} />
+      <HolidayManager holidays={holidays} setHolidays={setHolidays} labels={t} lang={lang} />
     )}
 
     {isModalOpen && reservationToDelete && (

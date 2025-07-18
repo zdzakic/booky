@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../../config/theme';
 
-const EmptyState = ({ icon, title, message, buttonText, buttonLink }) => {
+const EmptyState = ({ Icon, title, message, buttonText, buttonLink }) => {
   const navigate = useNavigate();
 
   // Note: For this to work with Tailwind's JIT compiler, you might need to safelist these dynamic classes
@@ -12,7 +12,7 @@ const EmptyState = ({ icon, title, message, buttonText, buttonLink }) => {
   return (
     <div className="text-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 my-6">
       <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
-        {icon}
+        {Icon && <Icon className="h-6 w-6 text-gray-400" />}
       </div>
       <h3 className="text-lg font-medium text-gray-900 dark:text-white">{title}</h3>
       <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{message}</p>
