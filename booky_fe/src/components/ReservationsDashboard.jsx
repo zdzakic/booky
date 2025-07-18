@@ -11,6 +11,8 @@ import { CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 import HolidayManager from './HolidayManager';
+import { useAuth } from '../context/AuthContext';
+import { UserCircle } from 'lucide-react';
 
 // API BASE URL
 const API_BASE_URL = '/api'; 
@@ -26,6 +28,7 @@ const ReservationsDashboard = () => {
   const [activeFilter, setActiveFilter] = useState('3w'); // Default filter
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [activeView, setActiveView] = useState('reservations'); // 'reservations' or 'holidays'
+  const { logout } = useAuth();
 
   // Debounce efekt za pretragu
   useEffect(() => {
@@ -146,7 +149,16 @@ const ReservationsDashboard = () => {
   <div className="font-sans bg-gray-50 dark:bg-gray-950 min-h-screen w-full flex flex-col items-center pt-8 px-4">
     <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
       <h2 className="text-2xl font-bold">{activeView === 'reservations' ? (t.all_reservations || 'All reservations') : (t.manage_holidays || 'Manage Holidays')}</h2>
-      <LanguageSwitcher lang={lang} setLang={setLang} />
+      <div className="flex items-center space-x-6"> 
+        <LanguageSwitcher lang={lang} setLang={setLang} />
+        <button
+          onClick={logout}
+          title="Logout"
+          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none transition-colors"
+        >
+          <UserCircle size={26} strokeWidth={1.4} />
+        </button>
+      </div>
     </div>
 
     {/* Combined Controls Row */}
