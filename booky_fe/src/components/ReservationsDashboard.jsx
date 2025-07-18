@@ -40,36 +40,27 @@ const ReservationsDashboard = () => {
   }, [searchQuery]);
 
   useEffect(() => {
-    setLoading(true);
-    axios.get('/reservations/', {
-      params: { 
-        period: activeFilter,
-        search: debouncedSearchQuery // Koristi debounced vrijednost
-      }
-    })
-      .then(res => {
-        // Sada direktno postavljamo podatke s backenda, bez FE filtriranja
-        setReservations(res.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [activeFilter, debouncedSearchQuery]); // Re-fetch when filter or debounced search term changes
+    const fetchData = async () => {
+      setLoading(true);
 
-  // Fetch holidays
-  useEffect(() => {
-    axios.get('/holidays/')
-      .then(res => {
-        setHolidays(res.data);
-      })
-      .catch(() => toast.error('Failed to fetch holidays.'));
-  }, []);
+      const [reservationsResult, holidaysResult] = await Promise.allSettled([
+        axios.get('/reservations/', { params: { period: activeFilter, search: debouncedSearchQuery } }),
+        axios.get('/holidays/'),
+      ]);
+
+      if (reservationsResult.status === 'fulfilled') setReservations(reservationsResult.value.data);
+      else toast.error('Failed to fetch reservations.');
+
+      if (holidaysResult.status === 'fulfilled') setHolidays(holidaysResult.value.data);
+      else toast.error('Failed to fetch holidays.');
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [activeFilter, debouncedSearchQuery]);
 
   const t = translations[lang]?.dashboard || {};
-
-  // VAŽNO: Uklanjamo staro filtriranje na frontendu.
-  // Vaš postojeći `filteredReservations` bi trebao biti uklonjen ili promijenjen
-  // da jednostavno koristi `reservations` koje dolaze s backenda.
-  const filteredReservations = reservations;
 
   const unapprovedCount = reservations.filter(res => !res.is_approved).length;
   const reservationsTodayCount = reservations.filter(r => {
@@ -147,7 +138,7 @@ const ReservationsDashboard = () => {
     </button>
   );
 
-  if (loading && reservations.length === 0) {
+  if (loading) {
     return <DashboardSkeleton />;
   }
 
@@ -204,36 +195,26 @@ const ReservationsDashboard = () => {
         />
 
         <div className="max-w-7xl w-full mx-auto">
-          <ReservationsTable
-            title={t.all_reservations || 'All reservations'}
-            reservations={filteredReservations}
-            labels={t}
-            lang={lang}
-            onView={handleView}
-            onEdit={handleEdit}
-            onApprove={handleApprove}
-            onDelete={handleDelete}
-          />
-
-          {filteredReservations.length === 0 && !loading && (
+          {reservations.length > 0 ? (
+            <ReservationsTable
+              reservations={reservations}
+              onApprove={handleApprove}
+              onDelete={handleDelete}
+              onView={handleView}
+              onEdit={handleEdit}
+              labels={t}
+            />
+          ) : (
             <EmptyState
-              icon={<CalendarPlus className="w-8 h-8 text-gray-400" />}
-              title={t.no_reservations_title || 'No Reservations Found'}
-              message={searchQuery 
-                ? (t.no_reservations_search_message || 'Try adjusting your search query.') 
-                : (t.no_reservations_message || 'There are currently no reservations. Why not create one?')}
-              buttonText={t.create_new_button || 'Create New Reservation'}
-              buttonLink="/"
+              Icon={CalendarPlus}
+              title={t.no_reservations_title || 'No reservations found'}
+              message={t.no_reservations_message || 'There are no reservations matching your criteria.'}
             />
           )}
         </div>
       </>
     ) : (
-      <HolidayManager 
-        lang={lang} 
-        holidays={holidays} 
-        setHolidays={setHolidays} 
-      />
+      <HolidayManager holidays={holidays} setHolidays={setHolidays} t={t} />
     )}
 
     {isModalOpen && reservationToDelete && (

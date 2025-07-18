@@ -40,10 +40,11 @@ export default function BookingForm() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [errors, setErrors] = useState({});
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const [serviceOptions, setServiceOptions] = useState([]);
-  const [loadingServices, setLoadingServices] = useState(true);
   const [holidays, setHolidays] = useState([]);
 
   const handleChange = (e) => {
@@ -59,7 +60,7 @@ export default function BookingForm() {
     setSelectedTime(null);
   }, [selectedDate, formData.service]);
 
-  // povuci servis dinamicki 
+  // Fetch initial data (services and holidays)
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -73,14 +74,8 @@ export default function BookingForm() {
       } catch (err) {
         setServiceOptions([]);
       }
-      setLoadingServices(false); 
     };
-    setLoadingServices(true); 
-    fetchServices();
-  }, [lang]);
 
-  // Fetch holidays to disable them in the date picker
-  useEffect(() => {
     const fetchHolidays = async () => {
       try {
         const resp = await axios.get('holidays/');
@@ -91,8 +86,18 @@ export default function BookingForm() {
         toast.error(t.errors.fetchHolidaysError || 'Could not load holidays.');
       }
     };
-    fetchHolidays();
-  }, [t.errors.fetchHolidaysError]);
+
+    const fetchInitialData = async () => {
+      setIsInitialLoading(true);
+      await Promise.allSettled([
+        fetchServices(),
+        fetchHolidays(),
+      ]);
+      setIsInitialLoading(false);
+    };
+
+    fetchInitialData();
+  }, [lang, t.errors.fetchHolidaysError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,6 +111,7 @@ export default function BookingForm() {
       toast.error(t.errors.selectDateTime || 'Bitte wählen Sie ein Datum und eine Uhrzeit.');
       return;
     }
+    setIsSubmitting(true);
     try {
       // Combine date and time into a single ISO 8601 string for the backend
       const [hours, minutes] = selectedTime.split(':');
@@ -130,102 +136,103 @@ export default function BookingForm() {
     } catch (err) {
       console.error('Booking error:', err);
       toast.error(t.errors.bookingFailed || 'Fehler beim Buchen.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 sm:p-8 flex flex-col gap-4">
-
-        <div className="flex justify-end mb-2">
-          <LanguageSwitcher lang={lang} setLang={setLang} />
-        </div>
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
-          {t.bookingTitle}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4 w-full" noValidate>
-
-          <div className="flex flex-col md:flex-row md:gap-4">
-            <div className="w-full md:w-1/2">
-              <InputField
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder={t.fullName}
-                error={errors.fullName}
-              />
-            </div>
-            <div className="w-full md:w-1/2 mt-4 md:mt-0">
-              <InputField
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder={t.phone}
-                error={errors.phone}
-              />
-            </div>
+      {isInitialLoading ? (
+        <Loader2 className="animate-spin text-gray-500 dark:text-gray-400" size={48} />
+      ) : (
+        <div className="w-full max-w-2xl bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 sm:p-8 flex flex-col gap-4">
+          <div className="flex justify-end mb-2">
+            <LanguageSwitcher lang={lang} setLang={setLang} />
           </div>
-
-          <div className="flex flex-col md:flex-row md:gap-4">
-            <div className="w-full md:w-1/2">
-              <InputField
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="E-Mail"
-                error={errors.email}
-              />
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
+            {t.bookingTitle}
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4 w-full" noValidate>
+            <div className="flex flex-col md:flex-row md:gap-4">
+              <div className="w-full md:w-1/2">
+                <InputField
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder={t.fullName}
+                  error={errors.fullName}
+                />
+              </div>
+              <div className="w-full md:w-1/2 mt-4 md:mt-0">
+                <InputField
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder={t.phone}
+                  error={errors.phone}
+                />
+              </div>
             </div>
-            <div className="w-full md:w-1/2 mt-4 md:mt-0">
-              <InputField
-                name="licensePlate"
-                value={formData.licensePlate}
-                onChange={handleChange}
-                placeholder={t.licensePlate}
-                error={errors.licensePlate}
-              />
+            <div className="flex flex-col md:flex-row md:gap-4">
+              <div className="w-full md:w-1/2">
+                <InputField
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="E-Mail"
+                  error={errors.email}
+                />
+              </div>
+              <div className="w-full md:w-1/2 mt-4 md:mt-0">
+                <InputField
+                  name="licensePlate"
+                  value={formData.licensePlate}
+                  onChange={handleChange}
+                  placeholder={t.licensePlate}
+                  error={errors.licensePlate}
+                />
+              </div>
             </div>
-          </div>
-      
-          <ServiceSelect
-            service={formData.service}
-            onChange={handleChange}
-            options={serviceOptions}
-            loading={loadingServices}
-            labelText={t.service}
-            placeholder={t.chooseService}
-          />
-          <CheckboxField
-            id="isStored"
-            name="isStored"
-            checked={formData.isStored}
-            onChange={handleChange}
-            label={t.isStored}
-          />
-          <DatePickerComponent
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            label={t.selectDate}
-            placeholder={t.datePlaceholder} 
-            lang={lang}
-            holidays={holidays}
-          />
-          {selectedDate && formData.service && (
-            <TimeSlots
-              selectedDate={selectedDate}
-              serviceId={formData.service}
-              selectedTime={selectedTime}
-              onTimeSelect={setSelectedTime}
-              lang={lang}
+            <ServiceSelect
+              service={formData.service}
+              onChange={handleChange}
+              options={serviceOptions}
+              labelText={t.service}
+              placeholder={t.chooseService}
             />
-          )}
-          <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime}>
-            {t.submit}
-          </SubmitButton>
-        </form>
-      </div>
+            <CheckboxField
+              id="isStored"
+              name="isStored"
+              checked={formData.isStored}
+              onChange={handleChange}
+              label={t.isStored}
+            />
+            <DatePickerComponent
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              label={t.selectDate}
+              placeholder={t.datePlaceholder}
+              lang={lang}
+              holidays={holidays}
+            />
+            {selectedDate && formData.service && (
+              <TimeSlots
+                selectedDate={selectedDate}
+                serviceId={formData.service}
+                selectedTime={selectedTime}
+                onTimeSelect={setSelectedTime}
+                lang={lang}
+              />
+            )}
+            <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime || isSubmitting}>
+              {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : t.submit}
+            </SubmitButton>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
