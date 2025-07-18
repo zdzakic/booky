@@ -1,5 +1,32 @@
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 from .models import Reservation, ServiceType, Resource, BusinessHours, Holiday
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['email'] = user.email
+
+        return token
+
+    def validate(self, attrs):
+        # The default result (access/refresh tokens)
+        data = super().validate(attrs)
+
+        # Add custom user data to the response body
+        data['user'] = {
+            'email': self.user.email,
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+            'is_staff': self.user.is_staff,
+        }
+
+        return data
 
 
 class ServiceTypeSerializer(serializers.ModelSerializer):

@@ -1,17 +1,21 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
 from rest_framework import status
-from booking.models import ServiceType, Reservation, Resource, BusinessHours, Holiday
+from rest_framework.test import APITestCase
+from django.contrib.auth import get_user_model
+from booking.models import Reservation, ServiceType, Resource, BusinessHours, Holiday
 from datetime import date, time, datetime, timedelta
 from django.utils import timezone
 from django.core import mail
 
+User = get_user_model()
+
 
 class BookingLogicTests(APITestCase):
-    """Potpuno novi test suite koji testira postojeću logiku bookinga."""
     
     def setUp(self):
         """Set up a clean environment for each test."""
+        self.user = User.objects.create_user(email='testuser@example.com', password='password123')
+        self.staff_user = User.objects.create_user(email='staffuser@example.com', password='password123', is_staff=True)
         self.service = ServiceType.objects.create(name='Test Service', duration_minutes=30)
         self.resource1 = Resource.objects.create(name='Lift 1')
         self.resource2 = Resource.objects.create(name='Lift 2')
@@ -81,6 +85,7 @@ class BookingLogicTests(APITestCase):
         Testira da PATCH zahtjev na /reservations/<id>/ ispravno odobrava
         rezervaciju i šalje email korisniku.
         """
+        self.client.force_authenticate(user=self.staff_user)
         # 1. Kreiraj rezervaciju koju ćemo odobriti
         tz = timezone.get_current_timezone()
         start_time_aware = datetime.combine(self.test_date, time(11, 0), tzinfo=tz)
@@ -144,6 +149,7 @@ class BookingLogicTests(APITestCase):
 class AvailabilityTests(APITestCase):
     def setUp(self):
         """Set up a service and a holiday for testing availability."""
+        self.user = User.objects.create_user(email='testuser@example.com', password='password123')
         self.service = ServiceType.objects.create(name='Test Service', duration_minutes=60)
         self.holiday_date = timezone.now().date() + timedelta(days=10)
         Holiday.objects.create(name='Test Holiday', date=self.holiday_date)
@@ -153,10 +159,11 @@ class AvailabilityTests(APITestCase):
             open_time=time(9, 0),
             close_time=time(17, 0)
         )
+        self.availability_url = reverse('booking:availability')
 
     def test_no_slots_on_holiday(self):
         """Verify that no available slots are returned for a date marked as a holiday."""
-        url = reverse('booking:availability')
+        url = self.availability_url
         response = self.client.get(url, {'service': self.service.id, 'date': self.holiday_date.strftime('%Y-%m-%d')})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -165,6 +172,8 @@ class AvailabilityTests(APITestCase):
 
 class ReservationFilteringTests(APITestCase):
     def setUp(self):
+        self.user = User.objects.create_user(email='testuser@example.com', password='password123')
+        self.staff_user = User.objects.create_user(email='staffuser@example.com', password='password123', is_staff=True)
         self.service = ServiceType.objects.create(name='Test Service', duration_minutes=60)
         self.resource = Resource.objects.create(name='Test Resource')
         self.resource.services.add(self.service)
@@ -184,6 +193,7 @@ class ReservationFilteringTests(APITestCase):
 
     def test_filter_period_3w(self):
         """Testira da `period=3w` vraća rezervacije od danas do 3 tjedna u budućnost."""
+        self.client.force_authenticate(user=self.staff_user)
         response = self.client.get(reverse('booking:reservation-list-create'), {'period': '3w'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3) # Today, Future, Pending
@@ -191,13 +201,15 @@ class ReservationFilteringTests(APITestCase):
 
     def test_filter_period_pending(self):
         """Testira da `period=pending` vraća samo neodobrene rezervacije."""
+        self.client.force_authenticate(user=self.staff_user)
         response = self.client.get(reverse('booking:reservation-list-create'), {'period': 'pending'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['full_name'], 'Pending User')
 
-    def test_filter_period_all_shows_upcoming(self):
+    def test_filter_period_all(self):
         """Testira da `period=all` vraća sve buduće i današnje rezervacije."""
+        self.client.force_authenticate(user=self.staff_user)
         response = self.client.get(reverse('booking:reservation-list-create'), {'period': 'all'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3) # Today, Future, Pending
@@ -205,6 +217,7 @@ class ReservationFilteringTests(APITestCase):
 
     def test_filter_period_past_shows_past(self):
         """Testira da `period=past` vraća samo prošle rezervacije."""
+        self.client.force_authenticate(user=self.staff_user)
         response = self.client.get(reverse('booking:reservation-list-create'), {'period': 'past'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -212,6 +225,7 @@ class ReservationFilteringTests(APITestCase):
 
     def test_search_query(self):
         """Testira da `search` parametar ispravno filtrira rezultate."""
+        self.client.force_authenticate(user=self.staff_user)
         response = self.client.get(reverse('booking:reservation-list-create'), {'search': 'Future'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)

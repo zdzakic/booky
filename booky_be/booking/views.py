@@ -6,17 +6,24 @@ from django.utils import timezone
 from django.db import transaction
 from datetime import datetime, time, timedelta
 from django.db.models import Q
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from .serializers import (
     ServiceTypeSerializer, 
     ReservationSerializer,
     ReservationListSerializer,
-    HolidaySerializer
+    HolidaySerializer,
+    MyTokenObtainPairSerializer
 )
 from django.core.mail import send_mail
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+
+
+class LoginAPIView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class ServiceTypeListAPIView(generics.ListAPIView):

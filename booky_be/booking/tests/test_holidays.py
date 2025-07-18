@@ -1,13 +1,15 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from ..models import Holiday
+
+User = get_user_model()
 
 class HolidayAPITests(APITestCase):
     def setUp(self):
         # Create a test user
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(email='testuser@example.com', password='testpassword')
         # URL for creating and listing holidays
         self.url = reverse('booking:holiday-list-create') # Corrected URL name with app_name prefix
 
@@ -16,7 +18,7 @@ class HolidayAPITests(APITestCase):
         Ensure an authenticated user can create a new holiday and their username is recorded.
         """
         # Authenticate the user
-        self.client.login(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
 
         data = {
             'name': 'Test Holiday',

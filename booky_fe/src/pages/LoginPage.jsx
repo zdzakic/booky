@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import { validateEmail } from '../utils/validators';
+import { theme } from '../config/theme';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -60,6 +61,15 @@ const LoginPage = () => {
     }
   };
 
+  const buttonClasses = [
+    `bg-${theme.colors.primary}-500`,
+    `hover:bg-${theme.colors.primary}-600`,
+    `focus:ring-${theme.colors.primary}-500`,
+    `disabled:bg-${theme.colors.primary}-300`,
+  ].join(' ');
+
+  const errorTextColor = `text-${theme.colors.error}-600`;
+
   return (
     <main className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center w-full">
       <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 space-y-6">
@@ -81,11 +91,13 @@ const LoginPage = () => {
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             error={errors.password}
           />
-          {serverError && <p className="text-sm text-red-600 text-center">{serverError}</p>}
+          {serverError && (
+            <p className={`text-sm ${errorTextColor} text-center`}>{serverError}</p>
+          )}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-2.5 font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-orange-300 transition-colors"
+            className={`w-full px-4 py-2.5 font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${buttonClasses}`}
           >
             {isSubmitting ? 'Logging in...' : 'Login'}
           </button>

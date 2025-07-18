@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s^v#n#v@#1t$g4(%-jztj=oii&xd^bsx$($5k-r@$nh2bc1*o3'
+SECRET_KEY = '1Hv___2as62vba99kssss8873-s^v#n#v@#1t$g4(%-jztj=oii&xd^bsx$($5k-r@$nh2bc1*o3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,6 +30,10 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+
+# Set the custom user model
+# This should be defined before INSTALLED_APPS if possible, but works here too.
+AUTH_USER_MODEL = 'booking.User'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -136,6 +141,23 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False, # Set to True if you want a new refresh token on every refresh
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "email",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+}
+
 # Email settings for development (prints to console)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-

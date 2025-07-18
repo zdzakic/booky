@@ -4,7 +4,8 @@ from .views import (
     AvailabilityAPIView,
     ReservationListCreateAPIView,
     ReservationDetailView,
-    HolidayViewSet
+    HolidayViewSet,
+    LoginAPIView
 )
 
 app_name = 'booking'
@@ -16,4 +17,5 @@ urlpatterns = [
     path('reservations/<int:pk>/', ReservationDetailView.as_view(), name='reservation-detail'),
     path('holidays/', HolidayViewSet.as_view({'get': 'list', 'post': 'create'}), name='holiday-list-create'),
     path('holidays/<int:pk>/', HolidayViewSet.as_view({'get': 'retrieve', 'delete': 'destroy'}), name='holiday-detail'),
+    path('auth/login/', LoginAPIView.as_view(), name='token_obtain_pair'),
 ]
