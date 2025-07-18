@@ -1,35 +1,38 @@
 import React, { createContext, useContext, useState } from 'react';
+import axios from 'axios';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('authToken'));
-
-  // In a real app, you'd fetch the user profile here if a token exists
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
   const login = async (email, password) => {
-    // This is a placeholder. We will connect this to the backend in the next step.
-    // For now, we'll simulate a successful login.
-    console.log('Simulating login for:', email);
-    const fakeToken = 'fake-jwt-token';
-    localStorage.setItem('authToken', fakeToken);
-    setToken(fakeToken);
-    setUser({ email }); // Set a dummy user object
+    try {
+      const response = await axios.post('/api/auth/login', {
+        email,
+        password,
+      });
+
+      const { token, user } = response.data;
+
+      localStorage.setItem('token', token);
+      setToken(token);
+      setUser(user);
+
+    } catch (error) {
+      // Re-throw the error so the calling component (LoginPage) can handle it.
+      throw error;
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
+    localStorage.removeItem('token');
     setToken(null);
+    setUser(null);
   };
 
-  const value = {
-    user,
-    token,
-    login,
-    logout,
-  };
+  const value = { user, token, login, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

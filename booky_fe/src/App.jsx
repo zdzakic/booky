@@ -7,6 +7,7 @@ import ReservationsDashboard from './components/ReservationsDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import SuccessPage from './pages/SuccessPage';
+import LoginBlockedPage from './pages/LoginBlockedPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<BookingForm />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/login-blocked" element={<LoginBlockedPage />} />
         <Route path="/success" element={<SuccessPage />} />
 
         {/* Protected Route */}
