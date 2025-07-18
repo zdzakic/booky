@@ -88,6 +88,8 @@ export const translations = {
         no_holidays_title: 'Keine Feiertage festgelegt',
         delete_holiday_confirm_title: 'Feiertag löschen?',
         delete_holiday_confirm_message: 'Sind Sie sicher, dass Sie löschen möchten',
+        delete_holiday_modal_title: 'Feiertag löschen',
+        delete_holiday_modal_message: 'Sind Sie sicher, dass Sie {holidayName} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
         // Table Headers
         holiday_name_header: 'Name',
         holiday_date_header: 'Datum',
@@ -108,7 +110,8 @@ export const translations = {
         fullName: "Bitte geben Sie Ihren Namen ein.",
         phone: "Ungültige Schweizer Telefonnummer.",
         email: "Ungültige E-Mail-Adresse.",
-        licensePlate: "Bitte geben Sie das Kennzeichen ein."
+        licensePlate: "Bitte geben Sie das Kennzeichen ein.",
+        fetchHolidaysError: 'Feiertage konnten nicht geladen werden.',
       }
     },
     en: {
@@ -199,6 +202,8 @@ export const translations = {
         no_holidays_title: 'No Holidays Set',
         delete_holiday_confirm_title: 'Delete Holiday?',
         delete_holiday_confirm_message: 'Are you sure you want to delete',
+        delete_holiday_modal_title: 'Delete Holiday',
+        delete_holiday_modal_message: 'Are you sure you want to delete {holidayName}? This action cannot be undone.',
         // Table Headers
         holiday_name_header: 'Name',
         holiday_date_header: 'Date',
@@ -219,7 +224,8 @@ export const translations = {
         fullName: "Please enter your name.",
         phone: "Invalid phone number.",
         email: "Invalid email address.",
-        licensePlate: "Please enter your license plate."
+        licensePlate: "Please enter your license plate.",
+        fetchHolidaysError: 'Could not load holidays.',
       }
     },
     hr: {
@@ -308,15 +314,10 @@ export const translations = {
         holiday_name_placeholder: 'npr. Nova Godina',
         holiday_date_label: 'Datum',
         holiday_date_placeholder: 'Odaberite datum',
-        add_holiday_form_error: 'Molimo popunite naziv i datum.',
+        add_holiday_form_error: 'Molimo ispunite naziv i datum.',
         add_button: 'Dodaj',
+        delete_holiday_modal_title: 'Izbriši praznik',
+        delete_holiday_modal_message: 'Jeste li sigurni da želite izbrisati {holidayName}? Ova se radnja ne može poništiti.',
       },
-      // Validation errors:
-      errors: {
-        fullName: "Molimo unesite vaše ime.",
-        phone: "Neispravan broj telefona.",
-        email: "Neispravna e-mail adresa.",
-        licensePlate: "Molimo unesite registarsku oznaku."
-      }
     }
   }

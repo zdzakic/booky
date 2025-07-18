@@ -17,6 +17,7 @@ const API_BASE_URL = '/api';
 
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
+  const [holidays, setHolidays] = useState([]); // State for holidays
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState('de');
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +54,15 @@ const ReservationsDashboard = () => {
       })
       .catch(() => setLoading(false));
   }, [activeFilter, debouncedSearchQuery]); // Re-fetch when filter or debounced search term changes
+
+  // Fetch holidays
+  useEffect(() => {
+    axios.get('/holidays/')
+      .then(res => {
+        setHolidays(res.data);
+      })
+      .catch(() => toast.error('Failed to fetch holidays.'));
+  }, []);
 
   const t = translations[lang]?.dashboard || {};
 
@@ -219,7 +229,11 @@ const ReservationsDashboard = () => {
         </div>
       </>
     ) : (
-      <HolidayManager lang={lang} />
+      <HolidayManager 
+        lang={lang} 
+        holidays={holidays} 
+        setHolidays={setHolidays} 
+      />
     )}
 
     {isModalOpen && reservationToDelete && (

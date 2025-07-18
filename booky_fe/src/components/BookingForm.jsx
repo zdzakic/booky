@@ -44,7 +44,7 @@ export default function BookingForm() {
 
   const [serviceOptions, setServiceOptions] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
-
+  const [holidays, setHolidays] = useState([]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -78,6 +78,21 @@ export default function BookingForm() {
     setLoadingServices(true); 
     fetchServices();
   }, [lang]);
+
+  // Fetch holidays to disable them in the date picker
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const resp = await axios.get('holidays/');
+        setHolidays(resp.data);
+      } catch (err) {
+        console.error("Failed to fetch holidays for booking form:", err);
+        // Non-blocking error toast
+        toast.error(t.errors.fetchHolidaysError || 'Could not load holidays.');
+      }
+    };
+    fetchHolidays();
+  }, [t.errors.fetchHolidaysError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -195,6 +210,7 @@ export default function BookingForm() {
             label={t.selectDate}
             placeholder={t.datePlaceholder} 
             lang={lang}
+            holidays={holidays}
           />
           {selectedDate && formData.service && (
             <TimeSlots

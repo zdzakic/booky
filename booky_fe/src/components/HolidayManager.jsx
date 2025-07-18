@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import axios from '../utils/axios';
 import { translations } from '../utils/translations';
 import { toast } from 'sonner';
@@ -8,37 +8,19 @@ import EmptyState from './ui/EmptyState';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 import AddHolidayModal from './ui/AddHolidayModal';
 
-const HolidayManager = ({ lang }) => {
-  const [holidays, setHolidays] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+const HolidayManager = ({ lang, holidays, setHolidays }) => {
   const [holidayToDelete, setHolidayToDelete] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const t = translations[lang]?.dashboard || {};
-
-  useEffect(() => {
-    fetchHolidays();
-  }, []);
-
-  const fetchHolidays = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('/holidays/');
-      const sortedHolidays = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
-      setHolidays(sortedHolidays);
-    } catch (error) {
-      console.error("Failed to fetch holidays:", error);
-      toast.error(t.fetch_holidays_error || 'Failed to fetch holidays.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddHoliday = async (newHoliday) => {
     try {
-      await axios.post('/holidays/', newHoliday);
+      const response = await axios.post('/holidays/', newHoliday);
+      setHolidays(prevHolidays => [...prevHolidays, response.data]);
       toast.success(t.add_holiday_success || 'Holiday added successfully.');
-      fetchHolidays();
+      setIsAddModalOpen(false);
     } catch (error) {
       console.error('Failed to add holiday:', error);
       toast.error(t.add_holiday_error || 'Failed to add holiday.');
@@ -54,8 +36,8 @@ const HolidayManager = ({ lang }) => {
     if (!holidayToDelete) return;
     try {
       await axios.delete(`/holidays/${holidayToDelete.id}/`);
+      setHolidays(prevHolidays => prevHolidays.filter(h => h.id !== holidayToDelete.id));
       toast.success(t.delete_holiday_success || 'Holiday deleted successfully.');
-      fetchHolidays();
     } catch (error) {
       console.error('Failed to delete holiday:', error);
       toast.error(t.delete_holiday_error || 'Failed to delete holiday.');
@@ -65,21 +47,15 @@ const HolidayManager = ({ lang }) => {
     }
   };
 
-  if (loading) {
-    return <div className="text-center p-8">{t.loading || 'Loading...'}</div>;
-  }
-
   return (
     <div className="max-w-7xl w-full mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{t.holiday_list_title || 'Holiday List'}</h3>
-        </div>
+      <div className="flex justify-end mb-4">
         <button 
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200">
-          <PlusCircle className="w-5 h-5 mr-2" />
-          {t.add_holiday_button || 'Add Holiday'}
+          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 flex items-center"
+        >
+          <PlusCircle className="mr-2 h-5 w-5" />
+          {t.add_new_holiday_button || 'Add New Holiday'}
         </button>
       </div>
 
@@ -88,28 +64,13 @@ const HolidayManager = ({ lang }) => {
           holidays={holidays} 
           labels={t} 
           lang={lang} 
-          onDelete={(id) => {
-            const holiday = holidays.find(h => h.id === id);
-            handleDeleteHoliday(holiday);
-          }}
+          onDelete={handleDeleteHoliday} 
         />
       ) : (
-        <EmptyState
-          icon={<CalendarX2 className="w-12 h-12 text-gray-400" />}
-          title={t.no_holidays_title || 'No Holidays Set'}
-          message={t.no_holidays_message || 'You have not set any holidays yet. Add one to block out dates for bookings.'}
-        />
-      )}
-
-      {isDeleteModalOpen && holidayToDelete && (
-        <ConfirmDeleteModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onConfirm={confirmDelete}
-          title={t.delete_holiday_confirm_title || 'Delete Holiday?'}
-          message={`${t.delete_holiday_confirm_message || 'Are you sure you want to delete'} ${holidayToDelete.name}?`}
-          cancelText={t.cancel_button || 'Cancel'}
-          confirmText={t.confirm_delete_button || 'Yes, Delete'}
+        <EmptyState 
+          message={t.no_holidays_message || 'No holidays have been set yet.'} 
+          buttonText={t.add_holiday_button || 'Add Holiday'}
+          onButtonClick={() => setIsAddModalOpen(true)}
         />
       )}
 
@@ -119,8 +80,25 @@ const HolidayManager = ({ lang }) => {
         onAdd={handleAddHoliday}
         lang={lang}
         labels={t}
-        holidays={holidays}
+        holidays={holidays} 
       />
+
+      {isDeleteModalOpen && (
+        <ConfirmDeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={confirmDelete}
+          title={t.delete_holiday_modal_title || 'Delete Holiday'}
+          message={
+            t.delete_holiday_modal_message
+              ? t.delete_holiday_modal_message.replace('{holidayName}', holidayToDelete?.name)
+              : `Are you sure you want to delete ${holidayToDelete?.name}? This action cannot be undone.`
+          }
+          cancelText={t.cancel_button || 'Cancel'}
+          confirmText={t.confirm_delete_button || 'Yes, Delete'}
+          lang={lang}
+        />
+      )}
     </div>
   );
 };
