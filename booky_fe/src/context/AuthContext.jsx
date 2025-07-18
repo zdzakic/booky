@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
+// Create an axios instance with a base URL from environment variables
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL
+});
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -9,15 +14,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await apiClient.post('/api/auth/login/', {
         email,
         password,
       });
 
-      const { token, user } = response.data;
+      // Correctly destructure the response from the backend
+      const { access, user } = response.data;
 
-      localStorage.setItem('token', token);
-      setToken(token);
+      // Store the access token
+      localStorage.setItem('token', access);
+      setToken(access);
       setUser(user);
 
     } catch (error) {
