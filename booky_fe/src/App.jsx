@@ -1,19 +1,34 @@
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { AuthProvider } from './context/AuthContext';
+
 import BookingForm from './components/BookingForm';
-import SuccessPage from './pages/SuccessPage';
 import ReservationsDashboard from './components/ReservationsDashboard';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import SuccessPage from './pages/SuccessPage';
 
 function App() {
   return (
-    <main className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
+    <AuthProvider>
       <Toaster richColors position="top-center" />
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<BookingForm />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/success" element={<SuccessPage />} />
-        <Route path="/dashboard" element={<ReservationsDashboard />} />
+
+        {/* Protected Route */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <ReservationsDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-    </main>
+    </AuthProvider>
   );
 }
 
