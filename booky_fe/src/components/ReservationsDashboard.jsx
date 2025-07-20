@@ -21,6 +21,7 @@ const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
   const [holidays, setHolidays] = useState([]); // State for holidays
   const [loading, setLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const [lang, setLang] = useState('de');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,15 +41,18 @@ const ReservationsDashboard = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchQuery]);
+  }, [searchQuery]); // Ovaj useEffect se pokreće samo kad se promijeni searchQuery
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      // Set loading state based on trigger
+      if (!debouncedSearchQuery) {
+        setLoading(true); // Full skeleton for initial load and filter changes
+      } 
 
       const [reservationsResult, holidaysResult] = await Promise.allSettled([
         axios.get('/reservations/', { params: { period: activeFilter, search: debouncedSearchQuery, lang } }),
-        axios.get('/holidays/'),
+        axios.get('/holidays/', { params: { lang } })
       ]);
 
       if (reservationsResult.status === 'fulfilled') setReservations(reservationsResult.value.data);
@@ -58,12 +62,18 @@ const ReservationsDashboard = () => {
       else toast.error('Failed to fetch holidays.');
 
       setLoading(false);
+      setIsSearching(false);
     };
 
     fetchData();
   }, [activeFilter, debouncedSearchQuery, lang]);
 
   const t = translations[lang]?.dashboard || {};
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setIsSearching(true);
+  };
 
   const unapprovedCount = reservations.filter(res => !res.is_approved).length;
   const reservationsTodayCount = reservations.filter(r => {
@@ -141,7 +151,7 @@ const ReservationsDashboard = () => {
     </button>
   );
 
-  if (loading) {
+  if (loading && reservations.length === 0) {
     return <DashboardSkeleton />;
   }
 
@@ -191,22 +201,23 @@ const ReservationsDashboard = () => {
     </div>
 
     {activeView === 'reservations' ? (
-      <>
+      <div className="max-w-7xl mx-auto w-full">
         <SearchBar
           searchQuery={searchQuery}
-          onSearchChange={(e) => setSearchQuery(e.target.value)}
+          onSearchChange={handleSearchChange}
           placeholder={t.search_placeholder}
           className="mb-6"
+          isSearching={isSearching}
         />
 
-        <QuickStats
-          reservationsTodayCount={reservationsTodayCount}
-          unapprovedCount={unapprovedCount}
-          reservationsThisWeekCount={reservationsThisWeekCount}
-          t={t}
-        />
+        <div className={`transition-opacity duration-300 ${isSearching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+          <QuickStats
+            reservationsTodayCount={reservationsTodayCount}
+            unapprovedCount={unapprovedCount}
+            reservationsThisWeekCount={reservationsThisWeekCount}
+            t={t}
+          />
 
-        <div className="max-w-7xl w-full mx-auto">
           {reservations.length > 0 ? (
             <ReservationsTable
               reservations={reservations}
@@ -225,7 +236,7 @@ const ReservationsDashboard = () => {
             />
           )}
         </div>
-      </>
+      </div>
     ) : (
       <HolidayManager holidays={holidays} setHolidays={setHolidays} labels={t} lang={lang} />
     )}
