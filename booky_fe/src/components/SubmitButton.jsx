@@ -1,18 +1,16 @@
 // components/SubmitButton.jsx
 import React from 'react';
-import { theme } from '../config/theme';
 
 const SubmitButton = ({ disabled, children, ...props }) => {
-  // Dinamički kreiramo klase na osnovu teme.
-  // Tailwind JIT će prepoznati ove klase jer su kompletni stringovi.
-  const baseClasses = 'w-full text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed';
-  const colorClasses = `bg-${theme.colors.primary}-600 hover:bg-${theme.colors.primary}-700`;
+  // Koristimo statičke, semantičke klase koje Tailwind može prepoznati.
+  // Ovo osigurava da se primarna boja (narančasta) ispravno primijeni.
+  const buttonClasses = 'w-full text-white font-semibold py-3 rounded-xl transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary';
 
   return (
     <button
       type="submit"
       disabled={disabled}
-      className={`${baseClasses} ${colorClasses}`}
+      className={buttonClasses}
       {...props}
     >
       {children}

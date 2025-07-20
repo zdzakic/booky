@@ -13,7 +13,7 @@ const InputField = ({
   required = false,
   className = '',
 }) => {
-  const baseClasses = 'block w-full px-4 py-3 text-sm bg-neutral-lightest border rounded-lg focus:outline-none transition-colors duration-200';
+  const baseClasses = 'block w-full px-4 py-3 text-sm bg-white border rounded-lg focus:outline-none transition-colors duration-200';
   
   // Uslovno dodavanje klasa za grešku ili normalno stanje
   const stateClasses = error

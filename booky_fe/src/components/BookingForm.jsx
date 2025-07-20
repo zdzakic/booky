@@ -156,6 +156,7 @@ export default function BookingForm() {
             <div className="flex flex-col md:flex-row md:gap-4">
               <div className="w-full md:w-1/2">
                 <InputField
+                 label={t.fullName}
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
@@ -165,6 +166,7 @@ export default function BookingForm() {
               </div>
               <div className="w-full md:w-1/2 mt-4 md:mt-0">
                 <InputField
+                 label={t.phone}
                   type="tel"
                   name="phone"
                   value={formData.phone}
@@ -177,6 +179,7 @@ export default function BookingForm() {
             <div className="flex flex-col md:flex-row md:gap-4">
               <div className="w-full md:w-1/2">
                 <InputField
+                 label={t.email}
                   type="email"
                   name="email"
                   value={formData.email}
@@ -187,6 +190,7 @@ export default function BookingForm() {
               </div>
               <div className="w-full md:w-1/2 mt-4 md:mt-0">
                 <InputField
+                 label={t.licensePlate}
                   name="licensePlate"
                   value={formData.licensePlate}
                   onChange={handleChange}
