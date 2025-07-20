@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 import BookingForm from './components/BookingForm';
 import ReservationsDashboard from './components/ReservationsDashboard';
@@ -13,25 +14,27 @@ import NotFoundPage from './pages/NotFoundPage';
 function App() {
   return (
     <AuthProvider>
-      <Toaster richColors position="top-center" />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<BookingForm />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/login-blocked" element={<LoginBlockedPage />} />
-        <Route path="/success" element={<SuccessPage />} />
+      <LanguageProvider>
+        <Toaster richColors position="top-center" />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<BookingForm />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login-blocked" element={<LoginBlockedPage />} />
+          <Route path="/success" element={<SuccessPage />} />
 
-        {/* Protected Route */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <ReservationsDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* Protected Route */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <ReservationsDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

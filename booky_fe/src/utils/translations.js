@@ -21,6 +21,12 @@ export const translations = {
       successMsg: "Vielen Dank! Wir haben Ihre Anfrage erhalten und werden sie prüfen. Sie erhalten eine Bestätigung per E-Mail und SMS, sobald der Termin genehmigt wurde.",
       successBooking: "Anfrage erfolgreich gesendet!",
       backToHome: "Zurück zur Startseite",
+      // not found page
+      notFoundTitle: "404 - Seite nicht gefunden",
+      notFoundMsg: "Entschuldigung, die gesuchte Seite existiert nicht. Möglicherweise haben Sie die Adresse falsch eingegeben oder die Seite wurde verschoben.",
+      // login blocked page
+      loginBlockedTitle: "Zu viele fehlgeschlagene Anmeldeversuche",
+      loginBlockedMsg: "Zu Ihrer Sicherheit wurde der Zugriff von Ihrer IP-Adresse vorübergehend blockiert. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.",
       // dashboard
       dashboard: {
         all_reservations: "Alle Reservierungen",
@@ -136,6 +142,12 @@ export const translations = {
       successMsg: "Thank you! We have received your request and will review it. You will receive a confirmation via email and SMS once the appointment is approved.",
       successBooking: "Request sent successfully!",
       backToHome: "Back to homepage",
+      // not found page
+      notFoundTitle: "404 - Page Not Found",
+      notFoundMsg: "Sorry, the page you are looking for does not exist. You might have mistyped the address or the page may have moved.",
+      // login blocked page
+      loginBlockedTitle: "Too Many Failed Login Attempts",
+      loginBlockedMsg: "For your security, access from your IP address has been temporarily blocked. Please try again later or contact support.",
       // dashboard
       dashboard: {
         all_reservations: "All Reservations",
@@ -250,6 +262,12 @@ export const translations = {
       successMsg: "Hvala! Primili smo vaš zahtjev i pregledat ćemo ga. Dobit ćete potvrdu putem e-pošte i SMS-a čim bude termin odobren.",
       successBooking: "Zahtjev uspješno poslan!",
       backToHome: "Natrag na početnu stranicu",
+      // not found page
+      notFoundTitle: "404 - Stranica nije pronađena",
+      notFoundMsg: "Izvinite, stranica koju tražite ne postoji. Možda ste pogrešno upisali adresu ili je stranica premještena.",
+      // login blocked page
+      loginBlockedTitle: "Previše neuspješnih pokušaja prijave",
+      loginBlockedMsg: "Zbog vaše sigurnosti, pristup s vaše IP adrese je privremeno blokiran. Pokušajte ponovo kasnije ili kontaktirajte podršku.",
       // dashboard
       dashboard: {
         all_reservations: "Sve rezervacije",

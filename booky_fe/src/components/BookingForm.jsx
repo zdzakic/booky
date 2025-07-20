@@ -13,6 +13,7 @@ import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
 import LanguageSwitcher from './LanguageSwitcher';
 import AnimatedText from './ui/AnimatedText';
+import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../utils/translations';
 import {
   validateFullName,
@@ -25,7 +26,7 @@ import {
 
 export default function BookingForm() {
 
-  const [lang, setLang] = useState('de');
+  const { lang, setLang } = useLanguage();
   const t = translations[lang];
 
   const [formData, setFormData] = useState({

@@ -1,33 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SearchX } from 'lucide-react';
-import { theme } from '../config/theme';
+import { translations } from '../utils/translations';
+import { useLanguage } from '../context/LanguageContext';
 
 const NotFoundPage = () => {
-  const bgColor = `bg-${theme.colors.info}-100`;
-  const textColor = `text-${theme.colors.info}-700`;
-  const buttonBgColor = `bg-${theme.colors.primary}-700`;
-  const buttonHoverBgColor = `hover:bg-${theme.colors.primary}-800`;
-  const ringColor = `focus:ring-${theme.colors.primary}-700`;
+  const { lang } = useLanguage();
+  const t = translations[lang];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-      <div className="w-full max-w-md p-8 text-center bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <div className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full ${bgColor}`}>
-          <SearchX className={`h-6 w-6 ${textColor}`} />
+    <div className="min-h-screen flex items-center justify-center bg-neutral-lightest dark:bg-neutral-darkest p-4">
+      <div className="w-full max-w-md p-8 text-center bg-white rounded-2xl shadow-lg dark:bg-neutral-dark relative">
+        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary-lighter">
+          <SearchX className="h-6 w-6 text-primary-dark" />
         </div>
-        <h2 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">
-          404 - Page Not Found
+        <h2 className="mt-6 text-2xl font-bold text-neutral-darkest dark:text-neutral-lightest">
+          {t.notFoundTitle}
         </h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Sorry, the page you are looking for does not exist. You might have mistyped the address or the page may have moved.
+        <p className="mt-2 text-neutral-darker dark:text-neutral-light">
+          {t.notFoundMsg}
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className={`inline-flex items-center px-4 py-2 font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${buttonBgColor} ${buttonHoverBgColor} ${ringColor}`}
+            className="inline-flex items-center justify-center px-6 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors bg-primary hover:bg-primary-dark focus:ring-primary"
           >
-            Go to Home Page
+            {t.backToHome}
           </Link>
         </div>
       </div>
