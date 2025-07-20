@@ -7,6 +7,8 @@ import dotenv
 # Load environment variables from .env file
 dotenv.load_dotenv()
 
+ENV = os.environ.get("ENV", "production")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -176,4 +178,4 @@ SIMPLE_JWT = {
 }
 
 # Email settings for development (prints to console)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
