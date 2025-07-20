@@ -44,7 +44,7 @@ export const translations = {
         no: "Nein",
         approved: "Genehmigt",
         pending: "Ausstehend",
-        today: "Heute",
+        today: "Heute", 
         upcoming_days: "Kommende Tage",
         reservations_today: "Termine Heute",
         pending_approval: "Warten auf Freigabe",

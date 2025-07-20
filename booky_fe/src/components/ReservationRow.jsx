@@ -13,17 +13,25 @@ const ActionButton = ({ title, onClick, children }) => (
 const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
   const t = translations[lang]?.dashboard || {};
 
+  // Helper function for cleaner translation logic
+  const getTranslatedServiceName = (service) => {
+    if (!service) return '-';
+    if (lang === 'de') return service.name_de || service.name;
+    // Fallback to English or the default name
+    return service.name_en || service.name;
+  };
+
   // Simplified 'isPast' logic using end_time
   const isPast = new Date(reservation.end_time) < new Date();
   const isToday = !isPast && reservation.start_time.startsWith(new Date().toISOString().slice(0, 10));
 
   // KORAK 2: Definišemo klase koristeći vrednosti iz teme
-  const isStoredClasses = `bg-${theme.colors.success}-100 text-${theme.colors.success}-800 dark:bg-${theme.colors.success}-900/30 dark:text-${theme.colors.success}-200`;
-  const isNotStoredClasses = `bg-${theme.colors.error}-100 text-${theme.colors.error}-800 dark:bg-${theme.colors.error}-900/30 dark:text-${theme.colors.error}-200`;
+  const isStoredClasses = `bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200`;
+  const isNotStoredClasses = `bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200`;
   const timeSlotClasses = `bg-custom-orange-200 text-custom-orange-800 dark:bg-custom-orange-800/30 dark:text-custom-orange-100`;
-  const viewIconClasses = `text-${theme.colors.secondary}-500`;
-  const editIconClasses = `text-${theme.colors.primary}-500`;
-  const deleteIconClasses = `text-${theme.colors.error}-500`;
+  const viewIconClasses = `text-gray-500`;
+  const editIconClasses = `text-blue-500`;
+  const deleteIconClasses = `text-red-500`;
 
   const rowClass = isPast
     ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-20'
@@ -55,7 +63,7 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
 
       <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.service || 'Service'}: </span>
-        {reservation.service?.name || '-'}
+        {getTranslatedServiceName(reservation.service)}
       </div>
 
       <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">

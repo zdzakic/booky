@@ -47,7 +47,7 @@ const ReservationsDashboard = () => {
       setLoading(true);
 
       const [reservationsResult, holidaysResult] = await Promise.allSettled([
-        axios.get('/reservations/', { params: { period: activeFilter, search: debouncedSearchQuery } }),
+        axios.get('/reservations/', { params: { period: activeFilter, search: debouncedSearchQuery, lang } }),
         axios.get('/holidays/'),
       ]);
 
@@ -61,7 +61,7 @@ const ReservationsDashboard = () => {
     };
 
     fetchData();
-  }, [activeFilter, debouncedSearchQuery]);
+  }, [activeFilter, debouncedSearchQuery, lang]);
 
   const t = translations[lang]?.dashboard || {};
 
@@ -215,6 +215,7 @@ const ReservationsDashboard = () => {
               onView={handleView}
               onEdit={handleEdit}
               labels={t}
+              lang={lang}
             />
           ) : (
             <EmptyState

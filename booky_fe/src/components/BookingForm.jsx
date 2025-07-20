@@ -127,6 +127,7 @@ export default function BookingForm() {
         license_plate: formData.licensePlate,
         service: parseInt(formData.service, 10),
         start_time: startTime.toISOString(), // Send the combined datetime string
+        is_stored: formData.isStored, // FIX: Add isStored value to the payload
       };
       const resp = await axios.post('reservations/', payload);
       if (resp.status === 201) {

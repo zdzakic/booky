@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import axios from '../utils/axios';
 import { toast } from 'sonner';
 import { PlusCircle, CalendarX2 } from 'lucide-react';
@@ -7,7 +7,7 @@ import EmptyState from './ui/EmptyState';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 import AddHolidayModal from './ui/AddHolidayModal';
 
-const HolidayManager = ({ lang, holidays, setHolidays, labels }) => {
+const HolidayManager = ({ holidays, setHolidays, labels }) => {
   const [holidayToDelete, setHolidayToDelete] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -49,7 +49,7 @@ const HolidayManager = ({ lang, holidays, setHolidays, labels }) => {
       <div className="flex justify-end mb-4">
         <button 
           onClick={() => setIsAddModalOpen(true)}
-          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 flex items-center"
+          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark flex items-center transition-colors"
         >
           <PlusCircle className="mr-2 h-5 w-5" />
           {labels.add_new_holiday_button || 'Add New Holiday'}
@@ -60,7 +60,6 @@ const HolidayManager = ({ lang, holidays, setHolidays, labels }) => {
         <HolidaysTable 
           holidays={holidays} 
           labels={labels} 
-          lang={lang} 
           onDelete={handleDeleteHoliday} 
         />
       ) : (
@@ -75,9 +74,8 @@ const HolidayManager = ({ lang, holidays, setHolidays, labels }) => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddHoliday}
-        lang={lang}
         labels={labels}
-        holidays={holidays} 
+        holidays={holidays.map(h => h.date)} 
       />
 
       {isDeleteModalOpen && (
@@ -93,7 +91,6 @@ const HolidayManager = ({ lang, holidays, setHolidays, labels }) => {
           }
           cancelText={labels.cancel_button || 'Cancel'}
           confirmText={labels.confirm_delete_button || 'Yes, Delete'}
-          lang={lang}
         />
       )}
     </div>

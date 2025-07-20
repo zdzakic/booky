@@ -8,17 +8,17 @@ const QuickStats = ({ reservationsTodayCount, unapprovedCount, reservationsThisW
     <StatCard 
       value={reservationsTodayCount} 
       label={t.reservations_today} 
-      color={theme.colors.primary}
+      color="primary"
     />
     <StatCard 
       value={unapprovedCount} 
       label={t.pending_approval} 
-      color={theme.colors.warning}
+      color="warning"
     />
     <StatCard 
       value={reservationsThisWeekCount} 
       label={t.reservations_this_week} 
-      color={theme.colors.info}
+      color="info"
     />
   </div>
 );

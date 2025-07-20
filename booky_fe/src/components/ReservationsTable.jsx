@@ -7,7 +7,7 @@ const ReservationsTable = ({ title, reservations, labels, lang, onApprove, onDel
   }
 
    return (
-    <div className="mb-8 shadow-md rounded-lg overflow-hidden">
+    <div className="mb-8 shadow-md rounded-lg overflow-hidden bg-white dark:bg-gray-800">
       {/* {title && <h3 className="p-4 text-lg font-semibold text-gray-800 dark:text-gray-200">{title}</h3>} */}
       <div className="md:table w-full border-collapse text-left">
         <div className="hidden md:table-header-group bg-gray-50 dark:bg-gray-700/50">
