@@ -73,16 +73,17 @@ class ReservationSerializer(serializers.ModelSerializer):
 
 
 class HolidaySerializer(serializers.ModelSerializer):
-    created_by_username = serializers.SerializerMethodField()
+    created_by_email = serializers.SerializerMethodField()
 
     class Meta:
         model = Holiday
-        fields = ['id', 'name', 'date', 'created_by_username']
+        fields = ['id', 'name', 'date', 'created_by', 'created_by_email']
+        read_only_fields = ('created_by', 'created_by_email')
 
-    def get_created_by_username(self, obj):
+    def get_created_by_email(self, obj):
         if obj.created_by:
-            return obj.created_by.username
-        return '-'
+            return obj.created_by.email
+        return None
 
 
 class ReservationListSerializer(serializers.ModelSerializer):
