@@ -132,10 +132,10 @@ const ReservationsDashboard = () => {
   const FilterButton = ({ filterValue, label }) => (
     <button 
       onClick={() => setActiveFilter(filterValue)}
-      className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${
+      className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
         activeFilter === filterValue 
-        ? 'bg-orange-500 text-white shadow-sm'
-        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700'
+        ? 'bg-primary text-neutral-white shadow-sm'
+        : 'bg-neutral-white dark:bg-neutral-darker text-neutral dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark border border-neutral-medium dark:border-neutral-dark'
       }`}>
       {label}
     </button>
@@ -146,15 +146,15 @@ const ReservationsDashboard = () => {
   }
 
   return (
-  <div className="font-sans bg-gray-50 dark:bg-gray-950 min-h-screen w-full flex flex-col items-center pt-8 px-4">
+  <div className="font-sans bg-neutral-white dark:bg-neutral-even-darker min-h-screen w-full flex flex-col items-center pt-8 px-4">
     <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
-      <h2 className="text-2xl font-bold">{activeView === 'reservations' ? (t.all_reservations || 'All reservations') : (t.manage_holidays || 'Manage Holidays')}</h2>
+      <h2 className="text-2xl font-bold text-neutral-darker dark:text-neutral-lightest">{activeView === 'reservations' ? (t.all_reservations || 'All reservations') : (t.manage_holidays || 'Manage Holidays')}</h2>
       <div className="flex items-center space-x-6"> 
         <LanguageSwitcher lang={lang} setLang={setLang} />
         <button
           onClick={logout}
           title="Logout"
-          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none transition-colors"
+          className="text-neutral hover:text-neutral-darkest dark:text-neutral-medium dark:hover:text-neutral-white focus:outline-none transition-colors"
         >
           <UserCircle size={26} strokeWidth={1.4} />
         </button>
@@ -166,7 +166,7 @@ const ReservationsDashboard = () => {
       {/* Filter Buttons (Left) - Only for reservations view */}
       <div>
         {activeView === 'reservations' && (
-          <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-gray-900 rounded-lg">
+          <div className="flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
             <FilterButton filterValue="3w" label={t.filter_upcoming || 'Upcoming (3 weeks)'} />
             <FilterButton filterValue="pending" label={t.filter_pending || 'Pending'} />
             <FilterButton filterValue="all" label={t.filter_all || 'All Upcoming'} />
@@ -176,15 +176,15 @@ const ReservationsDashboard = () => {
       </div>
 
       {/* View Switcher (Right) */}
-      <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-gray-900 rounded-lg">
+      <div className="flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
         <button 
           onClick={() => setActiveView('reservations')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'reservations' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'reservations' ? 'bg-primary text-neutral-white shadow-sm' : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark'}`}>
           {t.reservations_tab || 'Reservations'}
         </button>
         <button 
           onClick={() => setActiveView('holidays')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'holidays' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'holidays' ? 'bg-primary text-neutral-white shadow-sm' : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark'}`}>
           {t.holidays_tab || 'Manage Holidays'}
         </button>
       </div>
