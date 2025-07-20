@@ -10,10 +10,10 @@ const HolidaysTable = ({ holidays, labels, onDelete }) => {
   const currentLocale = localeMap[lang] || de;
 
   return (
-    <div className="bg-white dark:bg-neutral-darker shadow-md rounded-lg overflow-hidden">
+    <div className="bg-neutral-white dark:bg-neutral-darker shadow-md rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-neutral-light dark:divide-neutral-dark">
-          <thead className="bg-neutral-lightest dark:bg-neutral-dark hidden md:table-header-group">
+          <thead className="bg-neutral-lightest dark:bg-neutral-dark/50 hidden md:table-header-group">
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-neutral-dark dark:text-neutral-light uppercase tracking-wider">
                 {labels.holiday_name_header || 'Holiday Name'}
@@ -29,7 +29,7 @@ const HolidaysTable = ({ holidays, labels, onDelete }) => {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-neutral-darker divide-y divide-neutral-light dark:divide-neutral-dark">
+          <tbody className="bg-neutral-white dark:bg-neutral-darker divide-y divide-neutral-light dark:divide-neutral-dark">
             {holidays.map((holiday) => (
               <tr key={holiday.id} className="block mb-4 border rounded-lg md:table-row md:mb-0">
                 <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-neutral-darkest dark:text-white block md:table-cell">
