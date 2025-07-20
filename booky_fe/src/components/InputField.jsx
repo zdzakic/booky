@@ -1,43 +1,51 @@
 import React from 'react';
 
 const InputField = ({
-  type = 'text',
+  id,
   name,
+  type = 'text',
+  label,
+  placeholder,
   value,
   onChange,
-  placeholder,
+  error,
+  autoComplete,
   required = false,
-  error = '',
   className = '',
-}) => (
-  <div className="w-full flex flex-col">
-    <input
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      required={required}
-      className={`
-        w-full px-4 py-3 rounded-xl border
-        border-gray-300 dark:border-gray-700
-        bg-white dark:bg-gray-800
-        text-gray-900 dark:text-white
-        placeholder-gray-400 dark:placeholder-gray-500
-        focus:outline-none focus:border-orange-400 focus:ring-0
-        transition
-        ${error ? 'border-orange-500' : ''}
-        ${className}
-      `}
-      aria-invalid={!!error}
-    />
-    {/* Prikaz error poruke ispod inputa, uvijek rezervisan prostor */}
-    <div className="min-h-[20px] mt-1">
-      {error && (
-        <span className="text-xs text-red-500">{error}</span>
+}) => {
+  const baseClasses = 'block w-full px-4 py-3 text-sm bg-neutral-lightest border rounded-lg focus:outline-none transition-colors duration-200';
+  
+  // Uslovno dodavanje klasa za grešku ili normalno stanje
+  const stateClasses = error
+    ? 'text-error-dark border-error focus:border-error focus:ring-error'
+    : 'text-neutral-darker border-neutral-medium focus:border-primary focus:ring-primary';
+
+  return (
+    <div className="w-full flex flex-col">
+      {label && (
+        <label htmlFor={id || name} className="block text-sm font-medium text-neutral-dark mb-1">
+          {label}
+        </label>
       )}
+      <input
+        id={id || name}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        autoComplete={autoComplete}
+        required={required}
+        className={`${baseClasses} ${stateClasses} ${className}`}
+      />
+      {/* Prikaz error poruke ispod inputa, uvijek rezervisan prostor */}
+      <div className="min-h-[20px] mt-1">
+        {error && (
+          <p className="mt-1.5 text-xs text-error-dark">{error}</p>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default InputField;

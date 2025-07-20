@@ -1,3 +1,5 @@
+import { theme } from './src/config/theme.js';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
@@ -8,25 +10,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        'custom-orange': {
-          100: '#FFF7ED',
-          200: '#FFEDD5',
-          700: '#C2410C',
-          800: '#9A3412',
-        },
+        // Učitavamo sve boje definisane u našem centralnom theme.js fajlu
+        ...theme.colors,
       },
     },
   },
   plugins: [],
+  // Ažurirana safelist-a koja prepoznaje naš novi semantički sistem boja.
+  // Ovo osigurava da Tailwind ne ukloni klase koje dinamički generišemo.
   safelist: [
     {
-      pattern: /bg-(red|green|blue|orange|sky|yellow|custom-orange)-(100|200)/,
-    },
-    {
-      pattern: /text-(red|green|blue|orange|sky|yellow|custom-orange)-(600|700|800)/,
-    },
-    {
-      pattern: /border-(red|green|blue|orange|sky|yellow|custom-orange)-200/,
+      // Primer: bg-primary, text-neutral-dark, border-success-light
+      pattern: /^(bg|text|border|ring)-(primary|secondary|neutral|success|error|warning|info)(-(light|dark|lightest|darker|medium|even-darker))?$/,
     },
   ],
 }

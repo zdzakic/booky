@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import { validateEmail } from '../utils/validators';
 import { theme } from '../config/theme';
-import { ShieldCheckIcon, CodeBracketIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
+import { RocketLaunchIcon, CodeBracketIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -62,45 +62,44 @@ const LoginPage = () => {
     }
   };
 
-  const buttonClasses = [
-    `bg-${theme.colors.primary}-500`,
-    `hover:bg-${theme.colors.primary}-600`,
-    `focus:ring-${theme.colors.primary}-500`,
-    `disabled:bg-${theme.colors.primary}-300`,
-  ].join(' ');
-
-  const errorTextColor = `text-${theme.colors.error}-600`;
-
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      {/* Left Column: Login Form */}
-      <div className="bg-gray-100 dark:bg-gray-950 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 space-y-6">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Dashboard Login</h2>
-          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      {/* Login Form Section */}
+      <div className="bg-neutral-light dark:bg-neutral-even-darker flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-md bg-white dark:bg-neutral-darkest rounded-2xl shadow-xl p-8 space-y-6">
+          <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">Dashboard Login</h2>
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <InputField
+              id="email"
               name="email"
               type="email"
+              label="Email"
               placeholder="Email address"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               error={errors.email}
+              autoComplete="email"
             />
             <InputField
+              id="password"
               name="password"
               type="password"
+              label="Password"
               placeholder="Password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               error={errors.password}
+              autoComplete="current-password"
             />
+
             {serverError && (
-              <p className={`text-sm ${errorTextColor} text-center`}>{serverError}</p>
+              <p className="text-sm text-error-dark text-center">{serverError}</p>
             )}
+
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full px-4 py-2.5 font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${buttonClasses}`}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
               {isSubmitting ? 'Logging in...' : 'Login'}
             </button>
@@ -108,44 +107,33 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Right Column: Promotional Panel */}
-      <div className="hidden md:flex flex-col items-center justify-center bg-gray-800 dark:bg-gray-900 p-10 text-white">
-        <div className="text-center max-w-md">
+      {/* Promotional Content Section */}
+      <div className="hidden md:flex flex-col items-center justify-center bg-neutral-darker text-white p-12">
+        <div className="text-center max-w-lg">
           <a 
             href="https://zdzdigital.ch" 
             target="_blank" 
             rel="noopener noreferrer"
-            className={`text-4xl font-bold mb-6 inline-block text-${theme.colors.primary}-500 hover:text-${theme.colors.primary}-400 transition-colors`}
+            className="block text-5xl font-extrabold text-primary hover:text-primary-light transition-colors duration-300 mb-6"
           >
             zdzdigital.ch
           </a>
-          <p className="text-lg mb-8 text-gray-300">
-            Empowering Small & Medium Businesses to Thrive Online.
-          </p>
+          <h2 className="text-3xl font-bold text-neutral-lightest mb-10">From simple websites to complex platforms, we build solutions that perform.</h2>
           
-          <ul className="space-y-4 text-left mb-10">
+          <ul className="space-y-5 text-left text-lg max-w-md mx-auto">
             <li className="flex items-start">
-              <RocketLaunchIcon className={`h-6 w-6 mr-3 flex-shrink-0 text-${theme.colors.primary}-500`} />
+              <RocketLaunchIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
               <span>Custom web applications and digital strategy to fuel your growth.</span>
             </li>
             <li className="flex items-start">
-              <CodeBracketIcon className={`h-6 w-6 mr-3 flex-shrink-0 text-${theme.colors.primary}-500`} />
+              <CodeBracketIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
               <span>From simple websites to complex platforms, we build solutions that perform.</span>
             </li>
             <li className="flex items-start">
-              <ShieldCheckIcon className={`h-6 w-6 mr-3 flex-shrink-0 text-${theme.colors.primary}-500`} />
+              <ShieldCheckIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
               <span>Reliable support and maintenance to keep your digital presence secure.</span>
             </li>
           </ul>
-
-          <a 
-            href="https://zdzdigital.ch" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className={`w-full max-w-xs mx-auto px-6 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors ${buttonClasses}`}
-          >
-            Learn More
-          </a>
         </div>
       </div>
     </div>
