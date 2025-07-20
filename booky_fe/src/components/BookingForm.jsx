@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import axios from '../utils/axios';
 import InputField from './InputField';
 import ServiceSelect from './ServiceSelect';
-import CheckboxField from './CheckboxField';
+import CheckBoxField from './CheckBoxField';
 import DatePickerComponent from './DatePickerComponent';
 import TimeSlots from './TimeSlots';
 import SubmitButton from './SubmitButton';
@@ -208,7 +208,7 @@ export default function BookingForm() {
               labelText={<AnimatedText text={t.service} />}
               placeholder={t.chooseService}
             />
-            <CheckboxField
+            <CheckBoxField
               id="isStored"
               name="isStored"
               checked={formData.isStored}
