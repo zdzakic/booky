@@ -5,6 +5,7 @@ import InputField from '../components/InputField';
 import { validateEmail } from '../utils/validators';
 import { theme } from '../config/theme';
 import { RocketLaunchIcon, CodeBracketIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import Loader from '../components/Loader'; // Import the Loader
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -13,7 +14,7 @@ const LoginPage = () => {
   const [serverError, setServerError] = useState('');
   const [loginAttempts, setLoginAttempts] = useState(0); // Counter for failed attempts
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth(); // Get isLoading from context
 
   const validate = () => {
     const newErrors = {};
@@ -63,80 +64,83 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      {/* Login Form Section */}
-      <div className="bg-neutral-light dark:bg-neutral-even-darker flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-md bg-white dark:bg-neutral-darkest rounded-2xl shadow-xl p-8 space-y-6">
-          <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">Dashboard Login</h2>
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-            <InputField
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="Email address"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              error={errors.email}
-              autoComplete="email"
-            />
-            <InputField
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              error={errors.password}
-              autoComplete="current-password"
-            />
+    <>
+      {isLoading && <Loader />} 
+      <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+        {/* Login Form Section */}
+        <div className="bg-neutral-light dark:bg-neutral-even-darker flex items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="w-full max-w-md bg-white dark:bg-neutral-darkest rounded-2xl shadow-xl p-8 space-y-6">
+            <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">Dashboard Login</h2>
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+              <InputField
+                id="email"
+                name="email"
+                type="email"
+                label="Email"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                error={errors.email}
+                autoComplete="email"
+              />
+              <InputField
+                id="password"
+                name="password"
+                type="password"
+                label="Password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                error={errors.password}
+                autoComplete="current-password"
+              />
 
-            {serverError && (
-              <p className="text-sm text-error-dark text-center">{serverError}</p>
-            )}
+              {serverError && (
+                <p className="text-sm text-error-dark text-center">{serverError}</p>
+              )}
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {isSubmitting ? 'Logging in...' : 'Login'}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Promotional Content Section */}
+        <div className="hidden md:flex flex-col items-center justify-center bg-neutral-darker text-white p-12">
+          <div className="text-center max-w-lg">
+            <a 
+              href="https://zdzdigital.ch" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block text-5xl font-extrabold text-primary hover:text-primary-light transition-colors duration-300 mb-6"
             >
-              {isSubmitting ? 'Logging in...' : 'Login'}
-            </button>
-          </form>
+              zdzdigital.ch
+            </a>
+            <h2 className="text-3xl font-bold text-neutral-lightest mb-10">From simple websites to complex platforms, we build solutions that perform.</h2>
+            
+            <ul className="space-y-5 text-left text-lg max-w-md mx-auto">
+              <li className="flex items-start">
+                <RocketLaunchIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
+                <span>Custom web applications and digital strategy to fuel your growth.</span>
+              </li>
+              <li className="flex items-start">
+                <CodeBracketIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
+                <span>From simple websites to complex platforms, we build solutions that perform.</span>
+              </li>
+              <li className="flex items-start">
+                <ShieldCheckIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
+                <span>Reliable support and maintenance to keep your digital presence secure.</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-
-      {/* Promotional Content Section */}
-      <div className="hidden md:flex flex-col items-center justify-center bg-neutral-darker text-white p-12">
-        <div className="text-center max-w-lg">
-          <a 
-            href="https://zdzdigital.ch" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="block text-5xl font-extrabold text-primary hover:text-primary-light transition-colors duration-300 mb-6"
-          >
-            zdzdigital.ch
-          </a>
-          <h2 className="text-3xl font-bold text-neutral-lightest mb-10">From simple websites to complex platforms, we build solutions that perform.</h2>
-          
-          <ul className="space-y-5 text-left text-lg max-w-md mx-auto">
-            <li className="flex items-start">
-              <RocketLaunchIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
-              <span>Custom web applications and digital strategy to fuel your growth.</span>
-            </li>
-            <li className="flex items-start">
-              <CodeBracketIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
-              <span>From simple websites to complex platforms, we build solutions that perform.</span>
-            </li>
-            <li className="flex items-start">
-              <ShieldCheckIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
-              <span>Reliable support and maintenance to keep your digital presence secure.</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
