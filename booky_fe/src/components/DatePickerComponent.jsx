@@ -8,7 +8,7 @@ import { CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { useLanguage } from '../context/LanguageContext';
-import { HOLIDAYS } from '../utils/constants';
+// import { HOLIDAYS } from '../utils/constants';
 
 // Očekuje: selectedDate, setSelectedDate, label, placeholder, holidays (optional array)
 export default function DatePickerComponent({
@@ -16,15 +16,22 @@ export default function DatePickerComponent({
   setSelectedDate,
   label = 'Select Date',
   placeholder = 'Select a date',
-  holidays = HOLIDAYS // Fallback to static holidays if not provided
+  disabledDates = [],
+//   holidays = HOLIDAYS // Fallback to static holidays if not provided
 }) {
   const { lang } = useLanguage();
 
-  const disabledDays = [
-    { before: new Date() },
-    { dayOfWeek: [0, 6] },
-    ...holidays.map(d => (typeof d === 'string' ? new Date(d) : new Date(d.date))),
-  ];
+//   const disabledDays = [
+//     { before: new Date() },
+//     { dayOfWeek: [0, 6] },
+//     ...holidays.map(d => (typeof d === 'string' ? new Date(d) : new Date(d.date))),
+//   ];
+
+    const disabledDays = [
+        { before: new Date() },
+        { dayOfWeek: [0, 6] },
+        ...disabledDates.map(date => new Date(date)),
+    ];
 
   const modifiersClassNames = {
     disabled: 'text-gray-400',

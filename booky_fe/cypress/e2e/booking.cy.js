@@ -5,10 +5,10 @@ describe('Booking Form E2E', () => {
       statusCode: 200,
       body: [{ id: 1, name_de: 'Test Service', name_en: 'Test Service' }],
     }).as('getServices');
-    cy.intercept('GET', '**/api/holidays/', { statusCode: 200, body: [] }).as('getHolidays');
+    // cy.intercept('GET', '**/api/holidays/', { statusCode: 200, body: [] }).as('getHolidays');
 
     cy.visit('/');
-    cy.wait(['@getServices', '@getHolidays']);
+    cy.wait(['@getServices']);
   });
 
   it('displays all form elements correctly', () => {

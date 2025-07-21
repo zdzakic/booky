@@ -48,6 +48,8 @@ export default function BookingForm() {
 
   const [serviceOptions, setServiceOptions] = useState([]);
 //   const [holidays, setHolidays] = useState([]);
+const [disabledDates, setDisabledDates] = useState([]);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -61,6 +63,39 @@ export default function BookingForm() {
   useEffect(() => {
     setSelectedTime(null);
   }, [selectedDate, formData.service]);
+
+
+  // Fetch avialable dates 
+  useEffect(() => {
+  const fetchUnavailableDates = async () => {
+    const serviceId = formData.service;
+    if (!serviceId) return;
+
+    const today = new Date();
+    const daysToCheck = 30;
+    const unavailable = [];
+
+    for (let i = 0; i < daysToCheck; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + i);
+      const isoDate = date.toISOString().split('T')[0];
+
+      try {
+        const res = await apiClient.get(`/availability/?service=${serviceId}&date=${isoDate}`);
+        if (!res.data || res.data.length === 0) {
+          unavailable.push(isoDate);
+        }
+      } catch (err) {
+        console.error('Error checking availability for', isoDate);
+      }
+    }
+
+    setDisabledDates(unavailable);
+    };
+
+    fetchUnavailableDates();
+    }, [formData.service]);
+
 
   // Fetch services
   useEffect(() => {
@@ -93,16 +128,20 @@ export default function BookingForm() {
 //       }
 //     };
 
-    const fetchInitialData = async () => {
-      setIsInitialLoading(true);
-      await Promise.allSettled([
-        fetchHolidays(),
-      ]);
-      setIsInitialLoading(false);
-    };
+//     const fetchInitialData = async () => {
+//       setIsInitialLoading(true);
+//       await Promise.allSettled([
+//         fetchHolidays(),
+//       ]);
+//       setIsInitialLoading(false);
+//     };
 
-    fetchInitialData();
-  }, [lang, t.errors.fetchHolidaysError]);
+//     fetchInitialData();
+//   }, [lang, t.errors.fetchHolidaysError]);
+
+    useEffect(() => {
+  setIsInitialLoading(false);
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -225,6 +264,7 @@ export default function BookingForm() {
               label={<AnimatedText text={t.selectDate} />}
               placeholder={t.datePlaceholder}
               lang={lang}
+              disabledDates={disabledDates}
             //   holidays={holidays}
             />
             {selectedDate && formData.service && (

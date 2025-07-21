@@ -5,12 +5,12 @@ describe('Language Functionality E2E', () => {
       statusCode: 200,
       body: [{ id: 1, name_de: 'Test Service', name_en: 'Test Service' }],
     }).as('getServices');
-    cy.intercept('GET', '**/api/holidays/', { statusCode: 200, body: [] }).as('getHolidays');
+    // cy.intercept('GET', '**/api/holidays/', { statusCode: 200, body: [] }).as('getHolidays');
   });
 
   it('should switch language and persist it on the main page', () => {
     cy.visit('/');
-    cy.wait(['@getServices', '@getHolidays']);
+    cy.wait(['@getServices']);
 
     // 1. Initial language is German
     cy.contains('h2', 'Termin buchen').should('be.visible');
@@ -22,7 +22,7 @@ describe('Language Functionality E2E', () => {
     // 3. Check localStorage and reload
     cy.window().its('localStorage').invoke('getItem', 'appLanguage').should('eq', 'en');
     cy.reload();
-    cy.wait(['@getServices', '@getHolidays']);
+    cy.wait(['@getServices']);
 
     // 4. Assert language is still English after reload
     cy.contains('h2', 'Book an appointment').should('be.visible');
