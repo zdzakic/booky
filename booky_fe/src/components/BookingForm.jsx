@@ -176,6 +176,7 @@ const [disabledDates, setDisabledDates] = useState([]);
       setTimeout(() => navigate('/success', { state: { lang } }), 1500);
     } catch (error) {
       console.error('Booking submission failed:', error);
+      console.log('Full error response:', error.response?.data);
     } finally {
       setIsSubmitting(false);
     }

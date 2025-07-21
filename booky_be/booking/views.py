@@ -52,13 +52,11 @@ class AvailabilityAPIView(APIView):
         except ValueError:
             return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # === PROVJERA PRAZNIKA ===
         if Holiday.objects.filter(date=date_obj).exists():
-            return Response([], status=status.HTTP_200_OK) # Vrati praznu listu ako je praznik
+            return Response([], status=status.HTTP_200_OK)
 
         try:
             service = get_object_or_404(ServiceType, pk=service_id)
-            # The BusinessHours model uses 0-indexed weekdays (Monday=0), matching Python's weekday().
             day_of_week = date_obj.weekday()
         except (ValueError, ServiceType.DoesNotExist):
             return Response({"error": "Invalid service ID or date format."}, status=status.HTTP_400_BAD_REQUEST)
@@ -66,54 +64,49 @@ class AvailabilityAPIView(APIView):
         try:
             business_hours = BusinessHours.objects.get(day_of_week=day_of_week)
         except BusinessHours.DoesNotExist:
-            return Response([], status=status.HTTP_200_OK) # No slots on a day off
+            return Response([], status=status.HTTP_200_OK)
 
-        # 1. Filter reservations for the correct service on the given day (TIMEZONE-AWARE)
-        tz = timezone.get_current_timezone() # Gets 'Europe/Zurich' from settings
+        tz = timezone.get_current_timezone()
         start_of_day = datetime.combine(date_obj, time.min, tzinfo=tz)
         end_of_day = datetime.combine(date_obj, time.max, tzinfo=tz)
 
+        # 🔥 KLJUČNA PROMJENA: povlačimo sve rezervacije za resurse koje koristi servis
+        service_resources = list(Resource.objects.filter(services=service))
+        if not service_resources:
+            return Response({"error": "No resources are configured for this specific service."}, status=status.HTTP_400_BAD_REQUEST)
+
+        total_resources = len(service_resources)
+
         existing_reservations = Reservation.objects.filter(
-            service=service, 
-            start_time__lt=end_of_day, 
+            resource__in=service_resources,
+            start_time__lt=end_of_day,
             end_time__gt=start_of_day
         ).select_related('resource')
 
-        # Group reservations by resource for efficient lookup
-        reservations_by_resource = {}
-        for res in existing_reservations:
-            reservations_by_resource.setdefault(res.resource_id, []).append(res)
-        
-        # 2. Get only the resources relevant to the selected service (CORRECTED QUERY)
-        all_resources = list(Resource.objects.filter(services=service))
-        if not all_resources:
-            return Response({"error": "No resources are configured for this specific service."}, status=status.HTTP_400_BAD_REQUEST)
-
-        total_resources = len(all_resources)
-
-        # Loop through time slots and check for availability
-        available_slots = []
         start_work_time = datetime.combine(date_obj, business_hours.open_time, tzinfo=tz)
         end_work_time = datetime.combine(date_obj, business_hours.close_time, tzinfo=tz)
         service_duration = timedelta(minutes=service.duration_minutes)
-        step = timedelta(minutes=30)  # Define the time step for checking availability. We use 30 minutes for better UI.
+        step = timedelta(minutes=30)
 
+        available_slots = []
         current_time = start_work_time
-        while current_time + service_duration <= end_work_time:
 
-            # If the date is today, skip slots that are in the past.
+        while current_time + service_duration <= end_work_time:
             if date_obj == timezone.localdate() and current_time < timezone.localtime():
                 current_time += step
                 continue
 
             slot_end_time = current_time + service_duration
 
-            # Count how many resources are booked at this specific time
-            occupied_resources_count = sum(1 for r in existing_reservations if r.start_time < slot_end_time and r.end_time > current_time)
+            overlapping_reservations = [
+                res for res in existing_reservations
+                if res.start_time < slot_end_time and res.end_time > current_time
+            ]
 
-            # If the number of occupied resources is less than the total available, the slot is available
-            if occupied_resources_count < total_resources:
-                available_count = total_resources - occupied_resources_count
+            occupied_resource_ids = {res.resource_id for res in overlapping_reservations}
+            available_count = total_resources - len(occupied_resource_ids)
+
+            if available_count > 0:
                 available_slots.append({
                     "time": current_time.strftime('%H:%M'),
                     "available_count": available_count
@@ -122,6 +115,91 @@ class AvailabilityAPIView(APIView):
             current_time += step
 
         return Response(available_slots, status=status.HTTP_200_OK)
+
+    # def get(self, request):
+    #     service_id = request.query_params.get('service')
+    #     date_str = request.query_params.get('date')
+
+    #     if not service_id or not date_str:
+    #         return Response({"error": "'service' and 'date' parameters are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     try:
+    #         date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    #     except ValueError:
+    #         return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     # === PROVJERA PRAZNIKA ===
+    #     if Holiday.objects.filter(date=date_obj).exists():
+    #         return Response([], status=status.HTTP_200_OK) # Vrati praznu listu ako je praznik
+
+    #     try:
+    #         service = get_object_or_404(ServiceType, pk=service_id)
+    #         # The BusinessHours model uses 0-indexed weekdays (Monday=0), matching Python's weekday().
+    #         day_of_week = date_obj.weekday()
+    #     except (ValueError, ServiceType.DoesNotExist):
+    #         return Response({"error": "Invalid service ID or date format."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     try:
+    #         business_hours = BusinessHours.objects.get(day_of_week=day_of_week)
+    #     except BusinessHours.DoesNotExist:
+    #         return Response([], status=status.HTTP_200_OK) # No slots on a day off
+
+    #     # 1. Filter reservations for the correct service on the given day (TIMEZONE-AWARE)
+    #     tz = timezone.get_current_timezone() # Gets 'Europe/Zurich' from settings
+    #     start_of_day = datetime.combine(date_obj, time.min, tzinfo=tz)
+    #     end_of_day = datetime.combine(date_obj, time.max, tzinfo=tz)
+
+    #     relevant_resources = Resource.objects.filter(services=service)
+    #     existing_reservations = Reservation.objects.filter(
+    #         # service=service, 
+    #         resource__in=relevant_resources,
+    #         start_time__lt=end_of_day, 
+    #         end_time__gt=start_of_day
+    #     ).select_related('resource')
+
+    #     # Group reservations by resource for efficient lookup
+    #     reservations_by_resource = {}
+    #     for res in existing_reservations:
+    #         reservations_by_resource.setdefault(res.resource_id, []).append(res)
+        
+    #     # 2. Get only the resources relevant to the selected service (CORRECTED QUERY)
+    #     all_resources = list(Resource.objects.filter(services=service))
+    #     if not all_resources:
+    #         return Response({"error": "No resources are configured for this specific service."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     total_resources = len(all_resources)
+
+    #     # Loop through time slots and check for availability
+    #     available_slots = []
+    #     start_work_time = datetime.combine(date_obj, business_hours.open_time, tzinfo=tz)
+    #     end_work_time = datetime.combine(date_obj, business_hours.close_time, tzinfo=tz)
+    #     service_duration = timedelta(minutes=service.duration_minutes)
+    #     step = timedelta(minutes=30)  # Define the time step for checking availability. We use 30 minutes for better UI.
+
+    #     current_time = start_work_time
+    #     while current_time + service_duration <= end_work_time:
+
+    #         # If the date is today, skip slots that are in the past.
+    #         if date_obj == timezone.localdate() and current_time < timezone.localtime():
+    #             current_time += step
+    #             continue
+
+    #         slot_end_time = current_time + service_duration
+
+    #         # Count how many resources are booked at this specific time
+    #         occupied_resources_count = sum(1 for r in existing_reservations if r.start_time < slot_end_time and r.end_time > current_time)
+
+    #         # If the number of occupied resources is less than the total available, the slot is available
+    #         if occupied_resources_count < total_resources:
+    #             available_count = total_resources - occupied_resources_count
+    #             available_slots.append({
+    #                 "time": current_time.strftime('%H:%M'),
+    #                 "available_count": available_count
+    #             })
+
+    #         current_time += step
+
+    #     return Response(available_slots, status=status.HTTP_200_OK)
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
