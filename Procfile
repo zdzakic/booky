@@ -1,1 +1,1 @@
-web: gunicorn config.wsgi --chdir booky_be
+web: cd booky_be && gunicorn config.wsgi
