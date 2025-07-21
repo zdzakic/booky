@@ -1,0 +1,21 @@
+{
+  "build": {
+    "env": {
+      "PYTHONUNBUFFERED": "1"
+    },
+    "builder": "nixpacks",
+    "nixpacksPlan": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["python312", "python312Packages.pip", "python312Packages.setuptools", "python312Packages.wheel"]
+        },
+        "install": {
+          "cmds": ["pip install -r requirements.txt"]
+        },
+        "start": {
+          "cmd": "cd booky_be && gunicorn config.wsgi"
+        }
+      }
+    }
+  }
+}
