@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../utils/axios';
+import apiClient from '../utils/apiClient';
 import { translations } from '../utils/translations';
 import LanguageSwitcher from './LanguageSwitcher';
 import ReservationsTable from './ReservationsTable';
@@ -13,9 +13,6 @@ import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 import HolidayManager from './HolidayManager';
 import { useAuth } from '../context/AuthContext';
 import { UserCircle } from 'lucide-react';
-
-// API BASE URL
-const API_BASE_URL = '/api'; 
 
 const ReservationsDashboard = () => {
   const [reservations, setReservations] = useState([]);
@@ -50,19 +47,23 @@ const ReservationsDashboard = () => {
         setLoading(true); // Full skeleton for initial load and filter changes
       } 
 
-      const [reservationsResult, holidaysResult] = await Promise.allSettled([
-        axios.get('/reservations/', { params: { period: activeFilter, search: debouncedSearchQuery, lang } }),
-        axios.get('/holidays/', { params: { lang } })
-      ]);
+      try {
+        const [reservationsResult, holidaysResult] = await Promise.allSettled([
+          apiClient.get('/reservations/', { params: { period: activeFilter, search: debouncedSearchQuery, lang } }),
+          apiClient.get('/holidays/', { params: { lang } })
+        ]);
 
-      if (reservationsResult.status === 'fulfilled') setReservations(reservationsResult.value.data);
-      else toast.error('Failed to fetch reservations.');
+        if (reservationsResult.status === 'fulfilled') setReservations(reservationsResult.value.data);
+        else toast.error('Failed to fetch reservations.');
 
-      if (holidaysResult.status === 'fulfilled') setHolidays(holidaysResult.value.data);
-      else toast.error('Failed to fetch holidays.');
-
-      setLoading(false);
-      setIsSearching(false);
+        if (holidaysResult.status === 'fulfilled') setHolidays(holidaysResult.value.data);
+        else toast.error('Failed to fetch holidays.');
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
+        setIsSearching(false);
+      }
     };
 
     fetchData();
@@ -96,9 +97,14 @@ const ReservationsDashboard = () => {
   const handleView = (row) => alert(`${t.view || 'View'} reservation: ${row.full_name}`);
   const handleEdit = (row) => alert(`${t.edit || 'Edit'} reservation: ${row.full_name}`);
 
-  const handleDelete = (reservationId) => {
-    setReservationToDelete(reservationId);
-    setIsModalOpen(true);
+  const handleDelete = async (reservationId) => {
+    try {
+      await apiClient.delete(`reservations/${reservationId}/`);
+      setReservations(prev => prev.filter(res => res.id !== reservationId));
+      toast.success('Reservation deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete reservation:', error);
+    }
   };
 
   const handleApprove = (id) => {
@@ -107,7 +113,7 @@ const ReservationsDashboard = () => {
     setReservations(prev => prev.map(r => r.id === id ? { ...r, is_approved: true } : r));
 
     toast.promise(
-      axios.patch(`reservations/${id}/`, { is_approved: true }),
+      apiClient.patch(`reservations/${id}/`, { is_approved: true }),
       {
         loading: t.approving || 'Approving...',
         success: () => {
@@ -127,12 +133,11 @@ const ReservationsDashboard = () => {
   const confirmDelete = async () => {
     if (!reservationToDelete) return;
     try {
-      await axios.delete(`reservations/${reservationToDelete}/`);
+      await apiClient.delete(`reservations/${reservationToDelete}/`);
       setReservations(prev => prev.filter(res => res.id !== reservationToDelete));
-      toast.success(t.delete_success || 'Reservation deleted successfully.');
+      toast.success('Reservation deleted successfully.');
     } catch (error) {
       console.error('Failed to delete reservation:', error);
-      toast.error(t.delete_error || 'Failed to delete reservation.');
     } finally {
       setIsModalOpen(false);
       setReservationToDelete(null);

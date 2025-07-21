@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import axios from '../utils/axios';
+import apiClient from '../utils/apiClient';
 import InputField from './InputField';
 import ServiceSelect from './ServiceSelect';
 import CheckBoxField from './CheckBoxField';
@@ -62,25 +62,29 @@ export default function BookingForm() {
     setSelectedTime(null);
   }, [selectedDate, formData.service]);
 
-  // Fetch initial data (services and holidays)
+  // Fetch services
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const resp = await axios.get('services/');
+        const response = await apiClient.get('/services/');
         setServiceOptions(
-          resp.data.map(s => ({
+          response.data.map(s => ({
             value: s.id.toString(),
             label: lang === 'de' ? s.name_de : s.name_en,
           }))
         );
-      } catch (err) {
-        setServiceOptions([]);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
       }
     };
+    fetchServices();
+  }, [lang]);
 
+  // Fetch holidays
+  useEffect(() => {
     const fetchHolidays = async () => {
       try {
-        const resp = await axios.get('holidays/');
+        const resp = await apiClient.get('holidays/');
         setHolidays(resp.data);
       } catch (err) {
         console.error("Failed to fetch holidays for booking form:", err);
@@ -92,7 +96,6 @@ export default function BookingForm() {
     const fetchInitialData = async () => {
       setIsInitialLoading(true);
       await Promise.allSettled([
-        fetchServices(),
         fetchHolidays(),
       ]);
       setIsInitialLoading(false);
@@ -129,16 +132,11 @@ export default function BookingForm() {
         start_time: startTime.toISOString(), // Send the combined datetime string
         is_stored: formData.isStored, // FIX: Add isStored value to the payload
       };
-      const resp = await axios.post('reservations/', payload);
-      if (resp.status === 201) {
-        toast.success(t.successBooking || 'Reservierung erfolgreich erstellt!');
-        setTimeout(() => navigate('/success', { state: { lang } }), 1500);
-      } else {
-        toast.error(t.errors.general || 'Etwas ist schiefgelaufen.');
-      }
-    } catch (err) {
-      console.error('Booking error:', err);
-      toast.error(t.errors.bookingFailed || 'Fehler beim Buchen.');
+      await apiClient.post('/reservations/', payload);
+      toast.success(t.successBooking || 'Reservierung erfolgreich erstellt!');
+      setTimeout(() => navigate('/success', { state: { lang } }), 1500);
+    } catch (error) {
+      console.error('Booking submission failed:', error);
     } finally {
       setIsSubmitting(false);
     }
