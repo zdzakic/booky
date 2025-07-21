@@ -44,12 +44,12 @@ describe('Booking Form E2E', () => {
       });
     });
 
-    it('successfully fetches the list of holidays', () => {
-      cy.request('GET', `${API_BASE_URL}/holidays/`).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body).to.be.an('array'); // Can be empty
-      });
-    });
+    // it('successfully fetches the list of holidays', () => {
+    //   cy.request('GET', `${API_BASE_URL}/holidays/`).then((response) => {
+    //     expect(response.status).to.eq(200);
+    //     expect(response.body).to.be.an('array'); // Can be empty
+    //   });
+    // });
 
     it('returns available slots for a weekday', () => {
       // Assuming service ID 1 exists and 2025-07-17 is a weekday

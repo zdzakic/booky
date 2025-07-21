@@ -6,9 +6,10 @@ from django.utils import timezone
 from django.db import transaction
 from datetime import datetime, time, timedelta
 from django.db.models import Q
+from rest_framework import serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from rest_framework.permissions import IsAuthenticated
 from .models import ServiceType, Reservation, Resource, BusinessHours, Holiday
 from .serializers import (
     ServiceTypeSerializer, 
@@ -19,21 +20,25 @@ from .serializers import (
 )
 from django.core.mail import send_mail
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
+
 
 
 class LoginAPIView(TokenObtainPairView):
+    permission_classes = [AllowAny]
     serializer_class = MyTokenObtainPairSerializer
 
 
 class ServiceTypeListAPIView(generics.ListAPIView):
     """Lists all available service types."""
+    permission_classes = [AllowAny]
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
 
 
 class AvailabilityAPIView(APIView):
     """Calculates and returns available start times for a given service and date."""
+    permission_classes = [AllowAny]
 
     def get(self, request):
         service_id = request.query_params.get('service')
@@ -120,6 +125,7 @@ class AvailabilityAPIView(APIView):
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -241,7 +247,7 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
 class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Reservation.objects.all()
     serializer_class = ReservationListSerializer
-    # permission_classes = [IsAuthenticated] # Privremeno uklonjeno
+    permission_classes = [IsAuthenticated]
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -283,7 +289,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
     """
     queryset = Holiday.objects.all().order_by('date')
     serializer_class = HolidaySerializer
-    permission_classes = [AllowAny] # TODO: Replace with IsAdminUser or custom owner permission
+    permission_classes = [IsAuthenticated] # TODO: Replace with IsAdminUser or custom owner permission
 
     def perform_create(self, serializer):
         # Automatically set the creator to the current user.

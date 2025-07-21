@@ -14,6 +14,7 @@ const apiClient = axios.create({
   timeout: 15000, // 15s timeout, more realistic for a sleeping backend
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
 });
 
