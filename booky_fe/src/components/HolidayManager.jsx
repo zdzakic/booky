@@ -8,7 +8,7 @@ import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 import AddHolidayModal from './ui/AddHolidayModal';
 import apiClient from '../utils/apiClient';
 
-const HolidayManager = ({ holidays, setHolidays, labels }) => {
+const HolidayManager = ({ holidays, setHolidays, labels, lang }) => {
   const [holidayToDelete, setHolidayToDelete] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -76,7 +76,9 @@ const HolidayManager = ({ holidays, setHolidays, labels }) => {
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddHoliday}
         labels={labels}
-        holidays={holidays.map(h => h.date)} 
+        // holidays={holidays.map(h => h.date)} 
+        holidays={holidays}
+        lang={lang}
       />
 
       {isDeleteModalOpen && (

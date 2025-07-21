@@ -7,7 +7,7 @@ import { DayPicker } from 'react-day-picker';
 import { CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
-import { useLanguage } from '../context/LanguageContext';
+// import { useLanguage } from '../context/LanguageContext';
 // import { HOLIDAYS } from '../utils/constants';
 
 // Očekuje: selectedDate, setSelectedDate, label, placeholder, holidays (optional array)
@@ -17,9 +17,10 @@ export default function DatePickerComponent({
   label = 'Select Date',
   placeholder = 'Select a date',
   disabledDates = [],
+  lang,
 //   holidays = HOLIDAYS // Fallback to static holidays if not provided
 }) {
-  const { lang } = useLanguage();
+//   const { lang } = useLanguage();
 
 //   const disabledDays = [
 //     { before: new Date() },

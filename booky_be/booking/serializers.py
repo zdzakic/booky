@@ -109,3 +109,9 @@ class ReservationListSerializer(serializers.ModelSerializer):
             'created_at',
             'service_name'
         ]
+
+
+class DisabledDatesSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    disabled_dates = serializers.ListField(child=serializers.DateField())

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
 import DatePickerComponent from '../DatePickerComponent';
-import { useLanguage } from '../../context/LanguageContext';
 
-const AddHolidayModal = ({ isOpen, onClose, onAdd, labels, holidays }) => {
-  const { lang } = useLanguage(); 
+
+const AddHolidayModal = ({ isOpen, onClose, onAdd, labels, holidays = [], lang }) => {
   const [name, setName] = useState('');
   const [date, setDate] = useState(null);
   const [error, setError] = useState('');
+  const disabledDates = holidays.map(h => new Date(h.date));
 
   useEffect(() => {
     if (!isOpen) {
@@ -60,7 +60,8 @@ const AddHolidayModal = ({ isOpen, onClose, onAdd, labels, holidays }) => {
               setSelectedDate={setDate}
               label={labels.holiday_date_label || 'Date'}
               placeholder={labels.holiday_date_placeholder || 'Select a date'}
-              holidays={holidays}
+              lang={lang}
+              disabledDates={disabledDates}
             />
           </div>
           {error && <p className="text-error text-sm mb-4">{error}</p>}

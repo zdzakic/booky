@@ -47,9 +47,23 @@ export default function BookingForm() {
   const navigate = useNavigate();
 
   const [serviceOptions, setServiceOptions] = useState([]);
-//   const [holidays, setHolidays] = useState([]);
-const [disabledDates, setDisabledDates] = useState([]);
+  const [disabledDates, setDisabledDates] = useState([]);
 
+  // Fetch disabled dates
+  useEffect(() => {
+  const fetchDisabledDates = async () => {
+    try {
+      // Broj dana za koji predviđamo disabled datume
+      const daysToCheck = 90;
+      const res = await apiClient.get(`/disabled-dates/?days=${daysToCheck}`);
+      setDisabledDates(res.data.disabled_dates);
+    } catch (err) {
+      console.error('Error fetching disabled dates:', err);
+    }
+  };
+
+  fetchDisabledDates();
+}, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -65,36 +79,37 @@ const [disabledDates, setDisabledDates] = useState([]);
   }, [selectedDate, formData.service]);
 
 
+
   // Fetch avialable dates 
-  useEffect(() => {
-  const fetchUnavailableDates = async () => {
-    const serviceId = formData.service;
-    if (!serviceId) return;
+//   useEffect(() => {
+//   const fetchUnavailableDates = async () => {
+//     const serviceId = formData.service;
+//     if (!serviceId) return;
 
-    const today = new Date();
-    const daysToCheck = 30;
-    const unavailable = [];
+//     const today = new Date();
+//     const daysToCheck = 30;
+//     const unavailable = [];
 
-    for (let i = 0; i < daysToCheck; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + i);
-      const isoDate = date.toISOString().split('T')[0];
+//     for (let i = 0; i < daysToCheck; i++) {
+//       const date = new Date(today);
+//       date.setDate(date.getDate() + i);
+//       const isoDate = date.toISOString().split('T')[0];
 
-      try {
-        const res = await apiClient.get(`/availability/?service=${serviceId}&date=${isoDate}`);
-        if (!res.data || res.data.length === 0) {
-          unavailable.push(isoDate);
-        }
-      } catch (err) {
-        console.error('Error checking availability for', isoDate);
-      }
-    }
+//       try {
+//         const res = await apiClient.get(`/availability/?service=${serviceId}&date=${isoDate}`);
+//         if (!res.data || res.data.length === 0) {
+//           unavailable.push(isoDate);
+//         }
+//       } catch (err) {
+//         console.error('Error checking availability for', isoDate);
+//       }
+//     }
 
-    setDisabledDates(unavailable);
-    };
+//     setDisabledDates(unavailable);
+//     };
 
-    fetchUnavailableDates();
-    }, [formData.service]);
+//     fetchUnavailableDates();
+//     }, [formData.service]);
 
 
   // Fetch services
@@ -115,33 +130,10 @@ const [disabledDates, setDisabledDates] = useState([]);
     fetchServices();
   }, [lang]);
 
-  // Fetch holidays
-//   useEffect(() => {
-//     const fetchHolidays = async () => {
-//       try {
-//         const resp = await apiClient.get('holidays/');
-//         setHolidays(resp.data);
-//       } catch (err) {
-//         console.error("Failed to fetch holidays for booking form:", err);
-//         // Non-blocking error toast
-//         toast.error(t.errors.fetchHolidaysError || 'Could not load holidays.');
-//       }
-//     };
-
-//     const fetchInitialData = async () => {
-//       setIsInitialLoading(true);
-//       await Promise.allSettled([
-//         fetchHolidays(),
-//       ]);
-//       setIsInitialLoading(false);
-//     };
-
-//     fetchInitialData();
-//   }, [lang, t.errors.fetchHolidaysError]);
-
     useEffect(() => {
   setIsInitialLoading(false);
 }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -176,7 +168,7 @@ const [disabledDates, setDisabledDates] = useState([]);
       setTimeout(() => navigate('/success', { state: { lang } }), 1500);
     } catch (error) {
       console.error('Booking submission failed:', error);
-      console.log('Full error response:', error.response?.data);
+    //   console.log('Full error response:', error.response?.data);
     } finally {
       setIsSubmitting(false);
     }
@@ -266,7 +258,6 @@ const [disabledDates, setDisabledDates] = useState([]);
               placeholder={t.datePlaceholder}
               lang={lang}
               disabledDates={disabledDates}
-            //   holidays={holidays}
             />
             {selectedDate && formData.service && (
               <TimeSlots
