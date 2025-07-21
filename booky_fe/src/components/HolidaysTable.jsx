@@ -4,6 +4,7 @@ import { de, enUS } from 'date-fns/locale';
 import { Trash2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
+
 const HolidaysTable = ({ holidays, labels, onDelete }) => {
   const { lang } = useLanguage();
   const localeMap = { de, en: enUS };

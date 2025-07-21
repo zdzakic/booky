@@ -182,9 +182,62 @@ const ReservationsDashboard = () => {
     </div>
 
     {/* Combined Controls Row */}
-    <div className="flex justify-between items-center w-full max-w-7xl mx-auto mb-6">
-      {/* Filter Buttons (Left) - Only for reservations view */}
-      <div>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full max-w-7xl mx-auto mb-6 space-y-3 sm:space-y-0">
+    {/* MOBILE: dropdown */}
+    {activeView === 'reservations' && (
+        <div className="w-full sm:hidden">
+        <select
+            value={activeFilter}
+            onChange={e => setActiveFilter(e.target.value)}
+            className="w-full border border-neutral-medium dark:border-neutral-dark rounded-md px-3 py-2 text-sm"
+        >
+            <option value="3w">{t.filter_upcoming || 'Upcoming'}</option>
+            <option value="pending">{t.filter_pending || 'Pending'}</option>
+            <option value="all">{t.filter_all || 'All'}</option>
+            <option value="past">{t.filter_past || 'Past'}</option>
+        </select>
+        </div>
+    )}
+
+    {/* DESKTOP: buttons */}
+    <div className="hidden sm:flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
+        {activeView === 'reservations' && (
+        <>
+            <FilterButton filterValue="3w" label={t.filter_upcoming} />
+            <FilterButton filterValue="pending" label={t.filter_pending} />
+            <FilterButton filterValue="all" label={t.filter_all} />
+            <FilterButton filterValue="past" label={t.filter_past} />
+        </>
+        )}
+    </div>
+
+    {/* View Switcher */}
+    <div className="w-full sm:w-auto flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
+        <button 
+        onClick={() => setActiveView('reservations')}
+        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+            activeView === 'reservations'
+            ? 'bg-primary text-neutral-white shadow-sm'
+            : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark'
+        }`}
+        >
+        {t.reservations_tab}
+        </button>
+        <button 
+        onClick={() => setActiveView('holidays')}
+        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+            activeView === 'holidays'
+            ? 'bg-primary text-neutral-white shadow-sm'
+            : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark'
+        }`}
+        >
+        {t.holidays_tab}
+        </button>
+    </div>
+    </div>
+
+    {/* <div className="flex justify-between items-center w-full max-w-7xl mx-auto mb-6"> */}
+      {/* <div>
         {activeView === 'reservations' && (
           <div className="flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
             <FilterButton filterValue="3w" label={t.filter_upcoming || 'Upcoming (3 weeks)'} />
@@ -193,10 +246,10 @@ const ReservationsDashboard = () => {
             <FilterButton filterValue="past" label={t.filter_past || 'Past'} />
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* View Switcher (Right) */}
-      <div className="flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
+      {/* <div className="flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
         <button 
           onClick={() => setActiveView('reservations')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'reservations' ? 'bg-primary text-neutral-white shadow-sm' : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark'}`}>
@@ -207,8 +260,8 @@ const ReservationsDashboard = () => {
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${activeView === 'holidays' ? 'bg-primary text-neutral-white shadow-sm' : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-dark'}`}>
           {t.holidays_tab || 'Manage Holidays'}
         </button>
-      </div>
-    </div>
+      </div> */}
+    {/* </div>  */}
 
     {activeView === 'reservations' ? (
       <div className="max-w-7xl mx-auto w-full">
