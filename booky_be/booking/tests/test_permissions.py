@@ -14,9 +14,10 @@ class HolidayPermissionTests(APITestCase):
         self.list_url = reverse('booking:holiday-list-create')
         Holiday.objects.create(name='Existing', date='2025-01-01', created_by=self.user)
 
-    def test_unauthenticated_cannot_list(self):
+    def test_unauthenticated_can_list(self):
         resp = self.client.get(self.list_url)
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.data), 1)
 
     def test_authenticated_can_list(self):
         self.client.force_authenticate(self.user)
