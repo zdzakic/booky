@@ -8,6 +8,13 @@
 
 export const theme = {
   colors: {
+    // Glavna boja brenda , zelena
+    brand: {
+      light: '#4C7765',
+      DEFAULT: '#426558',
+      dark: '#38584A',
+    },
+
     // Glavna boja brenda za interaktivne elemente (dugmad, linkovi, input polja...)
     primary: {
       light: '#FB923C',   // orange-400

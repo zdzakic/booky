@@ -21,7 +21,7 @@ export default {
   safelist: [
     {
       // Primer: bg-primary, text-neutral-dark, border-success-light
-      pattern: /^(bg|text|border|ring)-(primary|secondary|neutral|success|error|warning|info)(-(light|dark|lightest|darker|medium|even-darker))?$/,
+      pattern: /^(bg|text|border|ring)-(brand|primary|secondary|neutral|success|error|warning|info)(-(light|dark|lightest|darker|medium|even-darker))?$/,
     },
   ],
 }

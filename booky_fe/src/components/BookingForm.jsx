@@ -157,12 +157,6 @@ export default function BookingForm() {
               text={`${t.bookingTitle} - SCHMIDICARS`} 
               className="text-3xl font-bold text-gray-900 dark:text-white" 
             />
-            {/* Uncomment and add your logo if you have one */}
-            {/* <img 
-              src="/path-to-your-logo.png" 
-              alt="Garage Logo" 
-              className="h-10 w-auto" 
-            /> */}
           </div>
           <form onSubmit={handleSubmit} className="space-y-4 w-full" noValidate>
             <div className="flex flex-col md:flex-row md:gap-4">
