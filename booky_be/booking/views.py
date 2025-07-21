@@ -289,7 +289,7 @@ class HolidayViewSet(viewsets.ModelViewSet):
     """
     queryset = Holiday.objects.all().order_by('date')
     serializer_class = HolidaySerializer
-    permission_classes = [IsAuthenticated] # TODO: Replace with IsAdminUser or custom owner permission
+    permission_classes = [IsAuthenticatedOrReadOnly] # TODO: Replace with IsAdminUser or custom owner permission
 
     def perform_create(self, serializer):
         # Automatically set the creator to the current user.

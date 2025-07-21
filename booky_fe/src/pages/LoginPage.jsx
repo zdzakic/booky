@@ -70,7 +70,7 @@ const LoginPage = () => {
         {/* Login Form Section */}
         <div className="bg-neutral-light dark:bg-neutral-even-darker flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="w-full max-w-md bg-white dark:bg-neutral-darkest rounded-2xl shadow-xl p-8 space-y-6">
-            <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">Dashboard Login</h2>
+            <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">SCHMIDICARS - Dashboard Login</h2>
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <InputField
                 id="email"
@@ -112,33 +112,41 @@ const LoginPage = () => {
 
         {/* Promotional Content Section */}
         <div className="hidden md:flex flex-col items-center justify-center bg-neutral-darker text-white p-12">
-          <div className="text-center max-w-lg">
+        <div className="text-center max-w-lg">
             <a 
-              href="https://zdzdigital.ch" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block text-5xl font-extrabold text-primary hover:text-primary-light transition-colors duration-300 mb-6"
+            href="https://zdzdigital.ch" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block text-5xl font-extrabold text-primary hover:underline mb-6"
             >
-              zdzdigital.ch
+            zdzdigital.ch
             </a>
-            <h2 className="text-3xl font-bold text-neutral-lightest mb-10">From simple websites to complex platforms, we build solutions that perform.</h2>
-            
+
+            <h2 className="text-3xl font-bold text-neutral-lightest mb-10">
+            We help small businesses go online — simply and smart.
+            </h2>
+
             <ul className="space-y-5 text-left text-lg max-w-md mx-auto">
-              <li className="flex items-start">
+            <li className="flex items-start">
                 <RocketLaunchIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
-                <span>Custom web applications and digital strategy to fuel your growth.</span>
-              </li>
-              <li className="flex items-start">
+                <span>Booking and management tools tailored to your business — no templates, no SaaS.</span>
+            </li>
+            <li className="flex items-start">
                 <CodeBracketIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
-                <span>From simple websites to complex platforms, we build solutions that perform.</span>
-              </li>
-              <li className="flex items-start">
+                <span>Lightweight, secure and easy to use — your clients will love it, and so will you.</span>
+            </li>
+            <li className="flex items-start">
                 <ShieldCheckIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
-                <span>Reliable support and maintenance to keep your digital presence secure.</span>
-              </li>
+                <span>You stay in control — we help you launch, host and maintain it when needed.</span>
+            </li>
             </ul>
-          </div>
+
+            <p className="text-sm text-neutral-medium mt-8">
+            Built by <a href="https://zdzdigital.ch" className="underline hover:text-brand-light transition">zdzdigital.ch</a> — practical tools for real businesses.
+            </p>
         </div>
+        </div>
+
       </div>
     </>
   );

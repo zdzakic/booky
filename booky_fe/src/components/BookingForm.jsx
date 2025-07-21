@@ -47,7 +47,7 @@ export default function BookingForm() {
   const navigate = useNavigate();
 
   const [serviceOptions, setServiceOptions] = useState([]);
-  const [holidays, setHolidays] = useState([]);
+//   const [holidays, setHolidays] = useState([]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -81,17 +81,17 @@ export default function BookingForm() {
   }, [lang]);
 
   // Fetch holidays
-  useEffect(() => {
-    const fetchHolidays = async () => {
-      try {
-        const resp = await apiClient.get('holidays/');
-        setHolidays(resp.data);
-      } catch (err) {
-        console.error("Failed to fetch holidays for booking form:", err);
-        // Non-blocking error toast
-        toast.error(t.errors.fetchHolidaysError || 'Could not load holidays.');
-      }
-    };
+//   useEffect(() => {
+//     const fetchHolidays = async () => {
+//       try {
+//         const resp = await apiClient.get('holidays/');
+//         setHolidays(resp.data);
+//       } catch (err) {
+//         console.error("Failed to fetch holidays for booking form:", err);
+//         // Non-blocking error toast
+//         toast.error(t.errors.fetchHolidaysError || 'Could not load holidays.');
+//       }
+//     };
 
     const fetchInitialData = async () => {
       setIsInitialLoading(true);
@@ -225,7 +225,7 @@ export default function BookingForm() {
               label={<AnimatedText text={t.selectDate} />}
               placeholder={t.datePlaceholder}
               lang={lang}
-              holidays={holidays}
+            //   holidays={holidays}
             />
             {selectedDate && formData.service && (
               <TimeSlots
