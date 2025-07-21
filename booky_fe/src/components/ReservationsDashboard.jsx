@@ -101,8 +101,9 @@ const ReservationsDashboard = () => {
     try {
       await apiClient.delete(`reservations/${reservationId}/`);
       setReservations(prev => prev.filter(res => res.id !== reservationId));
-      toast.success('Reservation deleted successfully.');
+      toast.success(t.delete_success);
     } catch (error) {
+      toast.error(t.delete_error);
       console.error('Failed to delete reservation:', error);
     }
   };
@@ -135,8 +136,9 @@ const ReservationsDashboard = () => {
     try {
       await apiClient.delete(`reservations/${reservationToDelete}/`);
       setReservations(prev => prev.filter(res => res.id !== reservationToDelete));
-      toast.success('Reservation deleted successfully.');
+      toast.success(t.delete_success);
     } catch (error) {
+      toast.error(t.delete_error);
       console.error('Failed to delete reservation:', error);
     } finally {
       setIsModalOpen(false);
