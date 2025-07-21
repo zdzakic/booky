@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import axios from '../utils/axios';
+// import axios from '../utils/axios';
 import { toast } from 'sonner';
 import { PlusCircle, CalendarX2 } from 'lucide-react';
 import HolidaysTable from './HolidaysTable';
 import EmptyState from './ui/EmptyState';
 import ConfirmDeleteModal from './ui/ConfirmDeleteModal';
 import AddHolidayModal from './ui/AddHolidayModal';
+import apiClient from '../utils/apiClient';
 
 const HolidayManager = ({ holidays, setHolidays, labels }) => {
   const [holidayToDelete, setHolidayToDelete] = useState(null);
@@ -14,7 +15,7 @@ const HolidayManager = ({ holidays, setHolidays, labels }) => {
 
   const handleAddHoliday = async (newHoliday) => {
     try {
-      const response = await axios.post('/holidays/', newHoliday);
+      const response = await apiClient.post('/holidays/', newHoliday);
       setHolidays(prevHolidays => [...prevHolidays, response.data]);
       toast.success(labels.add_holiday_success || 'Holiday added successfully.');
       setIsAddModalOpen(false);
@@ -32,7 +33,7 @@ const HolidayManager = ({ holidays, setHolidays, labels }) => {
   const confirmDelete = async () => {
     if (!holidayToDelete) return;
     try {
-      await axios.delete(`/holidays/${holidayToDelete.id}/`);
+      await apiClient.delete(`/holidays/${holidayToDelete.id}/`);
       setHolidays(prevHolidays => prevHolidays.filter(h => h.id !== holidayToDelete.id));
       toast.success(labels.delete_holiday_success || 'Holiday deleted successfully.');
     } catch (error) {
