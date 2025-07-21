@@ -163,7 +163,12 @@ const ReservationsDashboard = () => {
   return (
   <div className="font-sans bg-neutral-white dark:bg-neutral-even-darker min-h-screen w-full flex flex-col items-center pt-8 px-4">
     <div className="flex justify-between items-center max-w-7xl w-full mx-auto mb-5">
-      <h2 className="text-2xl font-bold text-neutral-darker dark:text-neutral-lightest">{activeView === 'reservations' ? (t.all_reservations || 'All reservations') : (t.manage_holidays || 'Manage Holidays')}</h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-neutral-darker dark:text-neutral-lightest">
+          {activeView === 'reservations' ? (t.all_reservations || 'All reservations') : (t.manage_holidays || 'Manage Holidays')}
+          <span className="ml-2"> - SCHMIDICARS</span>
+        </h2>
+      </div>
       <div className="flex items-center space-x-6"> 
         <LanguageSwitcher lang={lang} setLang={setLang} />
         <button
