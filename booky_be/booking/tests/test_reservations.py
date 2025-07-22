@@ -7,34 +7,9 @@ from datetime import date, time, datetime, timedelta
 from django.utils import timezone
 from django.core import mail
 from datetime import timedelta
+from .utils import *
 
 User = get_user_model()
-
-
-
-def is_slot_available(service, start_time):
-    duration = timedelta(minutes=service.duration_minutes)
-    end_time = start_time + duration
-    total_resources = service.resources.count()
-    busy_resources = Reservation.objects.filter(
-        service=service,
-        start_time__lt=end_time,
-        end_time__gt=start_time
-    ).count()
-    return busy_resources < total_resources
-
-def is_resource_available(service, resource, start_time):
-    duration = timedelta(minutes=service.duration_minutes)
-    end_time = start_time + duration
-    # Da li ovaj resource ima overlaping rezervaciju u tom terminu?
-    busy = Reservation.objects.filter(
-        service=service,
-        resource=resource,
-        start_time__lt=end_time,
-        end_time__gt=start_time
-    ).exists()
-    return not busy
-
 
 
 class BookingLogicTests(APITestCase):
@@ -195,8 +170,6 @@ class BookingLogicTests(APITestCase):
 
     
     def test_all_resources_busy_block_slot(self):
-    # Definiši start termina (npr. danas u 08:00)
-
         slot_start = timezone.now().replace(hour=8, minute=0, second=0, microsecond=0)
         slot_end = slot_start + timedelta(minutes=self.service.duration_minutes)
         
@@ -225,7 +198,6 @@ class BookingLogicTests(APITestCase):
         next_slot_start = slot_start + timedelta(minutes=30)
         self.assertTrue(is_slot_available(self.service, next_slot_start))
 
-    
     def test_overlapping_reservations_block_slot(self):
         from django.utils import timezone
         slot_start = timezone.now().replace(hour=8, minute=0, second=0, microsecond=0)
@@ -251,6 +223,60 @@ class BookingLogicTests(APITestCase):
         # Na drugom resursu u istom terminu mora biti dostupno
         self.assertTrue(is_resource_available(self.service, self.resource2, overlapping_start))
 
+
+    def test_long_and_short_service_overlap(self):
+        from django.utils import timezone
+        slot_start = timezone.now().replace(hour=8, minute=0, second=0, microsecond=0)
+
+        # Kreiraj "dugi servis" (60min)
+        long_service = ServiceType.objects.create(name='Long Service', duration_minutes=60)
+        long_service.resources.add(self.resource1)
+
+        # Kreiraj "kratki servis" (30min)
+        short_service = ServiceType.objects.create(name='Short Service', duration_minutes=30)
+        short_service.resources.add(self.resource1)
+
+        # Rezerviši duži servis: 08:00-09:00
+        Reservation.objects.create(
+            service=long_service,
+            resource=self.resource1,
+            start_time=slot_start,
+            end_time=slot_start + timedelta(minutes=60),
+            full_name="User LS",
+            phone="111"
+        )
+
+        # Pokušaj rezervacije kratkog servisa 08:30-09:00 na istoj liniji (treba biti zauzeto!)
+        short_start = slot_start + timedelta(minutes=30)
+        self.assertFalse(is_resource_available(short_service, self.resource1, short_start))
+
+        # Pokušaj rezervacije kratkog servisa 09:00-09:30 na istoj liniji (treba biti slobodno!)
+        free_start = slot_start + timedelta(minutes=60)
+        self.assertTrue(is_resource_available(short_service, self.resource1, free_start))
+
+
+    def test_back_to_back_reservations_allowed(self):
+        from django.utils import timezone
+        slot_start = timezone.now().replace(hour=8, minute=0, second=0, microsecond=0)
+        duration = self.service.duration_minutes
+
+        # Prva rezervacija: 08:00–08:30
+        Reservation.objects.create(
+            service=self.service,
+            resource=self.resource1,
+            start_time=slot_start,
+            end_time=slot_start + timedelta(minutes=duration),
+            full_name="User 1",
+            phone="123"
+        )
+
+        # Druga rezervacija: 08:30–09:00 na istom resursu (tačno posle prve) — dozvoljeno!
+        next_slot_start = slot_start + timedelta(minutes=duration)
+        self.assertTrue(is_resource_available(self.service, self.resource1, next_slot_start))
+
+        # Treća rezervacija: 07:30–08:00 na istom resursu (tačno pre prve) — dozvoljeno!
+        prev_slot_start = slot_start - timedelta(minutes=duration)
+        self.assertTrue(is_resource_available(self.service, self.resource1, prev_slot_start))
 
 
 
