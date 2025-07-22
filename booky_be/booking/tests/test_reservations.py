@@ -6,8 +6,35 @@ from booking.models import Reservation, ServiceType, Resource, BusinessHours, Ho
 from datetime import date, time, datetime, timedelta
 from django.utils import timezone
 from django.core import mail
+from datetime import timedelta
 
 User = get_user_model()
+
+
+
+def is_slot_available(service, start_time):
+    duration = timedelta(minutes=service.duration_minutes)
+    end_time = start_time + duration
+    total_resources = service.resources.count()
+    busy_resources = Reservation.objects.filter(
+        service=service,
+        start_time__lt=end_time,
+        end_time__gt=start_time
+    ).count()
+    return busy_resources < total_resources
+
+def is_resource_available(service, resource, start_time):
+    duration = timedelta(minutes=service.duration_minutes)
+    end_time = start_time + duration
+    # Da li ovaj resource ima overlaping rezervaciju u tom terminu?
+    busy = Reservation.objects.filter(
+        service=service,
+        resource=resource,
+        start_time__lt=end_time,
+        end_time__gt=start_time
+    ).exists()
+    return not busy
+
 
 
 class BookingLogicTests(APITestCase):
@@ -27,7 +54,7 @@ class BookingLogicTests(APITestCase):
         )
         self.availability_url = reverse('booking:availability')
         self.reservations_url = reverse('booking:reservation-list-create')
-
+    
     def test_availability_with_no_reservations(self):
         """Testira da su svi termini slobodni kada nema rezervacija."""
         response = self.client.get(
@@ -165,6 +192,68 @@ class BookingLogicTests(APITestCase):
         created_reservation = Reservation.objects.get(pk=response.data['id'])
         expected_end_time = start_time + timedelta(minutes=self.service.duration_minutes)
         self.assertEqual(created_reservation.end_time, expected_end_time)
+
+    
+    def test_all_resources_busy_block_slot(self):
+    # Definiši start termina (npr. danas u 08:00)
+
+        slot_start = timezone.now().replace(hour=8, minute=0, second=0, microsecond=0)
+        slot_end = slot_start + timedelta(minutes=self.service.duration_minutes)
+        
+        # Rezerviši oba resursa za isti termin
+        Reservation.objects.create(
+            service=self.service,
+            resource=self.resource1,
+            start_time=slot_start,
+            end_time=slot_end,
+            full_name="User 1",
+            phone="123"
+        )
+        Reservation.objects.create(
+            service=self.service,
+            resource=self.resource2,
+            start_time=slot_start,
+            end_time=slot_end,
+            full_name="User 2",
+            phone="456"
+        )
+
+        # Sada treba da je termin ZAUZET (nije više slobodan!)
+        self.assertFalse(is_slot_available(self.service, slot_start))
+
+        # Oprobaj sledeći slobodan termin (npr. 08:30, očekujemo da je slobodan)
+        next_slot_start = slot_start + timedelta(minutes=30)
+        self.assertTrue(is_slot_available(self.service, next_slot_start))
+
+    
+    def test_overlapping_reservations_block_slot(self):
+        from django.utils import timezone
+        slot_start = timezone.now().replace(hour=8, minute=0, second=0, microsecond=0)
+        slot_end = slot_start + timedelta(minutes=self.service.duration_minutes)
+
+        # Rezervacija na resursu 1, 08:00-08:30
+        Reservation.objects.create(
+            service=self.service,
+            resource=self.resource1,
+            start_time=slot_start,
+            end_time=slot_end,
+            full_name="User 1",
+            phone="123"
+        )
+
+        # Pokušaj rezervacije na istom resursu, 08:15-08:45 (preklapa se!)
+        overlapping_start = slot_start + timedelta(minutes=15)
+        overlapping_end = overlapping_start + timedelta(minutes=self.service.duration_minutes)
+
+        # Ovo treba da vrati False, jer je resurs već zauzet
+        self.assertFalse(is_resource_available(self.service, self.resource1, overlapping_start))
+
+        # Na drugom resursu u istom terminu mora biti dostupno
+        self.assertTrue(is_resource_available(self.service, self.resource2, overlapping_start))
+
+
+
+
 
 
 class AvailabilityTests(APITestCase):
