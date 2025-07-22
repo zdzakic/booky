@@ -159,8 +159,13 @@ const ReservationsDashboard = () => {
   );
 
   if (loading && reservations.length === 0) {
-    return <DashboardSkeleton />;
+    return (
+      <div className="max-w-7xl mx-auto w-full px-4">
+        <DashboardSkeleton />
+      </div>
+    );
   }
+
 
   return (
   <div className="font-sans bg-neutral-white dark:bg-neutral-even-darker min-h-screen w-full flex flex-col items-center pt-8 px-4">
