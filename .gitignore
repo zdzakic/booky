@@ -33,3 +33,4 @@ config.jsx
 *.venv*
 .env
 TODO*
+FAQ*

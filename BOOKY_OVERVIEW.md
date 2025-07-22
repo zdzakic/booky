@@ -40,8 +40,8 @@ Instead, each client gets their own standalone version of the app that is:
   - List of available services
   - View free time slots
   - Submit reservations
-  - Simple admin dashboard to view/manage reservations
-- **UI Language:** Default is German (DE), with full i18n support for EN, IT, FR
+  - Simple admin dashboard to view/manage reservations and holidays
+- **UI Language:** Default is German (DE), with full support for EN, IT, FR
 
 ---
 
@@ -55,7 +55,7 @@ The same logic can be easily reused for:
 - Physical therapy & massage
 - Cosmetic salons
 - Test drives
-- And more...
+- bike shops and more 
 
 ---
 
@@ -76,4 +76,22 @@ The same logic can be easily reused for:
 - It is **not** meant to be shared between unrelated businesses
 
 ---
+
+## ✂️ Basic Package – What’s Included
+Booky’s standard package includes:
+
+- Up to 2 services (e.g. “Tire Change”, “Oil Change”)
+- One resource (e.g. 1 lift, 1 chair, 1 room, etc.)
+- Fixed opening hours (e.g. 8:00–18:00, with 30-min slots)
+- Option to block holidays and collective vacation days
+- Simple admin panel for managing reservations and blocked dates
+
+### Additions (on request, for an extra fee):
+- More than 2 services
+- More resources/lines/chairs
+- Custom admin dashboard features (e.g. adding lines, services, prices)
+- SMS/email customization or integration
+- Per-day or seasonal opening hours
+- Integration with other calendars (Google, Outlook)
+- Any advanced/“out of the box” needs
 
