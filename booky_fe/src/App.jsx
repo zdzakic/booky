@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Loader from './components/Loader';
+import MaintenancePage from './pages/MaintenancePage';
 
 // Layouts and Guards
 import ProtectedRoute from './components/ProtectedRoute';
@@ -30,7 +31,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/login-blocked" element={<LoginBlockedPage />} />
-
+            <Route path="/maintenance" element={<MaintenancePage />} />
             {/* Protected Route */}
             <Route
               path="/dashboard"

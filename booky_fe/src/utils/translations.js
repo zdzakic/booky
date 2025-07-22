@@ -119,7 +119,13 @@ export const translations = {
         email: "Ungültige E-Mail-Adresse.",
         licensePlate: "Bitte geben Sie das Kennzeichen ein.",
         fetchHolidaysError: 'Feiertage konnten nicht geladen werden.',
-      }
+      },
+      // Maintenance
+      maintenance: {
+        title: 'Wartungsarbeiten laufen',
+        message: 'Wir führen gerade planmäßige Wartungsarbeiten durch. Bitte versuchen Sie es bald erneut.',
+        backToHome: 'Zur Startseite',
+      },
     },
     en: {
       bookingTitle: "Book an appointment",
@@ -239,7 +245,12 @@ export const translations = {
         email: "Invalid email address.",
         licensePlate: "Please enter your license plate.",
         fetchHolidaysError: 'Could not load holidays.',
-      }
+      },
+      maintenance: {
+        title: 'Maintenance in Progress',
+        message: 'We are currently performing scheduled maintenance. Please check back soon.',
+        backToHome: 'Back to Home',
+      },
     },
     hr: {
       bookingTitle: "Rezerviraj termin",
