@@ -10,19 +10,23 @@ export const theme = {
   colors: {
     // Glavna boja brenda , zelena
     brand: {
-      light: '#8edd6b',
-      DEFAULT: '#6BC048',   // SCHMIDICARS glavna zelena
-      dark: '#538d36',
+      light: '#4C7765',
+      DEFAULT: '#426558',
+      dark: '#38584A',
     },
+
+    // Glavna boja brenda za interaktivne elemente (dugmad, linkovi, input polja...)
     primary: {
-      light: '#b7ebae',
-      DEFAULT: '#6BC048',
-      dark: '#538d36',
+      light: '#FB923C',   // orange-400
+      DEFAULT: '#F97316', // orange-500
+      dark: '#EA580C',    // orange-600
     },
+
+    // Sekundarna boja za manje važne akcije ili alternativno isticanje.
     secondary: {
-      light: '#a2a7ab',
-      DEFAULT: '#353b3f',
-      dark: '#212529',
+      light: '#60A5FA',   // blue-400
+      DEFAULT: '#3B82F6', // blue-500
+      dark: '#2563EB',    // blue-600
     },
 
     // Neutralne boje za pozadine, tekst, kontejnere i obrube.
