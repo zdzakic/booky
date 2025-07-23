@@ -18,7 +18,7 @@ const ServiceSelect = ({
       onChange={onChange}
       required
       disabled={loading}
-      className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-green-500 dark:focus:border-green-600 focus:ring-0 transition"
+      className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-primary d  ark:focus:border-primary-dark focus:ring-0 transition"
     >
       <option value="">{placeholder}</option>
       {loading

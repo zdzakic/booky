@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* Strelica u DayPickeru - brand primary */
+.rdp-chevron {
+  fill: #7A927E !important;
+  color: #7A927E !important; /* fallback, ali fill je ključan */
+  transition: fill 0.2s;
+}
+
+/* Hover na strelicu - tamnija nijansa (opcionalno) */
+.rdp-nav_button:hover .rdp-chevron,
+.rdp-button:hover .rdp-chevron {
+  fill: #5e7363 !important;
+}
+
+
 @layer base {
   @keyframes fadeIn {
     from { opacity: 0; }

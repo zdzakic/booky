@@ -150,9 +150,15 @@ export default function BookingForm() {
             <LanguageSwitcher lang={lang} setLang={setLang} />
           </div>
           <div className="flex items-center justify-center gap-4 mb-4">
+            <img
+                src="/schmidicars-logo.png"
+                alt="Schmidicars Logo"
+                className="h-12 w-12 object-contain"
+                draggable={false}
+            />
             <AnimatedText 
               tag="h2" 
-              text={`${t.bookingTitle} - SCHMIDICARS`} 
+              text={`${t.bookingTitle}`} 
               className="text-3xl font-bold text-gray-900 dark:text-white" 
             />
           </div>
