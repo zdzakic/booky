@@ -34,40 +34,44 @@ apiClient.interceptors.request.use(
 
 // 4. Response Interceptor: Handle global errors
 apiClient.interceptors.response.use(
-  (response) => response, // Directly return successful responses
+  (response) => response,
   (error) => {
-    // Handle network errors or timeouts (backend might be sleeping)
+    const path = window.location.pathname;
+
+    // Handle server sleeping/network error
     if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
       toast.error('The server is waking up... Please try again in a moment.', {
         duration: 5000,
       });
-    } else if (error.response) {
-      // Handle HTTP errors (4xx, 5xx)
-      const { status, data } = error.response;
+      // NEMA redirecta na login!
+      return Promise.reject(error);
+    }
 
+    if (error.response) {
+      const { status, data } = error.response;
+      // 401 samo za dashboard
       if (status === 401) {
-        toast.error('Authentication failed. Please log in again.');
-        // Clean up and redirect to login
-        localStorage.removeItem('accessToken');
-        // Use window.location to force a full page reload, clearing all state
-        window.location.href = '/login';
+        const isProtectedRoute = path.startsWith('/dashboard');
+        if (isProtectedRoute) {
+          toast.error('Authentication failed. Please log in again.');
+          localStorage.removeItem('accessToken');
+          window.location.href = '/login';
+        }
       } else if (status === 403) {
         toast.error('You do not have permission to perform this action.');
       } else if (status >= 500) {
         toast.error('A server error occurred. Please try again later.');
       } else if (data && data.detail) {
-        // Display specific error detail from the backend if available
         toast.error(data.detail);
       } else {
         toast.error(`An error occurred: ${status}`);
       }
     } else {
-      // Handle other unexpected errors
       toast.error('An unexpected error occurred.');
     }
-
     return Promise.reject(error);
   }
 );
+
 
 export default apiClient;
