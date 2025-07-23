@@ -240,9 +240,18 @@ export default function BookingForm() {
                 lang={lang}
               />
             )}
-            <SubmitButton disabled={!formData.service || !selectedDate || !selectedTime || isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : t.submit}
+            <SubmitButton
+                disabled={!formData.service || !selectedDate || !selectedTime || isSubmitting}
+                >
+                {isSubmitting ? (
+                    <span className="flex items-center justify-center w-full">
+                    <Loader2 className="animate-spin" size={24} />
+                    </span>
+                ) : (
+                    t.submit
+                )}
             </SubmitButton>
+            
           </form>
         </div>
       )}
