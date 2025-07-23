@@ -1,11 +1,10 @@
 import React from 'react';
 import { translations } from '../utils/translations';
-import { theme } from '../config/theme'; // KORAK 1: Uvozimo temu
 import { Check, Trash2 } from 'lucide-react';
 
-// ActionButton ostaje ista mala helper komponenta
+// ActionButton helper
 const ActionButton = ({ title, onClick, children }) => (
-  <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" title={title} onClick={onClick}>
+  <button className="p-1 hover:bg-neutral-lightest dark:hover:bg-neutral-dark rounded" title={title} onClick={onClick}>
     {children}
   </button>
 );
@@ -13,60 +12,61 @@ const ActionButton = ({ title, onClick, children }) => (
 const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
   const t = translations[lang]?.dashboard || {};
 
-  // Helper function for cleaner translation logic
+  // Helper for service name
   const getTranslatedServiceName = (service) => {
     if (!service) return '-';
     if (lang === 'de') return service.name_de || service.name;
-    // Fallback to English or the default name
     return service.name_en || service.name;
   };
 
-  // Simplified 'isPast' logic using end_time
+  // Row status
   const isPast = new Date(reservation.end_time) < new Date();
   const isToday = !isPast && reservation.start_time.startsWith(new Date().toISOString().slice(0, 10));
 
-  // KORAK 2: Definišemo klase koristeći vrednosti iz teme
-  const isStoredClasses = `bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200`;
-  const isNotStoredClasses = `bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200`;
-  const timeSlotClasses = `bg-custom-orange-200 text-custom-orange-800 dark:bg-custom-orange-800/30 dark:text-custom-orange-100`;
-  const viewIconClasses = `text-gray-500`;
-  const editIconClasses = `text-blue-500`;
-  const deleteIconClasses = `text-red-500`;
+  // Badge/Status classes ONLY from theme.js
+  const isStoredClasses = `bg-success-light text-success-dark dark:bg-success-dark/30 dark:text-success-light`;
+  const isNotStoredClasses = `bg-error-light text-error-dark dark:bg-error-dark/30 dark:text-error-light`;
 
+  const approvedClasses = `bg-success-light text-success-dark dark:bg-success-dark/30 dark:text-success-light`;
+  const pendingClasses  = `bg-warning-light text-warning-dark dark:bg-warning-dark/30 dark:text-warning-light`;
+
+  const timeSlotClasses = `bg-info-light text-info-dark dark:bg-info-dark/30 dark:text-info-light`;
+
+  // Row bg/opacity by status
   const rowClass = isPast
-    ? 'border-b text-sm bg-gray-50/50 dark:bg-gray-900/10 text-gray-400 dark:text-gray-700 opacity-20'
+    ? 'border-b text-sm bg-neutral-lightest dark:bg-neutral-dark/50 text-neutral-medium dark:text-neutral-dark opacity-20'
     : isToday
-    ? 'border-b text-sm bg-sky-50 dark:bg-sky-900/30 hover:bg-sky-100 dark:hover:bg-sky-800/50 group transition-colors duration-200' // Highlight for today
-    : 'border-b text-sm hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors duration-200';
+    ? 'border-b text-sm bg-info-light dark:bg-info-dark/30 hover:bg-info-lightest dark:hover:bg-info-dark/60 group transition-colors duration-200'
+    : 'border-b text-sm hover:bg-neutral-lightest dark:hover:bg-neutral-dark group transition-colors duration-200';
 
   return (
-    <div className={`${rowClass} border-gray-200 dark:border-gray-700 p-4 grid grid-cols-2 gap-x-4 md:table-row md:p-0`}>
+    <div className={`${rowClass} border-neutral-medium dark:border-neutral-dark p-4 grid grid-cols-2 gap-x-4 md:table-row md:p-0`}>
 
-      <div className="col-span-2 mb-2 md:table-cell md:px-3 md:py-2 font-medium text-gray-900 dark:text-white">
+      <div className="col-span-2 mb-2 md:table-cell md:px-3 md:py-2 font-medium text-neutral-darkest dark:text-neutral-lightest">
         {reservation.full_name}
       </div>
 
-      <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
+      <div className="text-sm text-neutral-dark dark:text-neutral-medium md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.phone || 'Phone'}: </span>
         {reservation.phone || '-'}
       </div>
       
-      <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
+      <div className="text-sm text-neutral-dark dark:text-neutral-medium md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.email || 'Email'}: </span>
         {reservation.email || '-'}
       </div>
 
-      <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
+      <div className="text-sm text-neutral-dark dark:text-neutral-medium md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.plates || 'Plates'}: </span>
         {reservation.license_plate || '-'}
       </div>
 
-      <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
+      <div className="text-sm text-neutral-dark dark:text-neutral-medium md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.service || 'Service'}: </span>
         {getTranslatedServiceName(reservation.service)}
       </div>
 
-      <div className="text-sm text-gray-600 dark:text-gray-400 md:table-cell md:px-3 md:py-2">
+      <div className="text-sm text-neutral-dark dark:text-neutral-medium md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.stored || 'Stored?'}: </span>
         <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${reservation.is_stored ? isStoredClasses : isNotStoredClasses}`}>
           {reservation.is_stored ? (labels.yes || 'Yes') : (labels.no || 'No')}
@@ -76,14 +76,12 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
       {/* Status Cell */}
       <div className="text-sm md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.status || 'Status'}: </span>
-        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${reservation.is_approved 
-          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-          : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'}`}>
+        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${reservation.is_approved ? approvedClasses : pendingClasses}`}>
           {reservation.is_approved ? (labels.approved || 'Approved') : (labels.pending || 'Pending')}
         </span>
       </div>
       
-      {/* Simplified Time Slot display */}
+      {/* Time Slot */}
       <div className="col-span-2 mt-2 md:table-cell md:px-3 md:py-2 md:mt-0">
         <div className={`font-mono text-xs px-2 py-0.5 rounded-full whitespace-nowrap inline-block ${timeSlotClasses}`}>
           {new Date(reservation.start_time).toLocaleString(lang === 'de' ? 'de-CH' : 'en-GB', { 
@@ -92,7 +90,7 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
         </div>
       </div>
 
-      <div className="text-xs text-gray-400 dark:text-gray-500 md:table-cell md:px-3 md:py-2">
+      <div className="text-xs text-neutral-medium dark:text-neutral-dark md:table-cell md:px-3 md:py-2">
         <span className="font-semibold md:hidden">{labels.created || 'Created'}: </span>
         {reservation.created_at ? new Date(reservation.created_at).toLocaleString(lang === 'de' ? 'de-CH' : 'en-GB', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
       </div>
@@ -102,7 +100,7 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
           {!reservation.is_approved && (
             <button
               onClick={() => onApprove(reservation.id)}
-              className="text-green-600 hover:text-green-900 dark:text-green-500 dark:hover:text-green-400"
+              className="text-success-dark hover:text-success-dark/80 dark:text-success-light dark:hover:text-success-light/80"
               aria-label={`Approve ${reservation.full_name}`}
             >
               <Check className="h-4 w-4" />
@@ -110,14 +108,13 @@ const ReservationRow = ({ reservation, labels, lang, onApprove, onDelete }) => {
           )}
           <button
             onClick={() => onDelete(reservation.id)}
-            className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400"
+            className="text-error-dark hover:text-error-dark/80 dark:text-error-light dark:hover:text-error-light/80"
             aria-label={`Delete ${reservation.full_name}`}
           >
             <Trash2 className="h-4 w-4" />
           </button>
         </div>
       </div>
-
     </div>
   );
 };
