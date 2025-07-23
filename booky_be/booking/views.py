@@ -22,9 +22,18 @@ from .serializers import (
 )
 from django.core.mail import send_mail
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny, BasePermission
 
 
+class IsAdminOrCreateOnly(BasePermission):
+    """
+    GET (i ostalo) samo za autentifikovane,
+    POST svima.
+    """
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            return True  # Guest booking
+        return request.user and request.user.is_authenticated
 
 class LoginAPIView(TokenObtainPairView):
     permission_classes = [AllowAny]
@@ -150,8 +159,9 @@ class AvailabilityAPIView(APIView):
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]
+    # permission_classes = [IsAuthenticated]    #online version does not work
+    # permission_classes = [AllowAny]           # not secure but local and online works
+    permission_classes = [IsAdminOrCreateOnly]
 
     def get_queryset(self):
         """
