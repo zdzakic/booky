@@ -35,7 +35,7 @@ describe('Booking Form E2E', () => {
   });
 
   context('API Tests', () => {
-    const API_BASE_URL = 'http://localhost:8000/api';
+    const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
     it('successfully fetches the list of services', () => {
       cy.request('GET', `${API_BASE_URL}/services/`).then((response) => {

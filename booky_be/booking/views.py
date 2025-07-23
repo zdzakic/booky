@@ -229,6 +229,8 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
 
         # 4. Send email notification AFTER saving the instance
         try:
+            from django.conf import settings
+
             subject = f"New reservation for {instance.service.name}"
             message = f"""
             A new reservation has been created.
@@ -241,10 +243,10 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
             Service: {instance.service.name}
             Time Slot: {instance.start_time.strftime('%d.%m.%Y at %H:%M')}
 
-            Please approve it in the administration panel.
+            Please approve it in the administration/dashboard panel.
             """
-            from_email = 'noreply@booky.app' # This can be anything
-            recipient_list = ['owner@domain.com'] # Change to your email
+            from_email = settings.DEFAULT_FROM_EMAIL # This can be anything
+            recipient_list = [settings.BOOKY_OWNER_EMAIL] # Change to your email
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
@@ -280,6 +282,8 @@ class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
         # Ako se mijenja status na odobren
         if 'is_approved' in request.data and request.data['is_approved'] == True and not instance.is_approved:
             try:
+                from django.conf import settings
+
                 subject = "Your reservation has been approved"
                 message = f"""
                 Hello {instance.full_name},
@@ -298,7 +302,7 @@ class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
                 Best regards,
                 Your service team
                 """
-                from_email = 'noreply@booky.app'
+                from_email = settings.DEFAULT_FROM_EMAIL
                 recipient_list = [instance.email]
                 
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)

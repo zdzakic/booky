@@ -78,40 +78,6 @@ export default function BookingForm() {
     setSelectedTime(null);
   }, [selectedDate, formData.service]);
 
-
-
-  // Fetch avialable dates 
-//   useEffect(() => {
-//   const fetchUnavailableDates = async () => {
-//     const serviceId = formData.service;
-//     if (!serviceId) return;
-
-//     const today = new Date();
-//     const daysToCheck = 30;
-//     const unavailable = [];
-
-//     for (let i = 0; i < daysToCheck; i++) {
-//       const date = new Date(today);
-//       date.setDate(date.getDate() + i);
-//       const isoDate = date.toISOString().split('T')[0];
-
-//       try {
-//         const res = await apiClient.get(`/availability/?service=${serviceId}&date=${isoDate}`);
-//         if (!res.data || res.data.length === 0) {
-//           unavailable.push(isoDate);
-//         }
-//       } catch (err) {
-//         console.error('Error checking availability for', isoDate);
-//       }
-//     }
-
-//     setDisabledDates(unavailable);
-//     };
-
-//     fetchUnavailableDates();
-//     }, [formData.service]);
-
-
   // Fetch services
   useEffect(() => {
     const fetchServices = async () => {
