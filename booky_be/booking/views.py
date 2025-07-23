@@ -150,7 +150,8 @@ class AvailabilityAPIView(APIView):
 
 
 class ReservationListCreateAPIView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         """
