@@ -75,7 +75,7 @@ class BusinessHours(models.Model):
         (0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'),
         (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday'),
     )
-    day_of_week = models.PositiveSmallIntegerField(choices=DAY_CHOICES, unique=True)
+    day_of_week = models.PositiveSmallIntegerField(choices=DAY_CHOICES)
     open_time = models.TimeField()
     close_time = models.TimeField()
 

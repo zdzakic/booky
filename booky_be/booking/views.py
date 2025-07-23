@@ -39,83 +39,113 @@ class ServiceTypeListAPIView(generics.ListAPIView):
 
 
 class AvailabilityAPIView(APIView):
-    """Calculates and returns available start times for a given service and date."""
+    """
+    Calculates and returns available start times for a given service and date.
+    Sada podržava više radnih perioda po danu (pauze, fleksibilni rasporedi)!
+    """
     permission_classes = [AllowAny]
 
     def get(self, request):
+        # 1. Dohvati parametre iz URL-a (service i date)
         service_id = request.query_params.get('service')
         date_str = request.query_params.get('date')
 
         if not service_id or not date_str:
-            return Response({"error": "'service' and 'date' parameters are required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "'service' and 'date' parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        # 2. Parsiraj datum
         try:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
-            return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid date format. Use YYYY-MM-DD."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        # 3. Ako je praznik, nema termina (return prazna lista)
         if Holiday.objects.filter(date=date_obj).exists():
             return Response([], status=status.HTTP_200_OK)
 
+        # 4. Provjeri servis i dan u sedmici
         try:
             service = get_object_or_404(ServiceType, pk=service_id)
             day_of_week = date_obj.weekday()
         except (ValueError, ServiceType.DoesNotExist):
-            return Response({"error": "Invalid service ID or date format."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid service ID or date format."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        try:
-            business_hours = BusinessHours.objects.get(day_of_week=day_of_week)
-        except BusinessHours.DoesNotExist:
+        # 5. Dohvati SVE periode za taj dan (može biti više za radne dane s pauzom!)
+        business_hours_list = BusinessHours.objects.filter(day_of_week=day_of_week).order_by('open_time')
+        if not business_hours_list.exists():
+            # Neradni dan (npr. vikend) ili nije definisano radno vrijeme
             return Response([], status=status.HTTP_200_OK)
 
+        # 6. Pripremi timezone-aware interval za cijeli dan
         tz = timezone.get_current_timezone()
         start_of_day = datetime.combine(date_obj, time.min, tzinfo=tz)
         end_of_day = datetime.combine(date_obj, time.max, tzinfo=tz)
 
-        # 🔥 KLJUČNA PROMJENA: povlačimo sve rezervacije za resurse koje koristi servis
+        # 7. Nađi sve resurse koji su povezani s ovim servisom
         service_resources = list(Resource.objects.filter(services=service))
         if not service_resources:
-            return Response({"error": "No resources are configured for this specific service."}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(
+                {"error": "No resources are configured for this specific service."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         total_resources = len(service_resources)
 
+        # 8. Nađi sve rezervacije za te resurse u datom danu
         existing_reservations = Reservation.objects.filter(
             resource__in=service_resources,
             start_time__lt=end_of_day,
             end_time__gt=start_of_day
         ).select_related('resource')
 
-        start_work_time = datetime.combine(date_obj, business_hours.open_time, tzinfo=tz)
-        end_work_time = datetime.combine(date_obj, business_hours.close_time, tzinfo=tz)
+        # 9. Definiši trajanje servisa i korak za generisanje slotova
         service_duration = timedelta(minutes=service.duration_minutes)
-        step = timedelta(minutes=30)
+        step = timedelta(minutes=30)  # Svaki slot počinje na 30min razmaka (možeš mijenjati)
 
-        available_slots = []
-        current_time = start_work_time
+        available_slots = []  # Lista svih slotova koji će se vratiti FE-u
 
-        while current_time + service_duration <= end_work_time:
-            if date_obj == timezone.localdate() and current_time < timezone.localtime():
-                current_time += step
-                continue
+        # 10. PETLJA kroz SVE radne periode tog dana (omogućava pauze!)
+        for business_hours in business_hours_list:
+            start_work_time = datetime.combine(date_obj, business_hours.open_time, tzinfo=tz)
+            end_work_time = datetime.combine(date_obj, business_hours.close_time, tzinfo=tz)
+            current_time = start_work_time
 
-            slot_end_time = current_time + service_duration
+            while current_time + service_duration <= end_work_time:
+                # Ako je traženi dan danas i slot je u prošlosti — preskoči
+                if date_obj == timezone.localdate() and current_time < timezone.localtime():
+                    current_time += step
+                    continue
 
-            overlapping_reservations = [
-                res for res in existing_reservations
-                if res.start_time < slot_end_time and res.end_time > current_time
-            ]
+                slot_end_time = current_time + service_duration
 
-            occupied_resource_ids = {res.resource_id for res in overlapping_reservations}
-            available_count = total_resources - len(occupied_resource_ids)
+                # Pronađi sve rezervacije koje se preklapaju sa ovim slotom
+                overlapping_reservations = [
+                    res for res in existing_reservations
+                    if res.start_time < slot_end_time and res.end_time > current_time
+                ]
 
-            if available_count > 0:
-                available_slots.append({
-                    "time": current_time.strftime('%H:%M'),
-                    "available_count": available_count
-                })
+                # Koliko resursa je zauzeto u ovom slotu?
+                occupied_resource_ids = {res.resource_id for res in overlapping_reservations}
+                available_count = total_resources - len(occupied_resource_ids)
 
-            current_time += step
+                # Ako ima slobodnih resursa — dodaj slot
+                if available_count > 0:
+                    available_slots.append({
+                        "time": current_time.strftime('%H:%M'),
+                        "available_count": available_count
+                    })
 
+                current_time += step  # Pomjeri se na sljedeći potencijalni slot
+
+        # 11. Vrati sve raspoložive slotove za taj dan (svi periodi, bez pauza)
         return Response(available_slots, status=status.HTTP_200_OK)
 
 
