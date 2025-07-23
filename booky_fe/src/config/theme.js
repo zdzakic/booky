@@ -10,14 +10,14 @@ export const theme = {
   colors: {
     // Glavna boja brenda , zelena
     brand: {
-      light: '#8edd6b',
-      DEFAULT: '#6BC048',   // SCHMIDICARS glavna zelena
-      dark: '#538d36',
+      light: '#b8cfc1',
+      DEFAULT: '#7A927E',   // SCHMIDICARS glavna zelena
+      dark: '#5e7363',
     },
     primary: {
-      light: '#b7ebae',
-      DEFAULT: '#6BC048',
-      dark: '#538d36',
+      light: '#b8cfc1',
+      DEFAULT: '#7A927E',
+      dark: '#5e7363',
     },
     secondary: {
       light: '#a2a7ab',

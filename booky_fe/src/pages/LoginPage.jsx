@@ -69,8 +69,18 @@ const LoginPage = () => {
         {/* Login Form Section */}
         <div className="bg-neutral-light dark:bg-neutral-even-darker flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="w-full max-w-md bg-neutral-white dark:bg-neutral-darkest rounded-2xl shadow-xl p-8 space-y-6">
+            {/* Logo */}
+            <div className="flex justify-center">
+                <img
+                src="/schmidicars-logo.png"
+                alt="Schmidicars Logo"
+                className="h-14 mb-2 drop-shadow"
+                draggable={false}
+                loading="lazy"
+                />
+            </div>
             <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">
-              SCHMIDICARS - Dashboard Login
+                Dashboard Login
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <InputField
