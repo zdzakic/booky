@@ -68,9 +68,9 @@ const LoginPage = () => {
       {isLoading && <Loader />} 
       <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
         {/* Login Form Section */}
-        <div className="bg-neutral-light dark:bg-neutral-even-darker flex items-center justify-center p-4 sm:p-6 lg:p-8">
-          <div className="w-full max-w-md bg-white dark:bg-neutral-darkest rounded-2xl shadow-xl p-8 space-y-6">
-            <h2 className="text-3xl font-bold text-center text-neutral-darkest dark:text-neutral-lightest">SCHMIDICARS - Dashboard Login</h2>
+        <div className={`${theme.colors.neutral.light} dark:${theme.colors.neutral['even-darker']} flex items-center justify-center p-4 sm:p-6 lg:p-8`}>
+          <div className={`w-full max-w-md ${theme.colors.neutral.white} dark:${theme.colors.neutral.darkest} rounded-2xl shadow-xl p-8 space-y-6`}>
+            <h2 className={`text-3xl font-bold text-center ${theme.colors.neutral.darkest} dark:${theme.colors.neutral.lightest}`}>SCHMIDICARS - Dashboard Login</h2>
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <InputField
                 id="email"
@@ -96,13 +96,19 @@ const LoginPage = () => {
               />
 
               {serverError && (
-                <p className="text-sm text-error-dark text-center">{serverError}</p>
+                <p className={`text-sm text-${theme.colors.error.dark} text-center`}>{serverError}</p>
               )}
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                className={`
+                  w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium
+                  ${theme.colors.neutral.white ? 'text-neutral-white' : 'text-white'}
+                  bg-[${theme.colors.primary.DEFAULT}] hover:bg-[${theme.colors.primary.dark}]
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[${theme.colors.primary.DEFAULT}]
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200
+                `}
               >
                 {isSubmitting ? 'Logging in...' : 'Login'}
               </button>
@@ -112,39 +118,39 @@ const LoginPage = () => {
 
         {/* Promotional Content Section */}
         <div className="hidden md:flex flex-col items-center justify-center bg-neutral-darker text-white p-12">
-        <div className="text-center max-w-lg">
+          <div className="text-center max-w-lg">
             <a 
-            href="https://zdzdigital.ch" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="block text-5xl font-extrabold text-primary hover:underline mb-6"
+              href="https://zdzdigital.ch" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={`block text-5xl font-extrabold text-[${theme.colors.primary.DEFAULT}] hover:underline mb-6`}
             >
-            zdzdigital.ch
+              zdzdigital.ch
             </a>
 
-            <h2 className="text-3xl font-bold text-neutral-lightest mb-10">
-            We help small businesses go online — simply and smart.
+            <h2 className={`text-3xl font-bold ${theme.colors.neutral.lightest} mb-10`}>
+              We help small businesses go online — simply and smart.
             </h2>
 
             <ul className="space-y-5 text-left text-lg max-w-md mx-auto">
-            <li className="flex items-start">
-                <RocketLaunchIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
+              <li className="flex items-start">
+                <RocketLaunchIcon className={`h-7 w-7 mr-4 flex-shrink-0 text-[${theme.colors.primary.DEFAULT}]`} />
                 <span>Booking and management tools tailored to your business — no templates, no SaaS.</span>
-            </li>
-            <li className="flex items-start">
-                <CodeBracketIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
+              </li>
+              <li className="flex items-start">
+                <CodeBracketIcon className={`h-7 w-7 mr-4 flex-shrink-0 text-[${theme.colors.primary.DEFAULT}]`} />
                 <span>Lightweight, secure and easy to use — your clients will love it, and so will you.</span>
-            </li>
-            <li className="flex items-start">
-                <ShieldCheckIcon className="h-7 w-7 mr-4 flex-shrink-0 text-primary" />
+              </li>
+              <li className="flex items-start">
+                <ShieldCheckIcon className={`h-7 w-7 mr-4 flex-shrink-0 text-[${theme.colors.primary.DEFAULT}]`} />
                 <span>You stay in control — we help you launch, host and maintain it when needed.</span>
-            </li>
+              </li>
             </ul>
 
-            <p className="text-sm text-neutral-medium mt-8">
-            Built by <a href="https://zdzdigital.ch" className="underline hover:text-brand-light transition">zdzdigital.ch</a> — practical tools for real businesses.
+            <p className={`text-sm ${theme.colors.neutral.medium} mt-8`}>
+              Built by <a href="https://zdzdigital.ch" className="underline hover:text-brand-light transition">zdzdigital.ch</a> — practical tools for real businesses.
             </p>
-        </div>
+          </div>
         </div>
 
       </div>

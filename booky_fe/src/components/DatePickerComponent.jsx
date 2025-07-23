@@ -36,8 +36,8 @@ export default function DatePickerComponent({
 
   const modifiersClassNames = {
     disabled: 'text-gray-400',
-    selected: 'rounded-full bg-orange-500 text-white',
-    today: 'text-orange-500 font-bold',
+    selected: 'rounded-full bg-green-500 dark:bg-green-600 text-white',
+    today: 'text-green-500 dark:text-green-600 font-bold',
   };
 
   // Mapiranje jezika na date-fns locale
@@ -50,7 +50,7 @@ export default function DatePickerComponent({
         {label}
       </label>
       <Popover className="relative">
-        <Popover.Button className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-orange-400 transition">
+        <Popover.Button className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-green-500 dark:hover:border-green-600 transition">
           <span>
             {selectedDate
               ? format(selectedDate, 'dd.MM.yyyy', { locale: currentLocale })
