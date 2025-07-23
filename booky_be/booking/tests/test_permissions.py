@@ -106,9 +106,10 @@ class ReservationPermissionTests(APITestCase):
         resp = self.client.get(self.list_url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    def test_unauthenticated_cannot_create(self):
+    def test_unauthenticated_can_create(self):
         resp = self.client.post(self.list_url, self.valid_payload, format='json')
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Reservation.objects.filter(full_name='Test User').exists())
 
     def test_authenticated_can_create(self):
         self.client.force_authenticate(self.user)
