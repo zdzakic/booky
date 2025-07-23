@@ -1,7 +1,6 @@
 // QuickStats.jsx
 import React from 'react';
 import StatCard from './ui/StatCard';
-import { theme } from '../config/theme';
 
 const QuickStats = ({ reservationsTodayCount, unapprovedCount, reservationsThisWeekCount, t }) => (
   <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
