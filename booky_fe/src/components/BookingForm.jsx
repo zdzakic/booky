@@ -251,6 +251,11 @@ export default function BookingForm() {
                     t.submit
                 )}
             </SubmitButton>
+            {/* Booking pending info */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md mt-2 text-xs bg-gray-50 text-gray-700 dark:bg-gray-900 dark:text-gray-100">
+              <span aria-hidden>ℹ️</span>
+              {t.bookingPendingInfo}
+            </div>
             
           </form>
         </div>

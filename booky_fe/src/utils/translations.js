@@ -16,6 +16,7 @@ export const translations = {
       noSlots: "Keine freien Termine für diesen Tag verfügbar.",
       loadingSlots: "Lade Termine...",
       spotsAvailable: "frei",
+      bookingPendingInfo: "Ihr Termin ist erst nach Bestätigung durch die Garage gültig. Sie erhalten eine E-Mail, sobald der Termin freigegeben wurde.",
       // success page
       successTitle: "Anfrage erhalten",
       successMsg: "Vielen Dank! Wir haben Ihre Anfrage erhalten und werden sie prüfen. Sie erhalten eine Bestätigung per E-Mail und SMS, sobald der Termin genehmigt wurde.",
@@ -143,6 +144,7 @@ export const translations = {
       noSlots: "No available slots for this day.",
       loadingSlots: "Loading times...",
       spotsAvailable: "open",
+      bookingPendingInfo: "Your appointment is only valid after it is confirmed by the garage. You will receive an email once your booking is approved.",
       // success page
       successTitle: "Request Received",
       successMsg: "Thank you! We have received your request and will review it. You will receive a confirmation via email and SMS once the appointment is approved.",
