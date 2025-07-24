@@ -129,9 +129,12 @@ class AvailabilityAPIView(APIView):
 
             while current_time + service_duration <= end_work_time:
                 # Ako je traženi dan danas i slot je u prošlosti — preskoči
-                if date_obj == timezone.localdate() and current_time < timezone.localtime():
-                    current_time += step
-                    continue
+                if date_obj == timezone.localdate():
+                    now_plus_1h = timezone.localtime() + timedelta(hours=1)
+                    # Preskoči slotove koji su prije "sada + 1h"
+                    if current_time < now_plus_1h:
+                        current_time += step
+                        continue    
 
                 slot_end_time = current_time + service_duration
 

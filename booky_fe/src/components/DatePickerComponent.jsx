@@ -38,6 +38,7 @@ export default function DatePickerComponent({
     disabled: 'text-neutral-medium dark:text-neutral-dark',         // umjesto gray-400
     selected: 'rounded-full bg-primary text-neutral-white',         // tvoja nova glavna boja
     today: 'text-primary font-bold',                                // tvoja nova glavna za “danas”
+    selected_today: 'rounded-full bg-primary text-white ring-2 ring-primary-dark'
   };
 
   // Mapiranje jezika na date-fns locale

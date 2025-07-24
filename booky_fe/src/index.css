@@ -16,6 +16,13 @@
   fill: #5e7363 !important;
 }
 
+/* Ako je danas i selektovan (aria-label sadrži oba) — BIJEL BROJ */
+.rdp-day_button[aria-label*="selected"][aria-label*="Today"] {
+  color: #fff !important;
+  background: #7A927E !important;
+  font-weight: bold !important;
+  border-radius: 9999px;
+}
 
 @layer base {
   @keyframes fadeIn {
