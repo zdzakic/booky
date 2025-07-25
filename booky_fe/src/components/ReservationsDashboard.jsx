@@ -23,7 +23,7 @@
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reservationToDelete, setReservationToDelete] = useState(null);
-    const [activeFilter, setActiveFilter] = useState('3w'); // Default filter
+    const [activeFilter, setActiveFilter] = useState('3w'); // Default display of reservations
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
     const [activeView, setActiveView] = useState('reservations'); // 'reservations' or 'holidays'
     const { logout } = useAuth();

@@ -199,12 +199,16 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
             if period == '3w':
                 three_weeks_from_now = today + timedelta(weeks=3)
                 queryset = queryset.filter(start_time__date__lte=three_weeks_from_now)
+            elif period == '6w':
+                six_weeks_from_now = today + timedelta(weeks=6)
+                queryset = queryset.filter(start_time__date__lte=six_weeks_from_now)    
             elif period == 'today':
                 queryset = queryset.filter(start_time__date=today)
         
         # Sortiranje primjenjujemo na kraju
         if period == 'past':
-            return queryset.order_by('-start_time') # Prošle sortiramo od najnovijih
+            # filter only last 20 past reservations
+            return queryset.order_by('-start_time')[:20] # Prošle sortiramo od najnovijih
         return queryset.order_by('start_time') # Buduće sortiramo od najranijih
 
     def get_serializer_class(self):

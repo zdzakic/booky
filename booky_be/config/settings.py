@@ -12,6 +12,9 @@ ENV = os.environ.get("ENV", "production")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Data directory
+DATA_DIR = BASE_DIR / 'data'
+
 # emailing 
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
@@ -100,7 +103,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database is configured via DATABASE_URL env var. Falls back to sqlite for local dev.
 DATABASES = {
     'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        default=f'sqlite:///{DATA_DIR / "db.sqlite3"}',
         conn_max_age=600, # Keep connections alive for 10 minutes
         ssl_require=os.environ.get('DATABASE_SSL', 'False') == 'True' # Enable SSL for production DB
     )
