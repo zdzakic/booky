@@ -271,20 +271,6 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
-            # --- START: Send confirmation to user ---
-            # subject_user = "Your reservation is pending approval"
-            # message_user = f"""
-            # Hello {instance.full_name},
-
-            # We have received your reservation request for {instance.service.name} on {instance.start_time.strftime('%d.%m.%Y at %H:%M')}.
-
-            # You will receive another email once your reservation is confirmed.
-
-            # Thank you!
-            # """
-            # recipient_list_user = [instance.email]
-            # send_mail(subject_user, message_user, from_email, recipient_list_user, fail_silently=False)
-            # --- START: Send confirmation to user ---
             # --- START: Send confirmation to user (PENDING) ---
             template = email_templates["confirmation"]
             subject_user = template["subject"]
@@ -298,8 +284,9 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
             )
             email.content_subtype = "html"
 
-            ics_file = generate_ics_file(instance)
-            email.attach('reservation.ics', ics_file.read(), 'text/calendar')
+            # no need for ics icon during the approval proccess
+            # ics_file = generate_ics_file(instance)
+            # email.attach('reservation.ics', ics_file.read(), 'text/calendar')
 
             email.send()    
             # --- END: Send confirmation to user (PENDING) ---
@@ -323,28 +310,6 @@ class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
             try:
                 from django.conf import settings
 
-                # subject = "Your reservation has been approved"
-                # message = f"""
-                # Hello {instance.full_name},
-
-                # Your reservation for {instance.service.name} has been approved.
-
-                # Details:
-                # Service: {instance.service.name}
-                # Date: {instance.start_time.strftime('%d.%m.%Y')}
-                # Time: {instance.start_time.strftime('%H:%M')}
-                # Resource: {instance.resource.name}
-                # Plates: {instance.license_plate}
-
-                # We look forward to seeing you!
-
-                # Best regards,
-                # Your service team
-                # """
-                # from_email = settings.DEFAULT_FROM_EMAIL
-                # recipient_list = [instance.email]
-                
-                # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
                 template = email_templates["approved"]
                 subject = template["subject"]
                 html_message = template["html"](instance)
