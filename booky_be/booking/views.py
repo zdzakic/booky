@@ -23,6 +23,9 @@ from .serializers import (
 from django.core.mail import send_mail
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny, BasePermission
+from booking.utils.calendar_utils import generate_ics_file
+from booking.utils.email_templates import email_templates
+from django.core.mail import EmailMessage
 
 
 class IsAdminOrCreateOnly(BasePermission):
@@ -245,7 +248,7 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
         assigned_resource = available_resources.first()
         instance = serializer.save(end_time=end_time, resource=assigned_resource)
 
-        # 4. Send email notification AFTER saving the instance
+        # 4. Send email notification to owner AFTER saving the instance
         try:
             from django.conf import settings
 
@@ -269,19 +272,37 @@ class ReservationListCreateAPIView(generics.ListCreateAPIView):
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
             # --- START: Send confirmation to user ---
-            subject_user = "Your reservation is pending approval"
-            message_user = f"""
-            Hello {instance.full_name},
+            # subject_user = "Your reservation is pending approval"
+            # message_user = f"""
+            # Hello {instance.full_name},
 
-            We have received your reservation request for {instance.service.name} on {instance.start_time.strftime('%d.%m.%Y at %H:%M')}.
+            # We have received your reservation request for {instance.service.name} on {instance.start_time.strftime('%d.%m.%Y at %H:%M')}.
 
-            You will receive another email once your reservation is confirmed.
+            # You will receive another email once your reservation is confirmed.
 
-            Thank you!
-            """
+            # Thank you!
+            # """
+            # recipient_list_user = [instance.email]
+            # send_mail(subject_user, message_user, from_email, recipient_list_user, fail_silently=False)
+            # --- START: Send confirmation to user ---
+            # --- START: Send confirmation to user (PENDING) ---
+            template = email_templates["confirmation"]
+            subject_user = template["subject"]
+            html_message = template["html"](instance)
             recipient_list_user = [instance.email]
-            send_mail(subject_user, message_user, from_email, recipient_list_user, fail_silently=False)
-            # --- END: Send confirmation to user ---
+            email = EmailMessage(
+                subject=subject_user,
+                body=html_message,
+                from_email=from_email,
+                to=recipient_list_user,
+            )
+            email.content_subtype = "html"
+
+            ics_file = generate_ics_file(instance)
+            email.attach('reservation.ics', ics_file.read(), 'text/calendar')
+
+            email.send()    
+            # --- END: Send confirmation to user (PENDING) ---
 
         except Exception as e:
             # If email sending fails, we don't want to crash the whole process.
@@ -302,28 +323,47 @@ class ReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
             try:
                 from django.conf import settings
 
-                subject = "Your reservation has been approved"
-                message = f"""
-                Hello {instance.full_name},
+                # subject = "Your reservation has been approved"
+                # message = f"""
+                # Hello {instance.full_name},
 
-                Your reservation for {instance.service.name} has been approved.
+                # Your reservation for {instance.service.name} has been approved.
 
-                Details:
-                Service: {instance.service.name}
-                Date: {instance.start_time.strftime('%d.%m.%Y')}
-                Time: {instance.start_time.strftime('%H:%M')}
-                Resource: {instance.resource.name}
-                Plates: {instance.license_plate}
+                # Details:
+                # Service: {instance.service.name}
+                # Date: {instance.start_time.strftime('%d.%m.%Y')}
+                # Time: {instance.start_time.strftime('%H:%M')}
+                # Resource: {instance.resource.name}
+                # Plates: {instance.license_plate}
 
-                We look forward to seeing you!
+                # We look forward to seeing you!
 
-                Best regards,
-                Your service team
-                """
+                # Best regards,
+                # Your service team
+                # """
+                # from_email = settings.DEFAULT_FROM_EMAIL
+                # recipient_list = [instance.email]
+                
+                # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                template = email_templates["approved"]
+                subject = template["subject"]
+                html_message = template["html"](instance)
+
                 from_email = settings.DEFAULT_FROM_EMAIL
                 recipient_list = [instance.email]
-                
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+                email = EmailMessage(
+                    subject=subject,
+                    body=html_message,
+                    from_email=from_email,
+                    to=recipient_list,
+                )
+                email.content_subtype = "html"
+
+                ics_file = generate_ics_file(instance)
+                email.attach('reservation.ics', ics_file.read(), 'text/calendar')
+
+                email.send()
             except Exception as e:
                 print(f"Error sending approval email: {e}")
 
