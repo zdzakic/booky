@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
-from booking.models import Reservation, ServiceType, Resource, BusinessHours, Holiday
+from booking.models import Reservation, ServiceType, Resource, BusinessHours, Holiday, Location
 from datetime import date, time, datetime, timedelta
 from django.utils import timezone
 from django.core import mail
@@ -18,15 +18,26 @@ class BookingLogicTests(APITestCase):
         """Set up a clean environment for each test."""
         self.user = User.objects.create_user(email='testuser@example.com', password='password123')
         self.staff_user = User.objects.create_user(email='staffuser@example.com', password='password123', is_staff=True)
-        self.service = ServiceType.objects.create(name='Test Service', duration_minutes=30)
-        self.resource1 = Resource.objects.create(name='Lift 1')
-        self.resource2 = Resource.objects.create(name='Lift 2')
+
+        # ✅ Dodaj lokaciju
+        self.location = Location.objects.create(name="Test Garage", address="Teststraße 123, Zürich")
+
+        # ✅ Servis sa lokacijom
+        self.service = ServiceType.objects.create(name='Test Service', duration_minutes=30, location=self.location)
+
+        # ✅ Resource-i povezani sa lokacijom
+        self.resource1 = Resource.objects.create(name='Lift 1', location=self.location)
+        self.resource2 = Resource.objects.create(name='Lift 2', location=self.location)
         self.service.resources.add(self.resource1, self.resource2)
-        self.test_date = timezone.localdate() + timedelta(days=1) # UVIJEK KORISTI SUTRA
+
+        # ✅ Datum i radno vrijeme
+        self.test_date = timezone.localdate() + timedelta(days=1)  # UVIJEK KORISTI SUTRA
         BusinessHours.objects.create(
             day_of_week=self.test_date.weekday(),
-            open_time=time(9, 0), close_time=time(17, 0)
+            open_time=time(9, 0),
+            close_time=time(17, 0)
         )
+
         self.availability_url = reverse('booking:availability')
         self.reservations_url = reverse('booking:reservation-list-create')
     

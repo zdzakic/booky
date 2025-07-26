@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
-from booking.models import Reservation, ServiceType, Resource, BusinessHours
+from booking.models import Reservation, ServiceType, Resource, BusinessHours, Location
 from django.utils import timezone
 from datetime import time, timedelta
 from django.core import mail
@@ -15,10 +15,18 @@ class EmailingTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(email='test.client@email.com', password='pass')
         self.staff_user = User.objects.create_user(email='staff@email.com', password='pass', is_staff=True)
-        self.service = ServiceType.objects.create(name='Test Email Service', duration_minutes=30)
-        self.resource = Resource.objects.create(name='Lift X')
+
+        # ✅ Dodaj lokaciju
+        self.location = Location.objects.create(name="Test Garage", address="Teststraße 123, Zürich")
+
+        # ✅ Dodaj resource sa lokacijom
+        self.resource = Resource.objects.create(name='Lift X', location=self.location)
+
+        # ✅ Dodaj servis sa tom lokacijom
+        self.service = ServiceType.objects.create(name='Test Email Service', duration_minutes=30, location=self.location)
         self.service.resources.add(self.resource)
 
+        # Radno vrijeme i datum
         test_date = timezone.localdate() + timedelta(days=1)
         BusinessHours.objects.create(day_of_week=test_date.weekday(), open_time=time(9, 0), close_time=time(17, 0))
         self.test_datetime = timezone.make_aware(timezone.datetime.combine(test_date, time(10, 0)))
@@ -32,6 +40,7 @@ class EmailingTests(APITestCase):
             "email": "test.client@email.com",
             "license_plate": "EMAIL-001",
             "service": self.service.id,
+            "resource": self.resource.id,
             "start_time": self.test_datetime.isoformat()
         }
 

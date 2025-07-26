@@ -7,6 +7,7 @@ email_templates = {
 <p>Hello {escape(r.full_name)},</p>
 <p>We received your reservation for <strong>{escape(r.service.name_en or r.service.name)}</strong> on <strong>{r.start_time.strftime('%d.%m.%Y at %H:%M')}</strong>.</p>
 <p>Plate: {escape(r.license_plate)}</p>
+<p>Address: {escape(r.service.location.address) if r.service and r.service.location else "n/a"}</p>
 <p>You will receive an approval email shortly.</p>
 
 <hr>
@@ -14,6 +15,7 @@ email_templates = {
 <p>Hallo {escape(r.full_name)},</p>
 <p>Wir haben Ihre Reservierung für <strong>{escape(r.service.name_de or r.service.name)}</strong> am <strong>{r.start_time.strftime('%d.%m.%Y um %H:%M')}</strong> erhalten.</p>
 <p>Kennzeichen: {escape(r.license_plate)}</p>
+<p>Adresse: {escape(r.service.location.address) if r.service and r.service.location else "n/a"}</p>
 <p>Sie erhalten bald eine Bestätigungs-E-Mail.</p>
 """
     },
@@ -24,6 +26,7 @@ email_templates = {
 <p>Hello {escape(r.full_name)},</p>
 <p>Your reservation for <strong>{escape(r.service.name_en or r.service.name)}</strong> on <strong>{r.start_time.strftime('%d.%m.%Y at %H:%M')}</strong> has been approved.</p>
 <p>Plate: {escape(r.license_plate)}</p>
+<p>Address: {escape(r.service.location.address) if r.service and r.service.location else "n/a"}</p>
 <p>We look forward to seeing you!</p>
 
 <hr>
@@ -31,6 +34,7 @@ email_templates = {
 <p>Hallo {escape(r.full_name)},</p>
 <p>Ihre Reservierung für <strong>{escape(r.service.name_de or r.service.name)}</strong> am <strong>{r.start_time.strftime('%d.%m.%Y um %H:%M')}</strong> wurde bestätigt.</p>
 <p>Kennzeichen: {escape(r.license_plate)}</p>
+<p>Adresse: {escape(r.service.location.address) if r.service and r.service.location else "n/a"}</p>
 <p>Wir freuen uns auf Sie!</p>
 """
     }
