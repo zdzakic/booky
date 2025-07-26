@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Reservation, Resource, ServiceType, BusinessHours, Holiday
+from .models import User, Reservation, Resource, ServiceType, BusinessHours, Holiday, Location
 from .forms import CustomUserCreationForm
 
 # This is the new, clean, from-scratch configuration.
@@ -44,3 +44,4 @@ admin.site.register(Resource)
 admin.site.register(ServiceType)
 admin.site.register(BusinessHours)
 admin.site.register(Holiday)
+admin.site.register(Location)

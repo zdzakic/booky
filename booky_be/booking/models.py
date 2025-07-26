@@ -53,6 +53,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 # --- BOOKING MODELS --- #
+class Location(models.Model):
+    name = models.CharField(max_length=100)
+    address = models.TextField()
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    google_maps_url = models.URLField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
 class ServiceType(models.Model):
     name = models.CharField(max_length=100)
@@ -65,6 +75,8 @@ class ServiceType(models.Model):
 class Resource(models.Model):
     """Represents a bookable resource, e.g., a garage bay."""
     name = models.CharField(max_length=100, unique=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='resources', null=True, blank=True)  # ✅ Dodano
+
 
     def __str__(self):
         return self.name
@@ -117,3 +129,6 @@ class Holiday(models.Model):
 
     class Meta:
         ordering = ['date']
+
+
+
