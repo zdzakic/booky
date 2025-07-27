@@ -225,7 +225,11 @@
         </div>
 
         {/* View Switcher */}
-        <div className="w-full sm:w-auto flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg">
+        {/* <div className="w-full sm:w-auto flex items-center space-x-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg"> */}
+        {/* <div className="w-full sm:w-auto flex justify-center sm:justify-start flex-wrap gap-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg"> */}
+        <div className="flex justify-center flex-wrap gap-2 p-1 bg-neutral-light dark:bg-neutral-darkest rounded-lg w-full max-w-xs mx-auto sm:w-auto sm:mx-0">
+
+
             <button 
             onClick={() => setActiveView('reservations')}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${

@@ -31,6 +31,7 @@ const HolidaysTable = ({ holidays, labels, onDelete }) => {
             </tr>
           </thead>
           <tbody className="bg-neutral-white dark:bg-neutral-darker divide-y divide-neutral-light dark:divide-neutral-dark">
+          {/* <tbody className="bg-neutral-white dark:bg-neutral-darker"> */}
             {holidays.map((holiday) => (
               <tr key={holiday.id} className="block mb-4 border rounded-lg md:table-row md:mb-0">
                 <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-neutral-darkest dark:text-white block md:table-cell">
