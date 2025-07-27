@@ -13,8 +13,8 @@ ENV = os.environ.get("ENV", "production")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Data directory
-# DATA_DIR = BASE_DIR / 'data'
 DATA_DIR = Path('/app/data') if os.environ.get('RENDER') == 'True' else BASE_DIR / 'data'
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # emailing 
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
