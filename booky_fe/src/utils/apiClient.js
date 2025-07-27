@@ -1,5 +1,10 @@
 import axios from 'axios';
 import { toast } from 'sonner';
+import { translations } from '../utils/translations';
+
+// language
+const lang = localStorage.getItem('appLanguage') || 'de';
+const t = translations[lang];
 
 // 1. Get the base URL from .env files (VITE_ prefix is mandatory)
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -40,8 +45,8 @@ apiClient.interceptors.response.use(
 
     // Handle server sleeping/network error
     if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
-      toast.error('The server is waking up... Please try again in a moment.', {
-        duration: 5000,
+      toast(t.messages.serverWaking, {
+        duration: 3000,
       });
       // NEMA redirecta na login!
       return Promise.reject(error);

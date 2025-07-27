@@ -127,6 +127,10 @@ export const translations = {
         message: 'Wir führen gerade planmäßige Wartungsarbeiten durch. Bitte versuchen Sie es bald erneut.',
         backToHome: 'Zur Startseite',
       },
+      // messages 
+      messages: {
+        serverWaking: 'Der Server wird vorbereitet... Bitte einen Moment Geduld.',
+      },
     },
     en: {
       bookingTitle: "Book an appointment",
@@ -252,6 +256,9 @@ export const translations = {
         title: 'Maintenance in Progress',
         message: 'We are currently performing scheduled maintenance. Please check back soon.',
         backToHome: 'Back to Home',
+      },
+      messages: {
+        serverWaking: 'The server is waking up... Please try again in a moment.',
       },
     },
     hr: {
