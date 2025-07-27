@@ -33,5 +33,5 @@ config.jsx
 .env
 TODO*
 FAQ*
-**/db.sqlite3
+# **/db.sqlite3
 
