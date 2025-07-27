@@ -28,9 +28,10 @@ __pycache__*
 
 #app related
 instance/*
-*data.db
 config.jsx
 *.venv*
 .env
 TODO*
 FAQ*
+# *db.sqlite3
+

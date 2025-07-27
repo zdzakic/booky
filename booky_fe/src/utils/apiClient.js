@@ -46,6 +46,7 @@ apiClient.interceptors.response.use(
     // Handle server sleeping/network error
     if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
       toast(t.messages.serverWaking, {
+        id: 'server-waking',
         duration: 3000,
       });
       // NEMA redirecta na login!

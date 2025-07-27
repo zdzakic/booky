@@ -14,6 +14,7 @@ const LoginPage = () => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -104,6 +105,9 @@ const LoginPage = () => {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 error={errors.password}
                 autoComplete="current-password"
+                showPasswordToggle={true}
+                showPassword={showPassword}
+                onTogglePassword={() => setShowPassword((prev) => !prev)}
               />
 
               {serverError && (
