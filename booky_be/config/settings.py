@@ -13,7 +13,7 @@ ENV = os.environ.get("ENV", "production")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Data directory
-SQLITE_DB_PATH = os.environ.get("SQLITE_DB_PATH", str(BASE_DIR / "data" / "db.sqlite3"))
+SQLITE_DB_PATH = Path(os.environ.get("SQLITE_DB_PATH", BASE_DIR / "data" / "db.sqlite3")).resolve()
 
 # emailing 
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
