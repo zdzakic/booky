@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import apiClient from '../utils/apiClient';
+import apiPublic from '../utils/apiPublic';
 import InputField from './InputField';
 import ServiceSelect from './ServiceSelect';
 import CheckBoxField from './CheckBoxField';
@@ -55,7 +56,7 @@ export default function BookingForm() {
     try {
       // Broj dana za koji predviđamo disabled datume
       const daysToCheck = 90;
-      const res = await apiClient.get(`/disabled-dates/?days=${daysToCheck}`);
+      const res = await apiPublic.get(`/disabled-dates/?days=${daysToCheck}`);
       setDisabledDates(res.data.disabled_dates);
     } catch (err) {
       console.error('Error fetching disabled dates:', err);
@@ -82,7 +83,7 @@ export default function BookingForm() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await apiClient.get('/services/');
+        const response = await apiPublic.get('/services/');
         setServiceOptions(
           response.data.map(s => ({
             value: s.id.toString(),
@@ -129,7 +130,7 @@ export default function BookingForm() {
         start_time: startTime.toISOString(), // Send the combined datetime string
         is_stored: formData.isStored, // FIX: Add isStored value to the payload
       };
-      await apiClient.post('/reservations/', payload);
+      await apiPublic.post('/reservations/', payload);
       toast.success(t.successBooking || 'Reservierung erfolgreich erstellt!');
       setTimeout(() => navigate('/success', { state: { lang } }), 1500);
     } catch (error) {
