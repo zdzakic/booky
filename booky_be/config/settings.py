@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'modeltranslation',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'whitenoise',
     'booking',
@@ -181,7 +182,8 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False, # Set to True if you want a new refresh token on every refresh
+    'ROTATE_REFRESH_TOKENS': True, # Set to True if you want a new refresh token on every refresh
+    'BLACKLIST_AFTER_ROTATION': True,
 
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",

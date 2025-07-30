@@ -9,6 +9,7 @@ from .views import (
     DisabledDatesView,
 )
 
+
 app_name = 'booking'
 
 urlpatterns = [
